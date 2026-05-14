@@ -71,6 +71,35 @@ pytest
 
 Swap the demo store for real Anemoi/AIFS exports aligned with `lapai_inference/cache_schema.py` (`state_in`, `era5_target`, `teacher_pred`, `teacher_feat_L10`, `teacher_feat_L14`).
 
+## CHPC Lengau environments
+
+On **Lengau**, clone this repo (or use `tiny-media-analysis/lapai-forecast`), then from the repo root:
+
+```bash
+bash scripts/setup_lengau_envs.sh
+```
+
+This loads **`module load chpc/python/anaconda/3-2024.10.1`** (adjust if `module avail` shows a newer Anaconda), creates **`lapai-anemoi`** from [`environment-anemoi.yml`](environment-anemoi.yml), and **`lapai-credit`** from [`environment-credit-lengau.yml`](environment-credit-lengau.yml) (PyTorch + **CUDA 12.1** via conda `nvidia`). Dependencies come from the YAML so PyTorch is not overwritten by pip; the script ends with **`python -m pip install -e . --no-deps`** to register the `lapai_inference` packages.
+
+Optional: store envs on lustre if `$HOME` quota is tight:
+
+```bash
+export CONDA_ENVS_PATH=/mnt/lustre/users/$USER/conda-envs
+mkdir -p "$CONDA_ENVS_PATH"
+bash scripts/setup_lengau_envs.sh
+```
+
+GPU batch jobs (matches patterns used elsewhere on CHPC):
+
+```bash
+module load chpc/python/anaconda/3-2024.10.1
+module load chpc/cuda/12.0/12.0
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+conda activate lapai-credit
+```
+
+If conda solves are slow on the login node, submit [`pbs/setup_env_lengau.pbs`](pbs/setup_env_lengau.pbs) from the repo root (edit `cd` line if needed).
+
 ## Layout (implemented scaffold)
 
 ```
