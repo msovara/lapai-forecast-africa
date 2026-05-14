@@ -1,5 +1,9 @@
 # LapAI-Forecast
 
+Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
+
+The same project often lives under `tiny-media-analysis/lapai-forecast/` on local machines; `origin` should point at the URL above.
+
 A compressed, laptop-deployable AI Numerical Weather Prediction (NWP) model distilled from ECMWF AIFS, with regional adaptation for Africa.
 
 > **Code for Earth — African Stream proposal.** The goal is to bridge the gap in operational AI weather forecasting across Africa by producing a 10-day, 1° global forecast model that runs on a mid-range consumer laptop (Intel i7, 16 GB RAM, no GPU), and to enable low-cost regional fine-tuning by African National Meteorological and Hydrological Services (NMHS).
@@ -39,32 +43,43 @@ ERA5  ─────────────►  Track B (MILES-CREDIT student 
 
 ## Repository status
 
-This repository is currently in the **planning phase**. The full technical implementation plan — directory layout, configs, hyperparameters, distillation losses, CHPC compute plan, risk register, week-by-week milestones, and acceptance criteria — lives in [`PLAN.md`](PLAN.md).
+The long-form technical plan (layouts, compute budget, risks, milestones) is in [`PLAN.md`](PLAN.md).
 
-No training code has been written yet; that begins in Week 1 once the six open decisions in `PLAN.md §10` are closed.
+This tree includes a **working scaffold** aligned with that plan: student CNN (`lapai_inference`), distillation losses (`utils/losses_distillation.py`), cache schema (`lapai_inference/cache_schema.py`), Track A stub (`training/train_trackA.py`), training / LoRA / sensitivity drivers, evaluation hooks, ONNX export, `infer.py`, PBS templates, conda env YAMLs, and `dvc.yaml` stub. ECMWF Anemoi / challenge scorecards and real checkpoints still need to be wired per `PLAN.md` Week 1 gates.
 
-## Planned layout
+Install locally:
+
+```bash
+cd lapai-forecast
+pip install -e ".[dev,ort]"
+pytest
+```
+
+## Layout (implemented scaffold)
 
 ```
 lapai-forecast/
-├── PLAN.md                       Full 12-week technical plan
-├── README.md                     this file
-├── pyproject.toml                installable `lapai_inference` package
-├── requirements.txt              pinned env (Anemoi + MILES-CREDIT + LoRA + ONNX)
-├── environment-anemoi.yml        conda env for Track A
-├── environment-credit.yml        conda env for Tracks B / 3 / 4
-├── recipes/                      Anemoi data recipes (ERA5 N320 + N96)
-├── configs/                      Hydra configs per phase
-├── diagnostics/plot/             plotting callbacks
-├── training/                     Track A / Track B / LoRA drivers
-├── inference/                    global rollout + laptop ONNX driver
-├── evaluation/                   global skill + Africa extremes
-├── utils/                        grid coarsen, distillation losses, LoRA, ONNX export
-├── lapai_inference/              installable Python package (Phase 4)
-├── containers/                   Dockerfile + Singularity.def
-├── pbs/                          CHPC PBS templates
-├── data/, models/, logs/         (gitignored) artefacts
-└── reports/                      per-phase reports
+├── PLAN.md                  Technical plan
+├── README.md                This file
+├── pyproject.toml           Package metadata (`lapai_inference`, utils, evaluation, training, inference)
+├── requirements.txt
+├── environment-anemoi.yml   Track A conda sketch
+├── environment-credit.yml   Track B / ONNX conda sketch
+├── infer.py                 Laptop inference entry (delegates to CLI)
+├── dvc.yaml                 DVC stub stage (extend after `dvc init`)
+├── configs/                 YAML knobs for student, LoRA, eval, Track A
+├── recipes/                 Placeholders for Anemoi ERA5 recipes
+├── lapai_inference/         Model, cache schema, preprocess/postprocess, CLI
+├── utils/                   Losses, grid coarsen, LoRA, ONNX export
+├── evaluation/              Baseline gate, skill + Africa extremes helpers
+├── training/                train_student, train_trackA, train_lora, run_sensitivity
+├── inference/               PyTorch rollout + ONNX Runtime benchmark
+├── diagnostics/plot/        Callback config placeholder
+├── containers/              Dockerfile + Singularity sketch
+├── pbs/                     CHPC job scripts
+├── tests/                   Unit smoke tests
+├── data/, models/, logs/    Gitignored artefacts
+└── reports/
 ```
 
 ## License
