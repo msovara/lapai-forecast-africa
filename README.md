@@ -55,6 +55,22 @@ pip install -e ".[dev,ort]"
 pytest
 ```
 
+## Workflow (local vertical slice)
+
+1. Demo teacher cache (random fields, schema-compliant shapes):
+
+   `python training/build_demo_zarr_cache.py --out data/processed/demo_teacher_cache.zarr`
+
+2. Train from that cache:
+
+   `python training/train_student.py --cache data/processed/demo_teacher_cache.zarr --epochs 5 --batch_size 4`
+
+3. Synthetic smoke (no Zarr):
+
+   `python training/train_student.py --epochs 3 --steps_per_epoch 8`
+
+Swap the demo store for real Anemoi/AIFS exports aligned with `lapai_inference/cache_schema.py` (`state_in`, `era5_target`, `teacher_pred`, `teacher_feat_L10`, `teacher_feat_L14`).
+
 ## Layout (implemented scaffold)
 
 ```
@@ -69,10 +85,10 @@ lapai-forecast/
 ├── dvc.yaml                 DVC stub stage (extend after `dvc init`)
 ├── configs/                 YAML knobs for student, LoRA, eval, Track A
 ├── recipes/                 Placeholders for Anemoi ERA5 recipes
-├── lapai_inference/         Model, cache schema, preprocess/postprocess, CLI
+├── lapai_inference/         Model, cache schema, dataset, preprocess/postprocess, CLI
 ├── utils/                   Losses, grid coarsen, LoRA, ONNX export
 ├── evaluation/              Baseline gate, skill + Africa extremes helpers
-├── training/                train_student, train_trackA, train_lora, run_sensitivity
+├── training/                train_student, build_demo_zarr_cache, train_trackA, train_lora, run_sensitivity
 ├── inference/               PyTorch rollout + ONNX Runtime benchmark
 ├── diagnostics/plot/        Callback config placeholder
 ├── containers/              Dockerfile + Singularity sketch
