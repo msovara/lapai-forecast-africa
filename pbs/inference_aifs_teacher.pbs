@@ -22,6 +22,8 @@ source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
 lapai_activate_track_a
 
+echo "[lapai] PBS_O_WORKDIR=${PWD} LAPAI_INFER_TEMPLATE=${LAPAI_INFER_TEMPLATE:-} LAPAI_AIFS_INFER_DRY=${LAPAI_AIFS_INFER_DRY:-0}"
+
 infer_py=( python scripts/run_aifs_inference.py )
 if [[ -n "${LAPAI_INFER_TEMPLATE:-}" ]]; then
   infer_py+=( --template "${LAPAI_INFER_TEMPLATE}" )

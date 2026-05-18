@@ -23,6 +23,13 @@ def repo_root() -> Path:
     return _REPO_ROOT
 
 
+def _template_relative_posix(template: Path, rr: Path) -> str:
+    try:
+        return template.relative_to(rr).as_posix()
+    except ValueError:
+        return template.as_posix()
+
+
 def substitute_checkpoint_yaml(text: str, ckpt_abs: Path) -> str:
     def repl(m: re.Match[str]) -> str:
         return f"{m.group(1)}{ckpt_abs.as_posix()}"
@@ -112,10 +119,7 @@ def main() -> int:
         return 1
 
     if args.dry_run:
-        try:
-            tmpl_show = template.relative_to(rr).as_posix()
-        except ValueError:
-            tmpl_show = template.as_posix()
+        tmpl_show = _template_relative_posix(template, rr)
         print(f"# LapAI dry-run template: {tmpl_show}", file=sys.stderr)
         if env_default:
             print(f"# LAPAI_INFER_TEMPLATE={env_default!r}", file=sys.stderr)
@@ -126,6 +130,11 @@ def main() -> int:
     fd, tmp = tempfile.mkstemp(prefix="lapai_aifs_inference_", suffix=".yaml", text=True)
     tmp_path = Path(tmp)
     try:
+        tmpl_show = _template_relative_posix(template, rr)
+        print(f"LapAI inference template: {tmpl_show}", file=sys.stderr)
+        print(f"LapAI teacher checkpoint: {ck.as_posix()}", file=sys.stderr)
+        if env_default:
+            print(f"LapAI LAPAI_INFER_TEMPLATE={env_default!r}", file=sys.stderr)
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write(rendered)
         cmd = [str(exe_path), "run", str(tmp_path)]

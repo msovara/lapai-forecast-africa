@@ -22,5 +22,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev,ort]"
 
+      - name: LapAI verify stack script (non-strict)
+        run: python scripts/verify_inference_stack.py
+
       - name: Pytest
         run: pytest -q --tb=short
