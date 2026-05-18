@@ -9,38 +9,22 @@ import shutil
 import sys
 from pathlib import Path
 
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from utils.teacher_yaml import parse_teacher_aifs_yaml_file  # noqa: E402
+
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
-
-
-def _teacher_yaml_pins() -> dict[str, str]:
-    """Parse a few colon keys from ``configs/teacher_aifs.yaml`` (best-effort, no YAML dep)."""
-    cfg = repo_root() / "configs" / "teacher_aifs.yaml"
-    out: dict[str, str] = {}
-    if not cfg.is_file():
-        return out
-    watch = (
-        "huggingface_repo_id",
-        "checkpoint_filename",
-        "revision",
-        "local_checkpoint_relative",
-    )
-    for line in cfg.read_text(encoding="utf-8").splitlines():
-        s = line.split("#", 1)[0].strip()
-        for key in watch:
-            prefix = f"{key}:"
-            if s.startswith(prefix):
-                val = s.split(":", 1)[1].strip().strip("\"'")
-                if val and val.lower() not in ("null", "~", "none"):
-                    out[key] = val
-                break
-    return out
+    return _REPO_ROOT
 
 
 def teacher_yaml_checkpoint_relative() -> str | None:
-    pins = _teacher_yaml_pins()
-    return pins.get("local_checkpoint_relative")
+    rel = parse_teacher_aifs_yaml_file(repo_root() / "configs" / "teacher_aifs.yaml").get(
+        "local_checkpoint_relative"
+    )
+    return rel
 
 
 def main() -> int:
@@ -56,7 +40,7 @@ def main() -> int:
     ok = True
     print(f"repo_root: {rr}")
 
-    pins = _teacher_yaml_pins()
+    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
     if pins.get("huggingface_repo_id"):
         print(
             "teacher_hf: "

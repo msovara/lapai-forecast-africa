@@ -7,43 +7,37 @@ import argparse
 import sys
 from pathlib import Path
 
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from utils.teacher_yaml import parse_teacher_aifs_yaml_file  # noqa: E402
+
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
-
-
-def _revision_from_teacher_yaml() -> str | None:
-    """Return pinned HF revision from configs/teacher_aifs.yaml, or None if unset."""
-    cfg = _repo_root() / "configs" / "teacher_aifs.yaml"
-    if not cfg.is_file():
-        return None
-    for line in cfg.read_text(encoding="utf-8").splitlines():
-        s = line.split("#", 1)[0].strip()
-        if s.startswith("revision:"):
-            raw = s.split(":", 1)[1].strip().strip("\"'")
-            if not raw or raw.lower() in ("null", "~", "none"):
-                return None
-            return raw
-    return None
+    return _REPO_ROOT
 
 
 def main() -> int:
+    rr = _repo_root()
+    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
+
     p = argparse.ArgumentParser(description="Download ecmwf/aifs-single-1.0 checkpoint")
     p.add_argument(
         "--repo-id",
-        default="ecmwf/aifs-single-1.0",
-        help="Hugging Face model repo",
+        default=None,
+        help="Hugging Face model repo (default: huggingface_repo_id from configs/teacher_aifs.yaml)",
     )
     p.add_argument(
         "--filename",
-        default="aifs-single-mse-1.0.ckpt",
-        help="Checkpoint file name on the HF repo",
+        default=None,
+        help="Checkpoint file name on the HF repo (default: checkpoint_filename from teacher yaml)",
     )
     p.add_argument(
         "--revision",
-        default=_revision_from_teacher_yaml(),
+        default=None,
         help="HF revision (branch, tag, or commit). "
-        "Defaults to configs/teacher_aifs.yaml revision; use empty string via --revision \"\" for floating main",
+        "Omit to use revision from configs/teacher_aifs.yaml; use --revision \"\" for floating main",
     )
     p.add_argument(
         "--local-dir",
@@ -52,7 +46,13 @@ def main() -> int:
     )
     args = p.parse_args()
 
-    revision = args.revision if args.revision else None
+    repo_id = args.repo_id or pins.get("huggingface_repo_id") or "ecmwf/aifs-single-1.0"
+    filename = args.filename or pins.get("checkpoint_filename") or "aifs-single-mse-1.0.ckpt"
+    if args.revision is None:
+        revision = pins.get("revision")
+    else:
+        rev = args.revision.strip() if isinstance(args.revision, str) else args.revision
+        revision = rev if rev else None
 
     try:
         from huggingface_hub import hf_hub_download
@@ -62,14 +62,14 @@ def main() -> int:
             file=sys.stderr,
         )
         print(
-            f"Or download manually from https://huggingface.co/{args.repo_id}/tree/main",
+            f"Or download manually from https://huggingface.co/{repo_id}/tree/main",
             file=sys.stderr,
         )
         return 1
 
     path = hf_hub_download(
-        repo_id=args.repo_id,
-        filename=args.filename,
+        repo_id=repo_id,
+        filename=filename,
         local_dir=args.local_dir,
         revision=revision,
     )

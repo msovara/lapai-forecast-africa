@@ -7,24 +7,15 @@ import argparse
 import sys
 from pathlib import Path
 
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from utils.teacher_yaml import teacher_checkpoint_resolved  # noqa: E402
+
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
-
-
-def checkpoint_from_teacher_yaml() -> Path | None:
-    cfg = repo_root() / "configs" / "teacher_aifs.yaml"
-    if not cfg.is_file():
-        return None
-    rel: str | None = None
-    for line in cfg.read_text(encoding="utf-8").splitlines():
-        s = line.split("#", 1)[0].strip()
-        if s.startswith("local_checkpoint_relative:"):
-            rel = s.split(":", 1)[1].strip().strip('"').strip("'")
-            break
-    if not rel:
-        return None
-    return (repo_root() / rel).resolve()
+    return _REPO_ROOT
 
 
 def main() -> int:
@@ -43,7 +34,7 @@ def main() -> int:
     )
     args = p.parse_args()
 
-    ckpt = args.ckpt or checkpoint_from_teacher_yaml()
+    ckpt = args.ckpt or teacher_checkpoint_resolved(repo_root())
     if ckpt is None:
         print("Could not resolve checkpoint path; pass --ckpt", file=sys.stderr)
         return 1
