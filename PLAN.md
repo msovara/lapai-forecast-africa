@@ -456,7 +456,7 @@ PBS script outlines (to be written in Week 1):
 
 | #  | Risk                                                                        | Likelihood | Impact | Mitigation                                                                                         |
 | -- | --------------------------------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------- |
-| R1 | AIFS internal layer indices (10, 14) differ across released checkpoints     | Medium     | High   | Pin a specific AIFS release in Week 1; freeze layer mapping in `configs/teacher_aifs.yaml`.        |
+| R1 | AIFS internal layer indices (10, 14) differ across released checkpoints     | Medium     | High   | Teacher pinned to `aifs_single_v1.0.ckpt` ([ecmwf/aifs-single-1.0](https://huggingface.co/ecmwf/aifs-single-1.0)); freeze real module→hook mapping in `configs/teacher_aifs.yaml` after inspection.        |
 | R2 | Pruning gate (< 3 % CRPS) cannot be met at 30 % cumulative                  | Medium     | Medium | Reduce K per round; fall back to 20 % cumulative; document trade-off.                              |
 | R3 | Spectral loss destabilises training                                         | Medium     | Medium | Start with `λ_C = 0` for the first 1 k steps; warm-up to 0.25.                                     |
 | R4 | 15 % global / 20 % Africa skill budget breached                             | Medium     | High   | Add multi-step rollout supervision; revisit channel widths up to 15 M params; revisit lon padding. |
@@ -470,14 +470,21 @@ PBS script outlines (to be written in Week 1):
 
 ## 10. Open decisions (to close in Week 1)
 
-1. **AIFS checkpoint release** to pin (latest stable vs. a specific frozen release).
-2. **Variable list V** — final set of surface + pressure-level fields (drives student input channel count and parameter budget).
-3. **ENACTS access** — confirm which African countries' data is available under what licence.
-4. **Africa box** — keep the proposed `[−40, 38] × [−20, 55]` or extend to include Mascarenes / Madagascar offshore.
-5. **Quantisation scope** — INT8 dynamic only, or also weight-only INT4? (Affects accuracy vs. RAM trade-off.)
-6. **CI** — add a lightweight GitHub Actions matrix for the `lapai_inference` package now or only at Week 12?
+### Resolved — teacher checkpoint
 
-These are the only items that should block Week 2 from starting on time.
+Pin the **teacher** to Hugging Face [**ecmwf/aifs-single-1.0**](https://huggingface.co/ecmwf/aifs-single-1.0) (AIFS Single v1.0, operationally supported; supersedes v0.2.1). Use checkpoint artifact **`aifs_single_v1.0.ckpt`** (weights only; CC BY 4.0 — attribute ECMWF/HF URL in distributions). When `configs/teacher_aifs.yaml` exists, pin the HF **revision/commit** alongside the checkpoint path so reproducibility survives model-card updates.
+
+**Reminder:** Numeric distillation taps at “layers **10** and **14**” elsewhere in this document are **placeholder indices**; map real module names / tensor hooks after loading `aifs_single_v1.0.ckpt` (see §9-R1).
+
+### Still open
+
+1. **Variable list V** — final set of surface + pressure-level fields (drives student input channel count and parameter budget).
+2. **ENACTS access** — confirm which African countries' data is available under what licence.
+3. **Africa box** — keep the proposed `[−40, 38] × [−20, 55]` or extend to include Mascarenes / Madagascar offshore.
+4. **Quantisation scope** — INT8 dynamic only, or also weight-only INT4? (Affects accuracy vs. RAM trade-off.)
+5. **CI** — add a lightweight GitHub Actions matrix for the `lapai_inference` package now or only at Week 12?
+
+These are the only **remaining** items that should block Week 2 from starting on time.
 
 ---
 
@@ -529,7 +536,7 @@ To keep scope realistic for 12 weeks and 1,650 GPU-h:
 
 ## 14. Next concrete actions (when you say "go")
 
-1. Resolve the six open decisions in §10.
+1. Resolve the remaining open decisions in §10 (teacher checkpoint is already pinned to AIFS Single v1.0).
 2. Inside `lapai-forecast/`, create `requirements.txt`, `environment-anemoi.yml`, `environment-credit.yml`, `recipes/recipe_era5_n320.yaml`, `recipes/recipe_era5_n96.yaml`, and the three PBS templates under `pbs/`.
 3. Stand up `lapai-anemoi` and `lapai-credit` conda envs on CHPC.
 4. Reproduce the AIFS baseline rollout (Phase 0 §3.4) and write the result to `lapai-forecast/data/processed/aifs_baseline_20220601.nc`.
