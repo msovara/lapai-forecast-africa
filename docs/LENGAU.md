@@ -2,6 +2,8 @@
 
 This repo is wired for **Centre for High Performance Computing** [Lengau](https://www.chpc.ac.za/).
 
+**First-time teacher inference on GPU:** after **`conda activate lapai-anemoi`**, use the *Minimal copy-paste path* in [`reports/RUNBOOK_BASELINE_LENGAU.md`](../reports/RUNBOOK_BASELINE_LENGAU.md).
+
 ## Submit PBS from the LapAI repo root
 
 `PBS_O_WORKDIR` becomes the clone directory (`lapai-forecast/`).

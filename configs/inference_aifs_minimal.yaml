@@ -1,6 +1,8 @@
 # Minimal LapAI teacher inference template.
 # ECMWF Quickstart shape: https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html
 #
+# Operator sequence (Lengau): reports/RUNBOOK_BASELINE_LENGAU.md -> "Minimal copy-paste path"
+#
 # 1. Download weights: python scripts/download_teacher_ckpt.py --local-dir models/teacher
 # 2. Run launcher (resolves checkpoint to absolute path): python scripts/run_aifs_inference.py
 #

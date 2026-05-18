@@ -33,3 +33,9 @@ def test_runbook_lists_minimal_lengau_path() -> None:
     text = (_REPO / "reports" / "RUNBOOK_BASELINE_LENGAU.md").read_text(encoding="utf-8")
     assert "Minimal copy-paste path" in text
     assert "lapai_inference_gate.sh" in text
+
+
+def test_lengau_doc_links_runbook_minimal_path() -> None:
+    text = (_REPO / "docs" / "LENGAU.md").read_text(encoding="utf-8")
+    assert "RUNBOOK_BASELINE_LENGAU.md" in text
+    assert "Minimal copy-paste path" in text
