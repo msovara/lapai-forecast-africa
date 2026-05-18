@@ -17,3 +17,6 @@ YAML files here drive training, pruning, evaluation, and the pinned teacher iden
 **Anemoi training** expects Hydra YAML trees (often under `--config-path` bundles from ECMWF). This repo supplies **LapAI-specific** slabs only; glue them into `anemoi-training train` recipes on Lengau or consult the [AIFS Single HF model card](https://huggingface.co/ecmwf/aifs-single-1.0) for pinned package versions (`anemoi-training`, `anemoi-models`, `anemoi-graphs`).
 
 **Teacher inference CLI** docs: [anemoi-inference quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html).
+
+**GPU batch:** [`pbs/inference_aifs_teacher.pbs`](../pbs/inference_aifs_teacher.pbs) respects **`LAPAI_INFER_TEMPLATE`** (repo-relative path passed as `--template`) and **`LAPAI_AIFS_INFER_DRY=1`** for **`--dry-run`** only.
+

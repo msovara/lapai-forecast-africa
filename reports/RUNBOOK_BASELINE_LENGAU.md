@@ -19,15 +19,15 @@ bash scripts/setup_lengau_envs.sh
 
 ## 2. Download teacher checkpoint
 
-From repo root:
+From repo root (`configs/teacher_aifs.yaml` already pins **`revision`** + **`aifs-single-mse-1.0.ckpt`**):
 
 ```bash
 python scripts/download_teacher_ckpt.py --local-dir models/teacher
-# optional reproducible pin once you chose a HF revision:
-# python scripts/download_teacher_ckpt.py --revision <sha_or_tag>
+# floating main instead of pinned commit:
+# python scripts/download_teacher_ckpt.py --local-dir models/teacher --revision ""
 ```
 
-Copy the printed path into **`configs/teacher_aifs.yaml`** (`revision` + confirm `local_checkpoint_relative`).
+After download, **`local_checkpoint_relative`** in **`configs/teacher_aifs.yaml`** should match the relative path inside `models/teacher/` (adjust only if you store weights elsewhere).
 
 ## 3. Smoke: checkpoint file (+ optional `torch.load`)
 
@@ -65,7 +65,7 @@ python scripts/run_aifs_inference.py --dry-run
 python scripts/run_aifs_inference.py
 ```
 
-Or on the cluster (GPU PBS job): `qsub pbs/inference_aifs_teacher.pbs` (`qsub -v LAPAI_AIFS_INFER_DRY=1 …` for dry-run only).
+Or on the cluster (GPU PBS job): `qsub pbs/inference_aifs_teacher.pbs` (`qsub -v LAPAI_AIFS_INFER_DRY=1 …` for dry-run only). Use `qsub -v LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml …` after you customise that YAML (**`output:`** uncommented).
 
 Uses [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml); swap `input`/`output`/lead time per [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html). For a skeleton with longer lead and NetCDF comments, see [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml).
 When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for **`aifs-single-mse-1.0.ckpt`**:
@@ -77,4 +77,6 @@ When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for 
 
 | Date (UTC) | User | revision | Job ID | Output path | Notes |
 | ---------- | ---- | --------- | ------ | ----------- | ----- |
-|            |      |           |        |             |       |
+| _example_ | you  | `f0bb02c077e…` (from teacher yaml, or HF tip if you floated) | 123456[].chpc.ac.za | `data/processed/lapai/…` | `printer` baseline or first NetCDF |
+
+_Use a short SHA or full commit as in **`configs/teacher_aifs.yaml`**._

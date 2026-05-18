@@ -14,15 +14,33 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def teacher_yaml_checkpoint_relative() -> str | None:
+def _teacher_yaml_pins() -> dict[str, str]:
+    """Parse a few colon keys from ``configs/teacher_aifs.yaml`` (best-effort, no YAML dep)."""
     cfg = repo_root() / "configs" / "teacher_aifs.yaml"
+    out: dict[str, str] = {}
     if not cfg.is_file():
-        return None
+        return out
+    watch = (
+        "huggingface_repo_id",
+        "checkpoint_filename",
+        "revision",
+        "local_checkpoint_relative",
+    )
     for line in cfg.read_text(encoding="utf-8").splitlines():
         s = line.split("#", 1)[0].strip()
-        if s.startswith("local_checkpoint_relative:"):
-            return s.split(":", 1)[1].strip().strip("\"'")
-    return None
+        for key in watch:
+            prefix = f"{key}:"
+            if s.startswith(prefix):
+                val = s.split(":", 1)[1].strip().strip("\"'")
+                if val and val.lower() not in ("null", "~", "none"):
+                    out[key] = val
+                break
+    return out
+
+
+def teacher_yaml_checkpoint_relative() -> str | None:
+    pins = _teacher_yaml_pins()
+    return pins.get("local_checkpoint_relative")
 
 
 def main() -> int:
@@ -37,6 +55,15 @@ def main() -> int:
     rr = repo_root().resolve()
     ok = True
     print(f"repo_root: {rr}")
+
+    pins = _teacher_yaml_pins()
+    if pins.get("huggingface_repo_id"):
+        print(
+            "teacher_hf: "
+            f"repo={pins.get('huggingface_repo_id')} "
+            f"file={pins.get('checkpoint_filename', '?')} "
+            f"revision={pins.get('revision', 'floating')}"
+        )
 
     rel = teacher_yaml_checkpoint_relative()
     if rel is None:

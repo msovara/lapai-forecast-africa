@@ -42,6 +42,8 @@ python scripts/verify_inference_stack.py --strict
 python scripts/run_aifs_inference.py --dry-run
 python scripts/run_aifs_inference.py
 qsub pbs/inference_aifs_teacher.pbs
+# Custom template on the GPU job (must be a repo-relative path):
+# qsub -v LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml pbs/inference_aifs_teacher.pbs
 # Dry-run on the batch node:
 # qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs
 ```
