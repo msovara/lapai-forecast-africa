@@ -73,6 +73,8 @@ Swap the demo store for real Anemoi/AIFS exports aligned with `lapai_inference/c
 
 ## CHPC Lengau environments
 
+**Operations guide:** see [`docs/LENGAU.md`](docs/LENGAU.md) — default PBS **Track A** uses CHPC **`/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training`** (torch + anemoi); **Track B / LoRA** expects **`lapai-credit`** from [`environment-credit-lengau.yml`](environment-credit-lengau.yml).
+
 On **Lengau**, clone this repo (or use `tiny-media-analysis/lapai-forecast`), then from the repo root:
 
 ```bash

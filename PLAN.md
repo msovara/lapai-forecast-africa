@@ -445,7 +445,7 @@ Buffer: the 12-week schedule has ≈ 4 weeks of slack on top of the ~17 wall-clo
 
 PBS script outlines (to be written in Week 1):
 
-- All scripts `cd "$PBS_O_WORKDIR/lapai-forecast"` before launching.
+- All PBS jobs assume **`qsub` is executed from this repo root** so `cd "${PBS_O_WORKDIR}"` lands in `lapai-forecast/` (see `pbs/*.pbs`, `pbs/inc_conda_lengau.sh`, and `docs/LENGAU.md`).
 - 96 GB RAM / node, 8 CPUs / GPU, NVMe scratch for Zarr caches.
 - `module load chpc/cuda/12.x`, conda env activation, `OMP_NUM_THREADS=8`.
 - All checkpoints written to `lapai-forecast/models/`; logs to `lapai-forecast/logs/<run-name>/`.
