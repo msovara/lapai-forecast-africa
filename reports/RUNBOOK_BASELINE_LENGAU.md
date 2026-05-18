@@ -7,7 +7,7 @@ Use this after `git pull` and a working **`lapai-anemoi`** env ([`docs/LENGAU.md
 1. **`git pull`** — repo root is `lapai-forecast/`.
 2. **`conda activate lapai-anemoi`** (§1).
 3. **§2 → §3** — download **`aifs-single-mse-1.0.ckpt`**, **`smoke_teacher_ckpt`**.
-4. **`bash scripts/lapai_inference_gate.sh`** — strict verify + inference **`--dry-run`**.
+4. **`bash scripts/lapai_inference_gate.sh`** — strict verify + inference **`--dry-run`** (on failure the script mentions **§7**).
 5. **GPU:** `qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs` then `qsub pbs/inference_aifs_teacher.pbs` (see §6.a).
 6. **Optional artefact:** set **`LAPAI_INFER_TEMPLATE`** to your edited NetCDF YAML, re-submit; log §6 runs table.
 
@@ -44,7 +44,7 @@ After download, **`local_checkpoint_relative`** in **`configs/teacher_aifs.yaml`
 python scripts/smoke_teacher_ckpt.py
 ```
 
-Fails fast if weights are missing; with **torch** installed, prints shallow keys from the pickled checkpoint.
+Fails fast if weights are missing; with **torch** installed, prints shallow keys from the pickled checkpoint. **stderr** includes a one-line **`configs/teacher_aifs.yaml`** summary (HF repo / filename / revision) when those keys parse.
 
 ## 4. ERA5 → Zarr (when CDS / GRIB is ready)
 

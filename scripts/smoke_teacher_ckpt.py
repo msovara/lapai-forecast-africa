@@ -11,7 +11,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from utils.teacher_yaml import teacher_checkpoint_resolved  # noqa: E402
+from utils.teacher_yaml import parse_teacher_aifs_yaml_file, teacher_checkpoint_resolved  # noqa: E402
 
 
 def repo_root() -> Path:
@@ -34,7 +34,19 @@ def main() -> int:
     )
     args = p.parse_args()
 
-    ckpt = args.ckpt or teacher_checkpoint_resolved(repo_root())
+    rr = repo_root()
+    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
+    if pins.get("huggingface_repo_id"):
+        rev_disp = pins.get("revision") or "(not set in yaml)"
+        print(
+            "LapAI teacher yaml pins: "
+            f"repo={pins.get('huggingface_repo_id')} "
+            f"file={pins.get('checkpoint_filename', '?')} "
+            f"revision={rev_disp}",
+            file=sys.stderr,
+        )
+
+    ckpt = args.ckpt or teacher_checkpoint_resolved(rr)
     if ckpt is None:
         print("Could not resolve checkpoint path; pass --ckpt", file=sys.stderr)
         return 1

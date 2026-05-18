@@ -7,6 +7,7 @@
 # Requires: conda env lapai-anemoi (teacher weights on disk, anemoi-inference on PATH).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+trap 'echo "[lapai] gate FAILED. See reports/RUNBOOK_BASELINE_LENGAU.md section 7."' ERR
 cd "$ROOT"
 
 python scripts/smoke_teacher_ckpt.py
