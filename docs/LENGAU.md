@@ -29,12 +29,7 @@ cd /path/to/lapai-forecast
 bash scripts/setup_lengau_envs.sh
 ```
 
-That creates/updates **`lapai-anemoi`** and **`lapai-credit`**, then `pip install -e . --no-deps` inside **`lapai-credit`** only — repeat the editable install inside **`lapai-anemoi`** if you import `lapai_inference` during Track A scripts:
-
-```bash
-conda activate lapai-anemoi
-pip install -e . --no-deps
-```
+That creates/updates **`lapai-anemoi`** and **`lapai-credit`**, and runs **`pip install -e . --no-deps`** in **each** so `lapai_inference` resolves in Track A / Track B jobs.
 
 Optional: heavy env prefixes on lustre (`export CONDA_ENVS_PATH=...`; see README).
 
@@ -68,6 +63,17 @@ If **`lapai-anemoi`** already exists:
 ```bash
 conda env create -f environment-credit-lengau.yml
 conda activate lapai-credit
+pip install -e . --no-deps
+```
+
+## Troubleshooting conda updates
+
+If **`lapai-anemoi`** was created from an older `environment-anemoi.yml` (conda-forge‑only sketch) and `conda env update` conflicts on PyTorch/NVIDIA channels, remove and recreate:
+
+```bash
+conda env remove -n lapai-anemoi --yes
+conda env create -f environment-anemoi.yml
+conda activate lapai-anemoi
 pip install -e . --no-deps
 ```
 
