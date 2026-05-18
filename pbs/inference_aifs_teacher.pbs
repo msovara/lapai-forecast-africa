@@ -14,6 +14,8 @@
 #
 # To pass extra flags reliably, run interactively or edit this script; PBS -v
 # word-splitting makes multi-arg env vars fragile.
+#
+# Operator minimal path: reports/RUNBOOK_BASELINE_LENGAU.md -> Minimal copy-paste path
 
 set -euo pipefail
 cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1

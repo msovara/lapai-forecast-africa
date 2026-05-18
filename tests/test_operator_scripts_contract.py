@@ -39,3 +39,9 @@ def test_lengau_doc_links_runbook_minimal_path() -> None:
     text = (_REPO / "docs" / "LENGAU.md").read_text(encoding="utf-8")
     assert "RUNBOOK_BASELINE_LENGAU.md" in text
     assert "Minimal copy-paste path" in text
+
+
+def test_requirements_txt_utf8_not_utf16_bom() -> None:
+    raw = (_REPO / "requirements.txt").read_bytes()
+    assert not raw.startswith(b"\xff\xfe") and not raw.startswith(b"\xfe\xff")
+    assert b"numpy>=" in raw
