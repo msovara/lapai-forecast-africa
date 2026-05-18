@@ -27,3 +27,9 @@ def test_run_aifs_inference_documents_template_stderr() -> None:
     text = (_REPO / "scripts" / "run_aifs_inference.py").read_text(encoding="utf-8")
     assert "LapAI dry-run template:" in text
     assert "LapAI inference template:" in text
+
+
+def test_runbook_lists_minimal_lengau_path() -> None:
+    text = (_REPO / "reports" / "RUNBOOK_BASELINE_LENGAU.md").read_text(encoding="utf-8")
+    assert "Minimal copy-paste path" in text
+    assert "lapai_inference_gate.sh" in text

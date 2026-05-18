@@ -43,6 +43,8 @@ ERA5  ─────────────►  Track B (MILES-CREDIT student 
 
 ## Teacher checkpoint (AIFS Single v1.0)
 
+**Fast path (CHPC):** follow the *Minimal copy-paste path* in [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md) after loading **`lapai-anemoi`**.
+
 Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download weights (**`huggingface_hub`** is listed in [`environment-anemoi.yml`](environment-anemoi.yml); purely local pip setups can use `pip install -e ".[hf]"`).
 
 ```bash

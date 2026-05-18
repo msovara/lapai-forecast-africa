@@ -2,6 +2,20 @@
 
 Use this after `git pull` and a working **`lapai-anemoi`** env ([`docs/LENGAU.md`](../docs/LENGAU.md)).
 
+### Minimal copy-paste path (Lengau)
+
+Run inside **`lapai-forecast/`** after §1 (`module load …` + **`conda activate lapai-anemoi`**):
+
+```bash
+git pull
+python scripts/download_teacher_ckpt.py --local-dir models/teacher
+bash scripts/lapai_inference_gate.sh
+qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs   # optional: check logs, no full forward pass
+qsub pbs/inference_aifs_teacher.pbs
+```
+
+If anything errors, see **§7**. For a saved forecast file (NetCDF/GRIB), continue with checklist step **6** and **§6**.
+
 ## 0. Same-day checklist (teacher inference on GPU)
 
 1. **`git pull`** — repo root is `lapai-forecast/`.
