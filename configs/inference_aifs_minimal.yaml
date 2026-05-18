@@ -1,0 +1,24 @@
+# Minimal LapAI teacher inference template.
+# ECMWF Quickstart shape: https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html
+#
+# 1. Download weights: python scripts/download_teacher_ckpt.py --local-dir models/teacher
+# 2. Run launcher (resolves checkpoint to absolute path): python scripts/run_aifs_inference.py
+#
+# Tune lead_time / date / input / output once initial conditions feed is ready (cds, mars, grib,
+# dataset, etc.).
+
+checkpoint: models/teacher/aifs_single_v1.0.ckpt
+
+# Forecast length (hours)
+lead_time: 72
+
+# Initial condition time (ISO)
+date: "2022-06-01T00:00:00"
+
+# `test` dataset is bundled for demos; swap for operational sources on Lengau.
+input:
+  dataset: test
+
+# `printer` is fine for CI smoke; use netcdf/zarr outputs for artefacts (see ECMWF docs).
+output:
+  printer

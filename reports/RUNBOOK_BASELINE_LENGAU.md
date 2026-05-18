@@ -55,7 +55,18 @@ Expect the [`train_trackA.py`](../training/train_trackA.py) stub until Anemoi tr
 
 ## 6. Baseline forecast artefact (Phase 0)
 
-When **`anemoi-inference`** is configured for **`aifs_single_v1.0.ckpt`**:
+### 6.a Teacher smoke inference (bundled **`dataset: test`**, **`printer`** output)
+
+From repo root (`lapai-anemoi`, checkpoint on disk — see §2–3):
+
+```bash
+python scripts/run_aifs_inference.py --dry-run
+python scripts/run_aifs_inference.py
+```
+
+Uses [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml); swap `input`/`output`/lead time per [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html).
+
+When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for **`aifs_single_v1.0.ckpt`**:
 
 1. Produce one rollout (e.g. 10-day) NetCDF/Zarr under `data/processed/lapai/`.
 2. Record command line, **`revision`**, node type, CUDA module → append below.

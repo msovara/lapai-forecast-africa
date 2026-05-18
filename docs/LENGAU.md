@@ -33,7 +33,18 @@ That creates/updates **`lapai-anemoi`** and **`lapai-credit`**, and runs **`pip 
 
 Optional: heavy env prefixes on lustre (`export CONDA_ENVS_PATH=...`; see README).
 
-### Site‑wide fallback (no isolation)
+## Teacher inference (AIFS checkpoint on disk)
+
+With **`lapai-anemoi`** active and **`anemoi-inference`** on `PATH`:
+
+```bash
+python scripts/run_aifs_inference.py --dry-run
+python scripts/run_aifs_inference.py
+```
+
+Starter YAML: [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml) (bundled **`dataset: test`**, **`printer`**). For CDS/MARS ICs or NetCDF/Zarr sinks, edit the YAML per the [quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html).
+
+### Site-wide fallback (no isolation)
 
 If you prefer the CHPC **chem** env instead of **lapai‑anemoi**:
 

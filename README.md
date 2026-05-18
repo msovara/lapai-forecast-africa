@@ -48,9 +48,11 @@ Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download wei
 ```bash
 python scripts/download_teacher_ckpt.py --local-dir models/teacher
 python scripts/smoke_teacher_ckpt.py
+python scripts/run_aifs_inference.py --dry-run
+python scripts/run_aifs_inference.py   # invokes anemoi-inference run (bundled demo IC source)
 ```
 
-Set `revision:` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml) to the Hugging Face commit you used. Week-1 checklist for Lengau: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
+Set `revision:` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml) to the Hugging Face commit you used. Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
 
 ## Repository status
 
