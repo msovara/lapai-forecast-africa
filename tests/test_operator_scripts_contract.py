@@ -45,3 +45,18 @@ def test_requirements_txt_utf8_not_utf16_bom() -> None:
     raw = (_REPO / "requirements.txt").read_bytes()
     assert not raw.startswith(b"\xff\xfe") and not raw.startswith(b"\xfe\xff")
     assert b"numpy>=" in raw
+
+
+def test_readme_documents_optional_requirements_install() -> None:
+    text = (_REPO / "README.md").read_text(encoding="utf-8")
+    assert "pip install -r requirements.txt" in text
+
+
+def test_student_pbs_links_teacher_phase_doc() -> None:
+    text = (_REPO / "pbs" / "student.pbs").read_text(encoding="utf-8")
+    assert "RUNBOOK_BASELINE_LENGAU.md" in text
+
+
+def test_lora_pbs_links_ops_docs() -> None:
+    text = (_REPO / "pbs" / "lora.pbs").read_text(encoding="utf-8")
+    assert "LENGAU.md" in text

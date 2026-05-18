@@ -79,6 +79,7 @@ Install locally:
 ```bash
 cd lapai-forecast
 pip install -e ".[dev,ort]"
+# optional lightweight overlap: pip install -r requirements.txt  (UTF-8; CHPC stacks use conda YAMLs)
 pytest
 ```
 
