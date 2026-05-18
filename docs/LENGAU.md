@@ -38,11 +38,15 @@ Optional: heavy env prefixes on lustre (`export CONDA_ENVS_PATH=...`; see README
 With **`lapai-anemoi`** active and **`anemoi-inference`** on `PATH`:
 
 ```bash
+python scripts/verify_inference_stack.py --strict
 python scripts/run_aifs_inference.py --dry-run
 python scripts/run_aifs_inference.py
+qsub pbs/inference_aifs_teacher.pbs
+# Dry-run on the batch node:
+# qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs
 ```
 
-Starter YAML: [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml) (bundled **`dataset: test`**, **`printer`**). For CDS/MARS ICs or NetCDF/Zarr sinks, edit the YAML per the [quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html).
+Starter YAML: [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml) (bundled **`dataset: test`**, **`printer`**). Persisting forecasts: start from [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml).
 
 ### Site-wide fallback (no isolation)
 

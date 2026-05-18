@@ -18,6 +18,7 @@ def suggested_invocation(step: str, config: str) -> str:
         f"# Track A operator hints (step={step})\n"
         f"cd {rr}\n"
         f"conda activate lapai-anemoi   # or LAPAI_CONDA_TRACK_A override — see docs/LENGAU.md\n"
+        f"python scripts/verify_inference_stack.py --strict   # before batch inference\n"
         f"python scripts/smoke_teacher_ckpt.py     # after downloading teacher weights\n"
         f"python scripts/run_aifs_inference.py --dry-run   # then run without --dry-run for anemoi-inference\n"
         f"bash scripts/invoke_anemoi_training_example.sh   # read HF / ECMWF anemoi-training examples\n"

@@ -1,0 +1,25 @@
+# Example: persist teacher forecast instead of printer sink.
+# Copy to configs/inference_aifs_my_run.yaml and edit paths / CDS credentials.
+#
+# Checkpoint line is rewritten to an absolute path by scripts/run_aifs_inference.py :
+#   python scripts/run_aifs_inference.py --template configs/inference_aifs_my_run.yaml
+
+checkpoint: models/teacher/aifs_single_v1.0.ckpt
+
+lead_time: 240
+
+date: "2022-06-01T00"
+
+input:
+  dataset: test
+
+# ECMWF sinks include grib / netcdf / zarr — names depend on your anemoi-inference version.
+# Uncomment and customise after consulting:
+# https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html
+#
+# output:
+#   netcdf:
+#     path: data/processed/lapai/aifs_baseline_20220601.nc
+
+output:
+  printer

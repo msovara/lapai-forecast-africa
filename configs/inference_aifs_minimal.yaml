@@ -12,8 +12,8 @@ checkpoint: models/teacher/aifs_single_v1.0.ckpt
 # Forecast length (hours)
 lead_time: 72
 
-# Initial condition time (ISO)
-date: "2022-06-01T00:00:00"
+# Initial condition time (see ECMWF quickstart; short form often used)
+date: "2022-06-01T00"
 
 # `test` dataset is bundled for demos; swap for operational sources on Lengau.
 input:

@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N lapai_aifs_infer
+#PBS -l select=1:ncpus=8:ngpus=1
+#
+# Teacher AIFS inference on a GPU node (after checkpoint download).
+# Submit from lapai-forecast repo root:
+#   qsub pbs/inference_aifs_teacher.pbs
+#
+# Dry-run (render YAML + print command only):
+#   qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs
+#
+# To pass extra flags reliably, run interactively or edit this script; PBS -v
+# word-splitting makes multi-arg env vars fragile.
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
+
+source pbs/inc_conda_lengau.sh
+lapai_load_cuda_gpu
+lapai_activate_track_a
+
+if [[ "${LAPAI_AIFS_INFER_DRY:-0}" == 1 ]]; then
+  exec python scripts/run_aifs_inference.py --dry-run
+fi
+exec python scripts/run_aifs_inference.py
