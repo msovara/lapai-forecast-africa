@@ -2,13 +2,22 @@
 
 Use this after `git pull` and a working **`lapai-anemoi`** env ([`docs/LENGAU.md`](../docs/LENGAU.md)).
 
+## 0. Same-day checklist (teacher inference on GPU)
+
+1. **`git pull`** — repo root is `lapai-forecast/`.
+2. **`conda activate lapai-anemoi`** (§1).
+3. **§2 → §3** — download **`aifs-single-mse-1.0.ckpt`**, **`smoke_teacher_ckpt`**.
+4. **`bash scripts/lapai_inference_gate.sh`** — strict verify + inference **`--dry-run`**.
+5. **GPU:** `qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs` then `qsub pbs/inference_aifs_teacher.pbs` (see §6.a).
+6. **Optional artefact:** set **`LAPAI_INFER_TEMPLATE`** to your edited NetCDF YAML, re-submit; log §6 runs table.
+
 ## 1. Environments
 
 ```bash
 module load chpc/python/anaconda/3-2024.10.1
 source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
 conda activate lapai-anemoi
-pip install huggingface_hub   # once, for downloader
+# huggingface_hub is included via environment-anemoi.yml pip list; pip install once if your env predates it
 ```
 
 Optionally recreate isolated env:
@@ -67,7 +76,8 @@ python scripts/run_aifs_inference.py
 
 Or on the cluster (GPU PBS job): `qsub pbs/inference_aifs_teacher.pbs` (`qsub -v LAPAI_AIFS_INFER_DRY=1 …` for dry-run only). Use `qsub -v LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml …` after you customise that YAML (**`output:`** uncommented).
 
-Uses [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml); swap `input`/`output`/lead time per [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html). For a skeleton with longer lead and NetCDF comments, see [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml).
+Uses [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml); swap `input`/`output`/lead time per [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html). For a skeleton with longer lead and file-output examples, see [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml) and [Saving Outputs](https://anemoi.readthedocs.io/projects/inference/en/latest/usage/advanced/saving.html).
+
 When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for **`aifs-single-mse-1.0.ckpt`**:
 
 1. Produce one rollout (e.g. 10-day) NetCDF/Zarr under `data/processed/lapai/`.

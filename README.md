@@ -43,15 +43,13 @@ ERA5  ─────────────►  Track B (MILES-CREDIT student 
 
 ## Teacher checkpoint (AIFS Single v1.0)
 
-Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download weights (requires `pip install huggingface_hub` or optional install `pip install -e ".[hf]"`):
+Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download weights (**`huggingface_hub`** is listed in [`environment-anemoi.yml`](environment-anemoi.yml); purely local pip setups can use `pip install -e ".[hf]"`).
 
 ```bash
 python scripts/download_teacher_ckpt.py --local-dir models/teacher
-python scripts/smoke_teacher_ckpt.py
-python scripts/verify_inference_stack.py        # add --strict before batch jobs
+bash scripts/lapai_inference_gate.sh   # ckpt smoke + verify --strict + inference --dry-run
 # optional: export LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml
-python scripts/run_aifs_inference.py --dry-run
-python scripts/run_aifs_inference.py   # invokes anemoi-inference run (bundled demo IC source)
+python scripts/run_aifs_inference.py   # anemoi-inference run (omit internal --dry-run; requires GPU/driver)
 # or: qsub pbs/inference_aifs_teacher.pbs
 #     qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs
 ```

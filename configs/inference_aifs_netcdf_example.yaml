@@ -13,13 +13,16 @@ date: "2022-06-01T00"
 input:
   dataset: test
 
-# ECMWF sinks include grib / netcdf / zarr — names depend on your anemoi-inference version.
-# Uncomment and customise after consulting:
-# https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html
+# Persisting output (see Saving Outputs):
+# https://anemoi.readthedocs.io/projects/inference/en/latest/usage/advanced/saving.html
+# Typical NetCDF shape (adapt if your inference version uses a nested dict):
 #
 # output:
-#   netcdf:
-#     path: data/processed/lapai/aifs_baseline_20220601.nc
+#   netcdf: data/processed/lapai/aifs_baseline_20220601.nc
+#
+# GRIB alternative:
+# output:
+#   grib: data/processed/lapai/aifs_baseline_20220601.grib
 
 output:
   printer
