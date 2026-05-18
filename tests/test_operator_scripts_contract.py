@@ -60,3 +60,13 @@ def test_student_pbs_links_teacher_phase_doc() -> None:
 def test_lora_pbs_links_ops_docs() -> None:
     text = (_REPO / "pbs" / "lora.pbs").read_text(encoding="utf-8")
     assert "LENGAU.md" in text
+
+
+def test_shell_and_pbs_batches_utf8_no_utf16_bom() -> None:
+    paths = sorted((_REPO / "pbs").glob("*.pbs"))
+    paths += sorted((_REPO / "pbs").glob("*.sh"))
+    paths += sorted((_REPO / "scripts").glob("*.sh"))
+    assert paths, "expected PBS / bash scripts under pbs/ and scripts/"
+    for path in paths:
+        raw = path.read_bytes()
+        assert not raw.startswith(b"\xff\xfe") and not raw.startswith(b"\xfe\xff"), path.name
