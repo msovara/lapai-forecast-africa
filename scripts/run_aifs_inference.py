@@ -112,6 +112,13 @@ def main() -> int:
         return 1
 
     if args.dry_run:
+        try:
+            tmpl_show = template.relative_to(rr).as_posix()
+        except ValueError:
+            tmpl_show = template.as_posix()
+        print(f"# LapAI dry-run template: {tmpl_show}", file=sys.stderr)
+        if env_default:
+            print(f"# LAPAI_INFER_TEMPLATE={env_default!r}", file=sys.stderr)
         print(rendered, end="")
         print("\n# would run roughly:\n# anemoi-inference run /tmp/lapai_aifs_inference_....yaml\n", file=sys.stderr)
         return 0
