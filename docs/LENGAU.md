@@ -39,6 +39,7 @@ With **`lapai-anemoi`** active and **`anemoi-inference`** on `PATH`:
 
 ```bash
 python scripts/verify_inference_stack.py --strict
+# optional: export LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml
 python scripts/run_aifs_inference.py --dry-run
 python scripts/run_aifs_inference.py
 qsub pbs/inference_aifs_teacher.pbs

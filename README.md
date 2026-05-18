@@ -49,6 +49,7 @@ Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download wei
 python scripts/download_teacher_ckpt.py --local-dir models/teacher
 python scripts/smoke_teacher_ckpt.py
 python scripts/verify_inference_stack.py        # add --strict before batch jobs
+# optional: export LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml
 python scripts/run_aifs_inference.py --dry-run
 python scripts/run_aifs_inference.py   # invokes anemoi-inference run (bundled demo IC source)
 # or: qsub pbs/inference_aifs_teacher.pbs

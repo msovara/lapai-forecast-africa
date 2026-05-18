@@ -50,10 +50,15 @@ def substitute_checkpoint_yaml(text: str, ckpt_abs: Path) -> str:
 
 def main() -> int:
     p = argparse.ArgumentParser(description="LapAI: anemoi-inference launcher (teacher ckpt)")
+    env_default = os.environ.get("LAPAI_INFER_TEMPLATE")
     p.add_argument(
         "--template",
         type=Path,
-        default=Path("configs/inference_aifs_minimal.yaml"),
+        default=None,
+        help=(
+            "Inference YAML with a single top-level checkpoint: line. "
+            "Default: env LAPAI_INFER_TEMPLATE or configs/inference_aifs_minimal.yaml"
+        ),
     )
     p.add_argument("--checkpoint", type=Path, default=None)
     p.add_argument(
@@ -72,7 +77,10 @@ def main() -> int:
     rr = repo_root()
     os.chdir(rr)
 
-    template = args.template if args.template.is_absolute() else (rr / args.template).resolve()
+    template_path = args.template
+    if template_path is None:
+        template_path = Path(env_default) if env_default else Path("configs/inference_aifs_minimal.yaml")
+    template = template_path if template_path.is_absolute() else (rr / template_path).resolve()
     if not template.is_file():
         print(f"Missing template {template}", file=sys.stderr)
         return 1
