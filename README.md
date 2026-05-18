@@ -56,7 +56,7 @@ python scripts/run_aifs_inference.py   # anemoi-inference run (omit internal --d
 
 The Hugging Face file name is **`aifs-single-mse-1.0.ckpt`**; `revision` is pinned next to `checkpoint_filename` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). `scripts/download_teacher_ckpt.py` picks up that revision by default (`--revision ""` to float with `main`).
 
-Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
+Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md). **Troubleshooting (gate / PBS / YAML):** same file, **§7**.
 
 After saving NetCDF forecasts, cosine‑latitude RMSE vs truth (JSON on stdout):
 

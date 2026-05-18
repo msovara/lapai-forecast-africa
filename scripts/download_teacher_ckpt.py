@@ -67,6 +67,12 @@ def main() -> int:
         )
         return 1
 
+    rev_disp = revision if revision is not None else "floating main (HF default branch)"
+    print(
+        f"LapAI HF download: repo={repo_id} file={filename} revision={rev_disp} local_dir={args.local_dir}",
+        file=sys.stderr,
+    )
+
     path = hf_hub_download(
         repo_id=repo_id,
         filename=filename,

@@ -51,6 +51,8 @@ qsub pbs/inference_aifs_teacher.pbs
 
 Starter YAML: [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml) (bundled **`dataset: test`**, **`printer`**). Persisting forecasts: start from [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml).
 
+**If the gate or inference fails:** see [`reports/RUNBOOK_BASELINE_LENGAU.md`](../reports/RUNBOOK_BASELINE_LENGAU.md) section **7** (troubleshooting table).
+
 ### Site-wide fallback (no isolation)
 
 If you prefer the CHPC **chem** env instead of **lapai‑anemoi**:
