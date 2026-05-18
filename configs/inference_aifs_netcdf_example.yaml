@@ -4,7 +4,7 @@
 # Checkpoint line is rewritten to an absolute path by scripts/run_aifs_inference.py :
 #   python scripts/run_aifs_inference.py --template configs/inference_aifs_my_run.yaml
 
-checkpoint: models/teacher/aifs_single_v1.0.ckpt
+checkpoint: models/teacher/aifs-single-mse-1.0.ckpt
 
 lead_time: 240
 

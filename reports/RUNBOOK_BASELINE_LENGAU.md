@@ -68,7 +68,7 @@ python scripts/run_aifs_inference.py
 Or on the cluster (GPU PBS job): `qsub pbs/inference_aifs_teacher.pbs` (`qsub -v LAPAI_AIFS_INFER_DRY=1 …` for dry-run only).
 
 Uses [`configs/inference_aifs_minimal.yaml`](../configs/inference_aifs_minimal.yaml); swap `input`/`output`/lead time per [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html). For a skeleton with longer lead and NetCDF comments, see [`configs/inference_aifs_netcdf_example.yaml`](../configs/inference_aifs_netcdf_example.yaml).
-When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for **`aifs_single_v1.0.ckpt`**:
+When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for **`aifs-single-mse-1.0.ckpt`**:
 
 1. Produce one rollout (e.g. 10-day) NetCDF/Zarr under `data/processed/lapai/`.
 2. Record command line, **`revision`**, node type, CUDA module → append below.

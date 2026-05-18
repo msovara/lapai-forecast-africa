@@ -33,7 +33,7 @@ def main() -> int:
         "--ckpt",
         type=Path,
         default=None,
-        help="Path to aifs_single_v1.0.ckpt (default: from configs/teacher_aifs.yaml)",
+        help="Path to teacher .ckpt (default: configs/teacher_aifs.yaml → local_checkpoint_relative)",
     )
     p.add_argument(
         "--max-state-keys",

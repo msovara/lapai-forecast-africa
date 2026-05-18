@@ -456,7 +456,7 @@ PBS script outlines (to be written in Week 1):
 
 | #  | Risk                                                                        | Likelihood | Impact | Mitigation                                                                                         |
 | -- | --------------------------------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------- |
-| R1 | AIFS internal layer indices (10, 14) differ across released checkpoints     | Medium     | High   | Teacher pinned to `aifs_single_v1.0.ckpt` ([ecmwf/aifs-single-1.0](https://huggingface.co/ecmwf/aifs-single-1.0)); freeze real module→hook mapping in `configs/teacher_aifs.yaml` after inspection.        |
+| R1 | AIFS internal layer indices (10, 14) differ across released checkpoints     | Medium     | High   | Teacher pinned to HF artifact **`aifs-single-mse-1.0.ckpt`** ([ecmwf/aifs-single-1.0](https://huggingface.co/ecmwf/aifs-single-1.0)); freeze real module→hook mapping in `configs/teacher_aifs.yaml` after inspection.        |
 | R2 | Pruning gate (< 3 % CRPS) cannot be met at 30 % cumulative                  | Medium     | Medium | Reduce K per round; fall back to 20 % cumulative; document trade-off.                              |
 | R3 | Spectral loss destabilises training                                         | Medium     | Medium | Start with `λ_C = 0` for the first 1 k steps; warm-up to 0.25.                                     |
 | R4 | 15 % global / 20 % Africa skill budget breached                             | Medium     | High   | Add multi-step rollout supervision; revisit channel widths up to 15 M params; revisit lon padding. |
@@ -472,9 +472,9 @@ PBS script outlines (to be written in Week 1):
 
 ### Resolved — teacher checkpoint
 
-Pin the **teacher** to Hugging Face [**ecmwf/aifs-single-1.0**](https://huggingface.co/ecmwf/aifs-single-1.0) (AIFS Single v1.0, operationally supported; supersedes v0.2.1). Use checkpoint artifact **`aifs_single_v1.0.ckpt`** (weights only; CC BY 4.0 — attribute ECMWF/HF URL in distributions). When `configs/teacher_aifs.yaml` exists, pin the HF **revision/commit** alongside the checkpoint path so reproducibility survives model-card updates.
+Pin the **teacher** to Hugging Face [**ecmwf/aifs-single-1.0**](https://huggingface.co/ecmwf/aifs-single-1.0) (AIFS Single v1.0, operationally supported; supersedes v0.2.1). Use checkpoint artifact **`aifs-single-mse-1.0.ckpt`** (weights only; CC BY 4.0 — attribute ECMWF/HF URL in distributions). `configs/teacher_aifs.yaml` pins the HF **revision/commit** alongside the filename so reproducibility survives model-card updates.
 
-**Reminder:** Numeric distillation taps at “layers **10** and **14**” elsewhere in this document are **placeholder indices**; map real module names / tensor hooks after loading `aifs_single_v1.0.ckpt` (see §9-R1).
+**Reminder:** Numeric distillation taps at “layers **10** and **14**” elsewhere in this document are **placeholder indices**; map real module names / tensor hooks after loading **`aifs-single-mse-1.0.ckpt`** (see §9-R1).
 
 ### Still open
 

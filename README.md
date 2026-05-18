@@ -55,7 +55,11 @@ python scripts/run_aifs_inference.py   # invokes anemoi-inference run (bundled d
 #     qsub -v LAPAI_AIFS_INFER_DRY=1 pbs/inference_aifs_teacher.pbs
 ```
 
-Set `revision:` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml) to the Hugging Face commit you used. Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
+The Hugging Face file name is **`aifs-single-mse-1.0.ckpt`**; `revision` is pinned next to `checkpoint_filename` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). `scripts/download_teacher_ckpt.py` picks up that revision by default (`--revision ""` to float with `main`).
+
+Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
+
+After saving NetCDF forecasts, cosine‑latitude RMSE vs truth: `python evaluation/eval_skill.py --pred-netcdf PATH --truth-netcdf PATH --var VAR [--isel time=0,step=…]` (`pip install -e ".[data]"`).
 
 ## Repository status
 

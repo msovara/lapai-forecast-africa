@@ -7,7 +7,7 @@
 # Tune lead_time / date / input / output once initial conditions feed is ready (cds, mars, grib,
 # dataset, etc.).
 
-checkpoint: models/teacher/aifs_single_v1.0.ckpt
+checkpoint: models/teacher/aifs-single-mse-1.0.ckpt
 
 # Forecast length (hours)
 lead_time: 72

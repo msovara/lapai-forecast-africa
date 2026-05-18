@@ -4,7 +4,7 @@ YAML files here drive training, pruning, evaluation, and the pinned teacher iden
 
 | File | Role |
 |------|------|
-| `teacher_aifs.yaml` | Hugging Face repo ID, checkpoint name, optional `revision`, local relative path (`models/teacher/…`), distillation hook placeholders (`layer_map`). |
+| `teacher_aifs.yaml` | Hugging Face repo ID, checkpoint file **`aifs-single-mse-1.0.ckpt`**, pinned `revision`, local relative path, distillation hook placeholders (`layer_map`). |
 | `trackA_coarsen.yaml` | Track A coarse-grid parameters (e.g. N320 → processor mesh hints for Anemoi / offline tools). |
 | `trackA_prune.yaml` | CRPS gate and iterative head-prune knobs. |
 | `student_global.yaml` | LapAIStudent CNN geometry and loss phase schedule pointers. |
