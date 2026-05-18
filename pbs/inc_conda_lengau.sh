@@ -6,8 +6,8 @@
 #   source pbs/inc_conda_lengau.sh
 #
 # Optional overrides (exported before qsub or via qsub -v VAR=value):
-#   LAPAI_CONDA_TRACK_A=/path/to/env   # default below (CHPC shared Anemoi)
-#   LAPAI_CONDA_TRACK_B=name_or_path   # default lapai-credit (create via environment-credit-lengau.yml)
+#   LAPAI_CONDA_TRACK_A=name_or_path   # default lapai-isolated Track A env (environment-anemoi.yml)
+#   LAPAI_CONDA_TRACK_B=name_or_path   # default lapai-credit (environment-credit-lengau.yml)
 
 if [[ ! -f pbs/inc_conda_lengau.sh ]]; then
   echo "ERROR: cwd must be lapai-forecast repo root (needs ./pbs/). Now: $(pwd)" >&2
@@ -25,14 +25,27 @@ fi
 # shellcheck source=/dev/null
 source "$CONDA_SH"
 
-# Verified on Lengau (login nodes): interpreter has torch (+cu124 wheels) and anemoi imports.
-export LAPAI_CONDA_TRACK_A="${LAPAI_CONDA_TRACK_A:-/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training}"
+# Isolated conda env built from environment-anemoi.yml (recommended on Lengau).
+# Site-wide fallback (chem stack): LAPAI_CONDA_TRACK_A=/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training
+export LAPAI_CONDA_TRACK_A="${LAPAI_CONDA_TRACK_A:-lapai-anemoi}"
 export LAPAI_CONDA_TRACK_B="${LAPAI_CONDA_TRACK_B:-lapai-credit}"
 
 lapai_activate_track_a() {
   conda deactivate 2>/dev/null || true
   conda activate "${LAPAI_CONDA_TRACK_A}" || {
-    echo "ERROR: conda activate failed: ${LAPAI_CONDA_TRACK_A}" >&2
+    cat <<'EOF' >&2
+ERROR: TRACK_A conda env activation failed (default: lapai-anemoi).
+
+Create the isolated env from repo root (after module load chpc/python/anaconda + source conda.sh):
+
+  conda env create -f environment-anemoi.yml
+  conda activate lapai-anemoi
+  pip install -e . --no-deps
+
+Or submit with the CHPC shared Anemoi stack (not isolated):
+
+  qsub -v LAPAI_CONDA_TRACK_A=/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training pbs/trackA.pbs
+EOF
     exit 1
   }
 }

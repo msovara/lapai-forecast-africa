@@ -13,19 +13,43 @@ qsub pbs/trackA.pbs
 
 Submit **from inside** `lapai-forecast/`, not from a parent repo unless you deliberately set PBS `-d`.
 
-## Conda stacks (verified on login2)
+## Conda stacks
 
-| Slot | Env | Purpose |
-|------|-----|---------|
-| **Track A** (default) | `/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training` | **torch** (+cu wheels) + **`anemoi`** (`pbs/trackA.pbs`) |
-| **Track B / LoRA** (must exist) | `lapai-credit` | Create with [`environment-credit-lengau.yml`](../environment-credit-lengau.yml); `pbs/student.pbs` / `pbs/lora.pbs` |
+| Slot | Default env | Create from | Purpose |
+|------|-------------|-------------|---------|
+| **Track A** | **`lapai-anemoi`** (isolated) | [`environment-anemoi.yml`](../environment-anemoi.yml) | PyTorch + CUDA + full **Anemoi** pip stack + GRIB/xarray (`pbs/trackA.pbs`) |
+| **Track B / LoRA** | **`lapai-credit`** | [`environment-credit-lengau.yml`](../environment-credit-lengau.yml) | Student / LoRA / ONNX helpers (`pbs/student.pbs`, `pbs/lora.pbs`) |
 
-Personal environments under `$HOME/.conda/envs/` are **not** used unless you override (see below). A probe for `peft` + `torch` in personal envs found none until **`lapai-credit`** exists.
-
-## Override conda env targets
+Recommended one-shot install on Lengau (interactive or batch [`pbs/setup_env_lengau.pbs`](../pbs/setup_env_lengau.pbs)):
 
 ```bash
-qsub -v LAPAI_CONDA_TRACK_A=/path/to/other-anemoi pbs/trackA.pbs
+module load chpc/python/anaconda/3-2024.10.1
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+cd /path/to/lapai-forecast
+bash scripts/setup_lengau_envs.sh
+```
+
+That creates/updates **`lapai-anemoi`** and **`lapai-credit`**, then `pip install -e . --no-deps` inside **`lapai-credit`** only — repeat the editable install inside **`lapai-anemoi`** if you import `lapai_inference` during Track A scripts:
+
+```bash
+conda activate lapai-anemoi
+pip install -e . --no-deps
+```
+
+Optional: heavy env prefixes on lustre (`export CONDA_ENVS_PATH=...`; see README).
+
+### Site‑wide fallback (no isolation)
+
+If you prefer the CHPC **chem** env instead of **lapai‑anemoi**:
+
+```bash
+qsub -v LAPAI_CONDA_TRACK_A=/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training pbs/trackA.pbs
+```
+
+## Override conda targets
+
+```bash
+qsub -v LAPAI_CONDA_TRACK_A=my-anemoi-env pbs/trackA.pbs
 qsub -v LAPAI_CONDA_TRACK_B=my-torch-env pbs/student.pbs
 ```
 
@@ -37,25 +61,14 @@ Batch scripts call `lapai_load_cuda_gpu` which tries:
 
 `module load chpc/cuda/12.0/12.0`, then `chpc/cuda/11.8/11.8`.
 
-## Create `lapai-credit` once (required for Track B PBS)
+## Create `lapai-credit` only (Track B)
 
-Interactive or [`pbs/setup_env_lengau.pbs`](../pbs/setup_env_lengau.pbs):
+If **`lapai-anemoi`** already exists:
 
 ```bash
-module load chpc/python/anaconda/3-2024.10.1
-source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
-cd /path/to/lapai-forecast
 conda env create -f environment-credit-lengau.yml
 conda activate lapai-credit
 pip install -e . --no-deps
-```
-
-## Optional: dedicated `lapai-anemoi` for Track A
-
-[`scripts/setup_lengau_envs.sh`](../scripts/setup_lengau_envs.sh) builds **`lapai-anemoi`**. PBS defaults to CHPC **`anemoi-training`** unless you prefer isolation:
-
-```bash
-qsub -v LAPAI_CONDA_TRACK_A=lapai-anemoi pbs/trackA.pbs
 ```
 
 ## Sanity: personal env with peft + torch

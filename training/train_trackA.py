@@ -13,7 +13,7 @@ def main() -> None:
 
     print(
         "Track A stub: integrate anemoi-training here; PBS defaults use LAPAI_CONDA_TRACK_A "
-        "(CHPC anemoi-training).\n"
+        "(isolated lapai-anemoi from environment-anemoi.yml).\n"
         f"  step={args.step} config={args.config}\n"
         "Replace this entrypoint with anemoi-training after ECMWF challenge recipe access.\n"
         "Grid coarsening helpers live in utils/grid_coarsen.py for offline ERA5 stacks."
