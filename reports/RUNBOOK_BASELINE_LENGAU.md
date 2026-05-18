@@ -29,22 +29,31 @@ python scripts/download_teacher_ckpt.py --local-dir models/teacher
 
 Copy the printed path into **`configs/teacher_aifs.yaml`** (`revision` + confirm `local_checkpoint_relative`).
 
-## 3. ERA5 → Zarr (when CDS / GRIB is ready)
+## 3. Smoke: checkpoint file (+ optional `torch.load`)
+
+```bash
+python scripts/smoke_teacher_ckpt.py
+```
+
+Fails fast if weights are missing; with **torch** installed, prints shallow keys from the pickled checkpoint.
+
+## 4. ERA5 → Zarr (when CDS / GRIB is ready)
 
 - Place GRIB under `data/raw/lapai/era5/n320/` (gitignored).
 - Wire [`recipes/recipe_era5_n320.yaml`](../recipes/recipe_era5_n320.yaml) and [`recipes/recipe_era5_n96.yaml`](../recipes/recipe_era5_n96.yaml) to your **`anemoi-datasets`** / ingest driver; uncomment/adjust **`regrid`** for N96 with your toolchain.
 
-## 4. Smoke: Track A PBS
+## 5. Smoke: Track A PBS
 
 From repo root:
 
 ```bash
+python training/train_trackA.py --step coarsen --suggest-invocation
 qsub pbs/trackA.pbs
 ```
 
 Expect the [`train_trackA.py`](../training/train_trackA.py) stub until Anemoi training is wired; env activation must succeed (**`lapai-anemoi`**).
 
-## 5. Baseline forecast artefact (Phase 0)
+## 6. Baseline forecast artefact (Phase 0)
 
 When **`anemoi-inference`** is configured for **`aifs_single_v1.0.ckpt`**:
 

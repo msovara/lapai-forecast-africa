@@ -47,6 +47,7 @@ Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download wei
 
 ```bash
 python scripts/download_teacher_ckpt.py --local-dir models/teacher
+python scripts/smoke_teacher_ckpt.py
 ```
 
 Set `revision:` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml) to the Hugging Face commit you used. Week-1 checklist for Lengau: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
