@@ -90,3 +90,13 @@ When **`anemoi-inference`** is configured with real ICs (**CDS**/MARS/GRIB) for 
 | _example_ | you  | `f0bb02c077e…` (from teacher yaml, or HF tip if you floated) | 123456[].chpc.ac.za | `data/processed/lapai/…` | `printer` baseline or first NetCDF |
 
 _Use a short SHA or full commit as in **`configs/teacher_aifs.yaml`**._
+
+## 7. If `lapai_inference_gate.sh` fails
+
+| Symptom | What to try |
+|--------|-------------|
+| **`teacher_ckpt_exists: MISSING`** | Run **`python scripts/download_teacher_ckpt.py --local-dir models/teacher`**. Paths must match **`local_checkpoint_relative`** in **`configs/teacher_aifs.yaml`**. |
+| **`anemoi-inference_path: MISSING`** or **`NOT_INSTALLED`** | **`conda activate lapai-anemoi`**; refresh env from **`environment-anemoi.yml`**. PBS must **`source`** conda via **`pbs/inc_conda_lengau.sh`**. |
+| **`torch: NOT IMPORTABLE`** | Same env — avoid mixing login-node system Python with LapAI conda for these scripts. |
+| **`--dry-run` OK but real run fails** | Use **GPU**: **`pbs/inference_aifs_teacher.pbs`**. Inspect **`LAPAI`** template/checkpoint lines on **stderr**. |
+| **YAML rejected by `anemoi-inference run`** | Align with [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html) and [Saving Outputs](https://anemoi.readthedocs.io/projects/inference/en/latest/usage/advanced/saving.html). |

@@ -22,3 +22,4 @@ def test_verify_inference_stack_prints_hf_pin():
     assert "teacher_hf:" in out
     assert "aifs-single-mse-1.0.ckpt" in out
     assert "f0bb02c" in out
+    assert "anemoi-inference_pip_distribution:" in out

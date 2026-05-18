@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.metadata
 import importlib.util
 import shutil
 import sys
@@ -67,6 +68,15 @@ def main() -> int:
     print(f"anemoi-inference_path: {exe or 'MISSING'}")
     if exe is None and args.strict:
         ok = False
+
+    for dist_name in ("anemoi-inference", "anemoi_inference"):
+        try:
+            print(f"anemoi-inference_pip_distribution: {importlib.metadata.version(dist_name)}")
+            break
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    else:
+        print("anemoi-inference_pip_distribution: NOT_INSTALLED")
 
     if importlib.util.find_spec("torch") is None:
         print("torch: NOT IMPORTABLE")
