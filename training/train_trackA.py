@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -40,7 +41,10 @@ def main() -> None:
         "--anemoi-train",
         nargs=argparse.REMAINDER,
         metavar="ARGS",
-        help="If any tokens follow, run: python -m anemoi.training train ARGS (pass-through)",
+        help=(
+            "If any tokens follow, run anemoi-training: "
+            "`anemoi-training train ARGS` when on PATH, else `python -m anemoi.training train ARGS`"
+        ),
     )
     args = p.parse_args()
 
@@ -49,7 +53,11 @@ def main() -> None:
         return
 
     if args.anemoi_train is not None and len(args.anemoi_train) > 0:
-        cmd = [sys.executable, "-m", "anemoi.training", "train", *args.anemoi_train]
+        exe = shutil.which("anemoi-training")
+        if exe:
+            cmd = [exe, "train", *args.anemoi_train]
+        else:
+            cmd = [sys.executable, "-m", "anemoi.training", "train", *args.anemoi_train]
         print("exec:", " ".join(cmd))
         raise SystemExit(subprocess.call(cmd))
 

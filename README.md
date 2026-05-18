@@ -59,7 +59,13 @@ The Hugging Face file name is **`aifs-single-mse-1.0.ckpt`**; `revision` is pinn
 
 Template for **`anemoi-inference`**: [`configs/inference_aifs_minimal.yaml`](configs/inference_aifs_minimal.yaml). Week‑1 checklist: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
 
-After saving NetCDF forecasts, cosine‑latitude RMSE vs truth: `python evaluation/eval_skill.py --pred-netcdf PATH --truth-netcdf PATH --var VAR [--isel time=0,step=…]` (`pip install -e ".[data]"`).
+After saving NetCDF forecasts, cosine‑latitude RMSE vs truth (JSON on stdout):
+
+`python -m evaluation.eval_skill --pred-netcdf PATH --truth-netcdf PATH --var VAR [--isel time=0,step=…]`
+
+Torch dict mode (keys `pred` / `era5`): `python -m evaluation.eval_skill --blob MODEL.pt`.
+
+Install **`pip install -e ".[data]"`** when using NetCDF/Zarr.
 
 ## Repository status
 
