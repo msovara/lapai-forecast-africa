@@ -1,1 +1,29 @@
-﻿# placeholder: wire ECMWF Anemoi ERA5 N96 recipe
+﻿# ERA5 pipeline coarsened for student / Track A compressor input (~1°, O96/N96 per your graphs).
+# `regrid` keys depend on your anemoi-transform / graphs version — validate against cluster env.
+
+dates:
+  start: 1979-01-01T00:00:00Z
+  end: 2018-12-31T18:00:00Z
+  frequency: 6h
+
+input:
+  grib:
+    param:
+      - 2t
+      - 10u
+      - 10v
+      - msl
+      - sp
+      - tp
+    path: data/raw/lapai/era5/n320/*.grib
+
+# Uncomment and align with ECMWF tooling once graph target is fixed:
+# regrid:
+#   target_grid: n96
+
+output:
+  dtype: float32
+  chunking:
+    dates: 1
+    ensembles: 1
+  path: data/processed/lapai/era5_n96.zarr

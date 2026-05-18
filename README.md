@@ -41,6 +41,16 @@ ERA5  ─────────────►  Track B (MILES-CREDIT student 
                               Phase 4 — ONNX export + `lapai_inference` package
 ```
 
+## Teacher checkpoint (AIFS Single v1.0)
+
+Pinned in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml). Download weights (requires `pip install huggingface_hub` or optional install `pip install -e ".[hf]"`):
+
+```bash
+python scripts/download_teacher_ckpt.py --local-dir models/teacher
+```
+
+Set `revision:` in [`configs/teacher_aifs.yaml`](configs/teacher_aifs.yaml) to the Hugging Face commit you used. Week-1 checklist for Lengau: [`reports/RUNBOOK_BASELINE_LENGAU.md`](reports/RUNBOOK_BASELINE_LENGAU.md).
+
 ## Repository status
 
 The long-form technical plan (layouts, compute budget, risks, milestones) is in [`PLAN.md`](PLAN.md).

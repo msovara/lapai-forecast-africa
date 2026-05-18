@@ -15,7 +15,8 @@ def main() -> None:
         "Track A stub: integrate anemoi-training here; PBS defaults use LAPAI_CONDA_TRACK_A "
         "(isolated lapai-anemoi from environment-anemoi.yml).\n"
         f"  step={args.step} config={args.config}\n"
-        "Replace this entrypoint with anemoi-training after ECMWF challenge recipe access.\n"
+        "Teacher HF pin: configs/teacher_aifs.yaml — download ckpt via scripts/download_teacher_ckpt.py.\n"
+        "Replace this entrypoint with anemoi-training when challenge recipe / configs are wired.\n"
         "Grid coarsening helpers live in utils/grid_coarsen.py for offline ERA5 stacks."
     )
 

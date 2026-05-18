@@ -1,1 +1,28 @@
-﻿# placeholder: wire ECMWF Anemoi ERA5 N320 recipe
+﻿# Anemoi-style dataset recipe (input → Zarr) for LapAI Phase 0 / Track A.
+# Align field list with configs/student_global.yaml and AIFS I/O when you wire anemoi-datasets.
+#
+# Fill `input.grib.path` with your ERA5 GRIB location on Lustre; keep data/ out of git (see .gitignore).
+
+dates:
+  start: 1979-01-01T00:00:00Z
+  end: 2018-12-31T18:00:00Z
+  frequency: 6h
+
+input:
+  grib:
+    # Surface (subset; extend to match teacher / student channel list)
+    param:
+      - 2t
+      - 10u
+      - 10v
+      - msl
+      - sp
+      - tp
+    path: data/raw/lapai/era5/n320/*.grib
+
+output:
+  dtype: float32
+  chunking:
+    dates: 1
+    ensembles: 1
+  path: data/processed/lapai/era5_n320.zarr
