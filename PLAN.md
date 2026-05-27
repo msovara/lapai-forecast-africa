@@ -3,8 +3,7 @@
 **Project:** LapAI-Forecast (Code for Earth, African Stream)
 **Goal:** A compressed, laptop-deployable AI NWP model distilled from ECMWF AIFS, with regional adaptation for Africa.
 **Status:** Planning (no code yet). This document is the contract for Phases 0–3.
-**Project root:** `lapai-forecast/` — a dedicated, self-contained directory sibling to `neoss-csir-chpc/`, `mpas-lengau/`, `wrf-lengau/`, etc. **None** of the existing top-level `configs/`, `recipes/`, `training/`, `inference/`, `evaluation/`, `diagnostics/`, or `utils/` folders (which belong to the IOD / drought / JRA-3Q / T2M work) are touched, shared, or modified by this project.
-
+**Project root:** `lapai-forecast/` — a dedicated, self-contained directory.
 ---
 
 ## 0. Source plan reconciliation
