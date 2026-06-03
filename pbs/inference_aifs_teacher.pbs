@@ -12,6 +12,9 @@
 # Alternate inference YAML (e.g. netcdf_example after you customise output):
 #   qsub -v LAPAI_INFER_TEMPLATE=configs/inference_aifs_netcdf_example.yaml pbs/inference_aifs_teacher.pbs
 #
+# Challenge teacher (gated C4E-Mvula/n320_gt6) instead of public AIFS:
+#   qsub -v LAPAI_TEACHER_CONFIG=configs/teacher_n320_gt6.yaml pbs/inference_aifs_teacher.pbs
+#
 # To pass extra flags reliably, run interactively or edit this script; PBS -v
 # word-splitting makes multi-arg env vars fragile.
 #
@@ -24,11 +27,14 @@ source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
 lapai_activate_track_a
 
-echo "[lapai] PBS_O_WORKDIR=${PWD} LAPAI_INFER_TEMPLATE=${LAPAI_INFER_TEMPLATE:-} LAPAI_AIFS_INFER_DRY=${LAPAI_AIFS_INFER_DRY:-0}"
+echo "[lapai] PBS_O_WORKDIR=${PWD} LAPAI_INFER_TEMPLATE=${LAPAI_INFER_TEMPLATE:-} LAPAI_TEACHER_CONFIG=${LAPAI_TEACHER_CONFIG:-} LAPAI_AIFS_INFER_DRY=${LAPAI_AIFS_INFER_DRY:-0}"
 
 infer_py=( python scripts/run_aifs_inference.py )
 if [[ -n "${LAPAI_INFER_TEMPLATE:-}" ]]; then
   infer_py+=( --template "${LAPAI_INFER_TEMPLATE}" )
+fi
+if [[ -n "${LAPAI_TEACHER_CONFIG:-}" ]]; then
+  infer_py+=( --teacher-config "${LAPAI_TEACHER_CONFIG}" )
 fi
 
 if [[ "${LAPAI_AIFS_INFER_DRY:-0}" == 1 ]]; then

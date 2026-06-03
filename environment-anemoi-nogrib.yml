@@ -1,0 +1,34 @@
+name: lapai-anemoi
+# Variant without conda eccodes/cfgrib (avoids __glibc / jasper binary constraints on EL7-era CHPC login nodes).
+# Use when LapAI ingestion is via NetCDF/Zarr/CDS tooling outside conda, or when site-provided ECCODES is on LD_LIBRARY_PATH.
+#
+# Activate after create, then optionally: pip install cfgrib (only if eccodes libs are visible at runtime).
+
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+
+dependencies:
+  - python=3.11
+  - pytorch::pytorch>=2.2
+  - pytorch::torchvision
+  - pytorch-cuda=12.1
+  - numpy
+  - xarray>=2024.1
+  - netcdf4
+  - h5py>=3.10
+  - zarr>=2.16
+  - dask
+  - scipy
+  - pip
+  - pip:
+      - huggingface_hub>=0.21
+      - anemoi-datasets
+      - anemoi-graphs
+      - anemoi-inference
+      - anemoi-models
+      - anemoi-registry
+      - anemoi-training
+      - anemoi-transform
+      - anemoi-utils

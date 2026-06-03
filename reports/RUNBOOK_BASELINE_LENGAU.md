@@ -16,6 +16,14 @@ qsub pbs/inference_aifs_teacher.pbs
 
 If anything errors, see **§7**. For a saved forecast file (NetCDF/GRIB), continue with checklist step **6** and **§6**.
 
+**Challenge teacher (gated `C4E-Mvula/n320_gt6`)** instead of public AIFS — `huggingface-cli login` first, then point every step at its config:
+
+```bash
+python scripts/download_teacher_ckpt.py --config configs/teacher_n320_gt6.yaml --local-dir models/teacher_n320_gt6
+LAPAI_TEACHER_CONFIG=configs/teacher_n320_gt6.yaml bash scripts/lapai_inference_gate.sh
+qsub -v LAPAI_TEACHER_CONFIG=configs/teacher_n320_gt6.yaml pbs/inference_aifs_teacher.pbs
+```
+
 ## 0. Same-day checklist (teacher inference on GPU)
 
 1. **`git pull`** — repo root is `lapai-forecast/`.
@@ -31,14 +39,21 @@ If anything errors, see **§7**. For a saved forecast file (NetCDF/GRIB), contin
 module load chpc/python/anaconda/3-2024.10.1
 source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
 conda activate lapai-anemoi
-# huggingface_hub is included via environment-anemoi.yml pip list; pip install once if your env predates it
+# huggingface_hub is in lapai-anemoi yaml pip list; pip install once if your env predates it
 ```
 
-Optionally recreate isolated env:
+Optionally recreate isolated env — **prefer running this on interactive node `chpclic1`** (RAM + outbound network for conda/pip). Example:
 
 ```bash
+qsub -I -P CHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
+  -l place=scatter:excl -W x=FLAGS:ADVRES:chpclic1
+# then hostname should show chpclic1 — replace CHPC with your PBS project code if denied
+# setup defaults to environment-anemoi-nogrib.yml (conda eccodes/cfgrib omitted for old glibc hosts)
 bash scripts/setup_lengau_envs.sh
+# workstation with glibc ~2.28+ and conda GRIB: LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml bash scripts/setup_lengau_envs.sh
 ```
+
+Or batch: edit **`pbs/setup_env_chpclic1.pbs`** (`-P`), then **`qsub pbs/setup_env_chpclic1.pbs`** from **`lapai-forecast/`**.
 
 ## 2. Download teacher checkpoint
 

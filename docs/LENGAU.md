@@ -19,10 +19,29 @@ Submit **from inside** `lapai-forecast/`, not from a parent repo unless you deli
 
 | Slot | Default env | Create from | Purpose |
 |------|-------------|-------------|---------|
-| **Track A** | **`lapai-anemoi`** (isolated) | [`environment-anemoi.yml`](../environment-anemoi.yml) | PyTorch + CUDA + full **Anemoi** pip stack + GRIB/xarray (`pbs/trackA.pbs`) |
+| **Track A** | **`lapai-anemoi`** (isolated) | **`scripts/setup_lengau_envs.sh`** defaults to [`environment-anemoi-nogrib.yml`](../environment-anemoi-nogrib.yml) **(CHPC‑safe)** | PyTorch + CUDA + full **Anemoi** pip stack; optional conda [`environment-anemoi.yml`](../environment-anemoi.yml) adds **eccodes/cfgrib** when `LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml` and glibc is new enough (~2.28+) |
 | **Track B / LoRA** | **`lapai-credit`** | [`environment-credit-lengau.yml`](../environment-credit-lengau.yml) | Student / LoRA / ONNX helpers (`pbs/student.pbs`, `pbs/lora.pbs`) |
 
-Recommended one-shot install on Lengau (interactive or batch [`pbs/setup_env_lengau.pbs`](../pbs/setup_env_lengau.pbs)):
+**First-time environment creation belongs on compute node `chpclic1`**, not `login*`:
+login-node conda solves often get **OOM-killed**; some batch queues have **no outbound HTTPS**, so conda/pip stalls. Mirror the allocation pattern used elsewhere on CHPC (see also project notes on **`chpclic1`**).
+
+Interactive (recommended first run — replace **`CHPC`** in **`-P`** if your allocations use another project code):
+
+```bash
+ssh msovara@lengau.chpc.ac.za   # or your login node path
+qsub -I -P CHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
+  -l place=scatter:excl -W x=FLAGS:ADVRES:chpclic1
+hostname   # expect chpclic1
+module purge
+module load chpc/python/anaconda/3-2024.10.1
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+cd ~/repos/lapai-forecast                        # wherever you cloned lapai-forecast-africa
+bash scripts/setup_lengau_envs.sh
+```
+
+Batch option (still pinned to **`chpclic1`**) from repo root [`pbs/setup_env_chpclic1.pbs`](../pbs/setup_env_chpclic1.pbs): edit **`#PBS -P`** if needed, then **`qsub pbs/setup_env_chpclic1.pbs`**.
+
+Legacy login-only attempt (often fails on RAM) or smp batch [`pbs/setup_env_lengau.pbs`](../pbs/setup_env_lengau.pbs):
 
 ```bash
 module load chpc/python/anaconda/3-2024.10.1
@@ -34,6 +53,14 @@ bash scripts/setup_lengau_envs.sh
 That creates/updates **`lapai-anemoi`** and **`lapai-credit`**, and runs **`pip install -e . --no-deps`** in **each** so `lapai_inference` resolves in Track A / Track B jobs.
 
 Optional: heavy env prefixes on lustre (`export CONDA_ENVS_PATH=...`; see README).
+
+**If conda fails on `eccodes` / `jasper` / `__glibc`:** some CHPC nodes ship **glibc &lt; 2.28** but recent conda-forge GRIB binaries target newer glibc.
+
+1. Check: `ldd --version`.
+2. **`bash scripts/setup_lengau_envs.sh`** uses **`environment-anemoi-nogrib.yml`** by default (already avoids conda **`eccodes`/`cfgrib`**).  
+   If you overrode **`LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml`**, unset it or reinstall after **`conda env remove -n lapai-anemoi --yes`**.
+3. On a workstation with **`glibc` ≥ ~2.28**, optional full GRIB in conda:  
+   `LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml bash scripts/setup_lengau_envs.sh`
 
 ## Teacher inference (AIFS checkpoint on disk)
 

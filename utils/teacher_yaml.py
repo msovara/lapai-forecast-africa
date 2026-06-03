@@ -2,7 +2,19 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
+
+# Default teacher config; override with env LAPAI_TEACHER_CONFIG (e.g. configs/teacher_n320_gt6.yaml).
+DEFAULT_TEACHER_CONFIG = "configs/teacher_aifs.yaml"
+TEACHER_CONFIG_ENV = "LAPAI_TEACHER_CONFIG"
+
+
+def resolve_teacher_config_path(repo_root: Path, cli_value: str | Path | None = None) -> Path:
+    """Pick the teacher YAML: CLI value > env LAPAI_TEACHER_CONFIG > default. Relative paths join repo_root."""
+    chosen = cli_value or os.environ.get(TEACHER_CONFIG_ENV) or DEFAULT_TEACHER_CONFIG
+    path = Path(chosen)
+    return path if path.is_absolute() else (repo_root / path)
 
 _TEACHER_KEYS = frozenset(
     {
