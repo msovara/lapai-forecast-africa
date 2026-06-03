@@ -196,10 +196,11 @@ Two conda environments, both defined under `lapai-forecast/` and kept independen
 
 Data conventions:
 
-- **Years:** train 1979–2018, val 2019–2020, test 2021–2022.
-- **Frequency:** 6 h.
-- **Variables (start):** `2t, 10u, 10v, msl, sp, tp` at surface; `t, u, v, q, z` at pressure levels {1000, 850, 700, 500, 250, 100, 50} hPa. (Final list locked at end of Week 2.)
-- **Storage:** under `lapai-forecast/data/processed/{era5_n320.zarr, era5_n96.zarr, aifs_targets.zarr, enacts.zarr}`.
+- **Years:** train 1979–2018, val 2019–2020. **Evaluation/test period: 2023–2025** (per the agreed evaluation protocol).
+- **Frequency:** 6 h; precipitation also scored at **daily** aggregation.
+- **Variables (training set):** `2t, 10u, 10v, msl, sp, tp` at surface; `t, u, v, q, z` at pressure levels {1000, 850, 700, 500, 250, 100, 50} hPa.
+- **Evaluation variables (ERA5 ground truth):** 2 m **temperature**, **total precipitation** (priority for the *Mvua* team), and **10 m u/v wind**. See `configs/eval.yaml`.
+- **Storage:** a **joint bucket repo** (to be created) holds **ERA5 ground truth** plus generated forecasts across resolutions; local working copies under `lapai-forecast/data/processed/`.
 
 ### 3.3 Recipes (added in Week 1)
 
@@ -214,7 +215,7 @@ Deliverable for end of Week 2:
 
 1. AIFS public checkpoint loaded inside `lapai-anemoi` env using `anemoi-inference`.
 2. A 10-day global rollout for one initialisation date (e.g. 2022-06-01 00 Z) saved to `lapai-forecast/data/processed/aifs_baseline_20220601.nc`.
-3. `lapai-forecast/evaluation/eval_skill.py` produces RMSE / ACC for `2t, msl, z500, t850` against ERA5 — **this is the AIFS baseline number** that all subsequent experiments are measured against.
+3. `lapai-forecast/evaluation/eval_skill.py` produces RMSE / ACC against **ERA5** for the evaluation variables (`t2m, tp, u10, v10`; see `configs/eval.yaml`) over the **2023–2025** test period — **this is the baseline number** that all subsequent experiments are measured against.
 
 ---
 
