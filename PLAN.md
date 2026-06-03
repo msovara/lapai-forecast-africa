@@ -2,7 +2,8 @@
 
 **Project:** LapAI-Forecast (Code for Earth, African Stream)
 **Goal:** A compressed, laptop-deployable AI NWP model distilled from ECMWF AIFS, with regional adaptation for Africa.
-**Status:** Planning (no code yet). This document is the contract for Phases 0–3.
+**Status:** Phase 0 in progress. Scaffolding, inference scripts, gate, PBS, CI, and tests are implemented; outstanding work is the Lengau/`chpclic1` environment + the first saved baseline forecast. This document remains the contract for Phases 0–3.
+**Teacher checkpoint:** Two options are wired — the public **`ecmwf/aifs-single-1.0`** (`configs/teacher_aifs.yaml`, regression harness) and the gated Code-for-Earth challenge model **`C4E-Mvula/n320_gt6`** (`configs/teacher_n320_gt6.yaml`, `inference.ckpt`). Select with `LAPAI_TEACHER_CONFIG` / `--config`.
 **Project root:** `lapai-forecast/` — a dedicated, self-contained directory.
 ---
 
@@ -177,10 +178,10 @@ tiny-media-analysis/
 
 Two conda environments, both defined under `lapai-forecast/` and kept independent so Anemoi and MILES-CREDIT do not fight over PyTorch / CUDA pins:
 
-- `lapai-anemoi` (file: `lapai-forecast/environment-anemoi.yml`) — used for Track A and AIFS checkpoint handling.
-- `lapai-credit` (file: `lapai-forecast/environment-credit.yml`) — clean env with PyTorch ≥ 2.3 + CUDA 12.x, MILES-CREDIT, and `peft` for LoRA, used for Tracks B/3 and ONNX export.
+- `lapai-anemoi` — Track A and teacher checkpoint handling. Created via `scripts/setup_lengau_envs.sh`, which **defaults to `environment-anemoi-nogrib.yml`** (omits conda `eccodes`/`cfgrib`). This is required on legacy CHPC nodes whose `glibc < 2.28` cannot satisfy conda-forge `jasper`/`libjpeg-turbo`. The full GRIB conda stack lives in `environment-anemoi.yml` and is opt-in (`LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml`) on hosts with modern glibc. On old-glibc nodes, install GRIB via pip wheels (`ecmwflibs`, `eccodes`, `cfgrib`) instead.
+- `lapai-credit` (file: `lapai-forecast/environment-credit-lengau.yml`) — PyTorch + CUDA + MILES-CREDIT + `peft` for LoRA, used for Tracks B/3 and ONNX export.
 
-`lapai-forecast/requirements.txt` (to be created) will pin: `miles-credit`, `peft`, `onnx`, `onnxruntime`, `einops`, `torch-harmonics`, `xarray`, `zarr`, `cdsapi`, `cfgrib`, `eccodes`, plus the `anemoi-*` package set. All versions to be locked in Week 1 from the latest stable releases.
+`lapai-forecast/requirements.txt` pins the broad package set; env creation belongs on the interactive `chpclic1` node (RAM + outbound network), not login nodes (OOM) or non-networked batch queues.
 
 ### 3.2 Data inventory
 
