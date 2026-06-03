@@ -20,13 +20,18 @@ def _repo_root() -> Path:
 
 def main() -> int:
     rr = _repo_root()
-    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
 
-    p = argparse.ArgumentParser(description="Download ecmwf/aifs-single-1.0 checkpoint")
+    p = argparse.ArgumentParser(description="Download a teacher checkpoint from Hugging Face")
+    p.add_argument(
+        "--config",
+        default="configs/teacher_aifs.yaml",
+        help="Teacher YAML providing default pins (repo-relative or absolute). "
+        "Use configs/teacher_n320_gt6.yaml for the Code-for-Earth challenge teacher.",
+    )
     p.add_argument(
         "--repo-id",
         default=None,
-        help="Hugging Face model repo (default: huggingface_repo_id from configs/teacher_aifs.yaml)",
+        help="Hugging Face model repo (default: huggingface_repo_id from --config)",
     )
     p.add_argument(
         "--filename",
@@ -46,8 +51,21 @@ def main() -> int:
     )
     args = p.parse_args()
 
+    cfg_path = Path(args.config)
+    if not cfg_path.is_absolute():
+        cfg_path = rr / cfg_path
+    pins = parse_teacher_aifs_yaml_file(cfg_path)
+
     repo_id = args.repo_id or pins.get("huggingface_repo_id") or "ecmwf/aifs-single-1.0"
-    filename = args.filename or pins.get("checkpoint_filename") or "aifs-single-mse-1.0.ckpt"
+    filename = args.filename or pins.get("checkpoint_filename")
+    if not filename:
+        print(
+            f"ERROR: no checkpoint_filename in {cfg_path} and --filename not given.\n"
+            f"List files at https://huggingface.co/{repo_id}/tree/main (log in if gated) "
+            "and pass --filename <name>.",
+            file=sys.stderr,
+        )
+        return 2
     if args.revision is None:
         revision = pins.get("revision")
     else:

@@ -11,7 +11,11 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from utils.teacher_yaml import parse_teacher_aifs_yaml_file, teacher_checkpoint_resolved  # noqa: E402
+from utils.teacher_yaml import (  # noqa: E402
+    parse_teacher_aifs_yaml_file,
+    resolve_teacher_config_path,
+    teacher_checkpoint_resolved,
+)
 
 
 def repo_root() -> Path:
@@ -19,12 +23,17 @@ def repo_root() -> Path:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="Smoke-test AIFS teacher .ckpt on disk")
+    p = argparse.ArgumentParser(description="Smoke-test teacher .ckpt on disk")
+    p.add_argument(
+        "--config",
+        default=None,
+        help="Teacher YAML (default: env LAPAI_TEACHER_CONFIG or configs/teacher_aifs.yaml)",
+    )
     p.add_argument(
         "--ckpt",
         type=Path,
         default=None,
-        help="Path to teacher .ckpt (default: configs/teacher_aifs.yaml → local_checkpoint_relative)",
+        help="Path to teacher .ckpt (default: --config → local_checkpoint_relative)",
     )
     p.add_argument(
         "--max-state-keys",
@@ -35,7 +44,9 @@ def main() -> int:
     args = p.parse_args()
 
     rr = repo_root()
-    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
+    cfg_path = resolve_teacher_config_path(rr, args.config)
+    pins = parse_teacher_aifs_yaml_file(cfg_path)
+    print(f"LapAI teacher config: {cfg_path}", file=sys.stderr)
     if pins.get("huggingface_repo_id"):
         rev_disp = pins.get("revision") or "(not set in yaml)"
         print(
@@ -46,7 +57,7 @@ def main() -> int:
             file=sys.stderr,
         )
 
-    ckpt = args.ckpt or teacher_checkpoint_resolved(rr)
+    ckpt = args.ckpt or teacher_checkpoint_resolved(rr, cfg_path)
     if ckpt is None:
         print("Could not resolve checkpoint path; pass --ckpt", file=sys.stderr)
         return 1

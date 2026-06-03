@@ -1,0 +1,21 @@
+# Code-for-Earth challenge teacher (AIFS-like, ERA-trained). GATED Hugging Face repo.
+# Model card: https://huggingface.co/C4E-Mvula/n320_gt6
+# Access: create a Hugging Face account, request access, then `huggingface-cli login`
+#         (or export HF_TOKEN=...) before scripts/download_teacher_ckpt.py / anemoi-inference.
+
+huggingface_repo_id: C4E-Mvula/n320_gt6
+
+# Confirmed from repo Files tab (7 days ago, ~1.12 GB). Inference notebook: run_C4E_inference.ipynb.
+checkpoint_filename: inference.ckpt
+
+# Floating main by default. To pin reproducibly, set the full commit hash (HEAD short hash is 0fec9cf).
+revision:
+
+local_checkpoint_relative: models/teacher_n320_gt6/inference.ckpt
+
+layer_map:
+  feature_L10: 10
+  feature_L14: 14
+
+license_note: >-
+  Private challenge checkpoint; respect repository terms and challenge rules.

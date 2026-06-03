@@ -16,7 +16,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from utils.teacher_yaml import teacher_checkpoint_resolved  # noqa: E402
+from utils.teacher_yaml import (  # noqa: E402
+    resolve_teacher_config_path,
+    teacher_checkpoint_resolved,
+)
 
 
 def repo_root() -> Path:
@@ -60,6 +63,12 @@ def main() -> int:
     )
     p.add_argument("--checkpoint", type=Path, default=None)
     p.add_argument(
+        "--teacher-config",
+        default=None,
+        help="Teacher YAML providing the checkpoint path "
+        "(default: env LAPAI_TEACHER_CONFIG or configs/teacher_aifs.yaml)",
+    )
+    p.add_argument(
         "--anemoi-inference-binary",
         type=Path,
         default=None,
@@ -86,7 +95,9 @@ def main() -> int:
     if args.checkpoint is not None:
         ck = args.checkpoint if args.checkpoint.is_absolute() else (rr / args.checkpoint).resolve()
     else:
-        ck_maybe = teacher_checkpoint_resolved(rr)
+        cfg_path = resolve_teacher_config_path(rr, args.teacher_config)
+        print(f"# LapAI teacher config: {cfg_path}", file=sys.stderr)
+        ck_maybe = teacher_checkpoint_resolved(rr, cfg_path)
         ck = ck_maybe.resolve() if ck_maybe is not None else None
 
     if ck is None or not ck.is_file():

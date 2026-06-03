@@ -14,22 +14,23 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from utils.teacher_yaml import parse_teacher_aifs_yaml_file  # noqa: E402
+from utils.teacher_yaml import (  # noqa: E402
+    parse_teacher_aifs_yaml_file,
+    resolve_teacher_config_path,
+)
 
 
 def repo_root() -> Path:
     return _REPO_ROOT
 
 
-def teacher_yaml_checkpoint_relative() -> str | None:
-    rel = parse_teacher_aifs_yaml_file(repo_root() / "configs" / "teacher_aifs.yaml").get(
-        "local_checkpoint_relative"
-    )
-    return rel
-
-
 def main() -> int:
     p = argparse.ArgumentParser(description="LapAI: verify inference prerequisites")
+    p.add_argument(
+        "--config",
+        default=None,
+        help="Teacher YAML (default: env LAPAI_TEACHER_CONFIG or configs/teacher_aifs.yaml)",
+    )
     p.add_argument(
         "--strict",
         action="store_true",
@@ -41,7 +42,9 @@ def main() -> int:
     ok = True
     print(f"repo_root: {rr}")
 
-    pins = parse_teacher_aifs_yaml_file(rr / "configs" / "teacher_aifs.yaml")
+    cfg_path = resolve_teacher_config_path(rr, args.config)
+    print(f"teacher_config: {cfg_path}")
+    pins = parse_teacher_aifs_yaml_file(cfg_path)
     if pins.get("huggingface_repo_id"):
         print(
             "teacher_hf: "
@@ -50,9 +53,9 @@ def main() -> int:
             f"revision={pins.get('revision', 'floating')}"
         )
 
-    rel = teacher_yaml_checkpoint_relative()
+    rel = pins.get("local_checkpoint_relative")
     if rel is None:
-        print("teacher_ckpt_path: MISSING (configs/teacher_aifs.yaml / local_checkpoint_relative)")
+        print(f"teacher_ckpt_path: MISSING ({cfg_path} / local_checkpoint_relative)")
         if args.strict:
             ok = False
     else:
