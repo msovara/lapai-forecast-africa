@@ -8,10 +8,22 @@ import torch
 
 from evaluation.run_scorecard import (
     _aggregate_daily,
+    _crop_domain,
     _read_eval_config,
+    _resolve_domain,
     _split_csv,
     _to_tensors,
 )
+
+_AFRICA_CFG = {
+    "domain": {
+        "default": "africa",
+        "regions": {
+            "africa": {"lat": [-40.0, 40.0], "lon": [-20.0, 55.0]},
+            "global": {"lat": [-90.0, 90.0], "lon": [-180.0, 180.0]},
+        },
+    }
+}
 
 
 def test_split_csv():
@@ -32,6 +44,37 @@ def test_read_eval_config_lists(tmp_path):
     assert parsed["ground_truth"] == "era5"
     assert parsed["variables"] == ["t2m", "tp", "u10", "v10"]
     assert parsed["temporal_resolutions"] == ["6h", "daily"]
+
+
+def test_resolve_domain_default_and_global():
+    name, lat_r, lon_r = _resolve_domain(_AFRICA_CFG, None)
+    assert name == "africa"
+    assert lat_r == (-40.0, 40.0)
+    assert lon_r == (-20.0, 55.0)
+    # global is an explicit no-op (full grid, no crop)
+    assert _resolve_domain(_AFRICA_CFG, "global") is None
+    # no domain config -> no crop
+    assert _resolve_domain({}, None) is None
+
+
+def test_crop_domain_handles_0_360_longitude():
+    xr = pytest.importorskip("xarray")
+    lat = np.linspace(-90.0, 90.0, 73)  # 2.5 deg
+    lon = np.linspace(0.0, 357.5, 144)  # 0..360 convention
+    da = xr.DataArray(
+        np.zeros((lat.size, lon.size), dtype=np.float32),
+        dims=("latitude", "longitude"),
+        coords={"latitude": lat, "longitude": lon},
+    )
+    cropped = _crop_domain(da, (-40.0, 40.0), (-20.0, 55.0))
+    # latitude trimmed into the box
+    assert float(cropped.latitude.min()) >= -40.0
+    assert float(cropped.latitude.max()) <= 40.0
+    # longitude wraps: -20..55 maps to 340..360 and 0..55 in the 0..360 grid
+    lon180 = ((cropped.longitude.values + 180) % 360) - 180
+    assert lon180.min() >= -20.0
+    assert lon180.max() <= 55.0
+    assert cropped.longitude.size < da.longitude.size
 
 
 def _make_da(values, var):  # type: ignore[no-untyped-def]

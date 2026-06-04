@@ -85,6 +85,45 @@ def _aggregate_daily(da, var: str):  # type: ignore[no-untyped-def]
     return grouped.sum() if reducer == "sum" else grouped.mean()
 
 
+def _resolve_domain(cfg: dict, override: str | None) -> tuple[str, tuple, tuple] | None:
+    """Return (region_name, lat_range, lon_range) for cropping, or None for full grid."""
+    dom = cfg.get("domain") or {}
+    name = override or dom.get("default")
+    if not name:
+        return None
+    regions = dom.get("regions") or {}
+    region = regions.get(name)
+    if region is None:
+        # 'global' is a no-op even without an explicit config entry.
+        if name == "global":
+            return None
+        raise SystemExit(f"unknown domain {name!r}; configured: {sorted(regions)}")
+    lat = region.get("lat")
+    lon = region.get("lon")
+    if not (lat and lon):
+        raise SystemExit(f"domain {name!r} missing lat/lon ranges")
+    if name == "global":
+        return None
+    return name, (float(lat[0]), float(lat[1])), (float(lon[0]), float(lon[1]))
+
+
+def _crop_domain(da, lat_range: tuple, lon_range: tuple):  # type: ignore[no-untyped-def]
+    """Crop to a lat/lon box, tolerant of 0..360 vs -180..180 longitude conventions."""
+    dims = tuple(str(d) for d in da.dims)
+    lat_n, lon_n = _resolve_lat_lon_names(dims)
+    if lat_n is None or lon_n is None:
+        return da
+    lat = da[lat_n]
+    lon180 = ((da[lon_n] + 180) % 360) - 180
+    mask = (
+        (lat >= lat_range[0])
+        & (lat <= lat_range[1])
+        & (lon180 >= lon_range[0])
+        & (lon180 <= lon_range[1])
+    )
+    return da.where(mask, drop=True)
+
+
 def _to_tensors(ap, at):  # type: ignore[no-untyped-def]
     """Aligned DataArrays -> (pred[T,1,H,W], truth[T,1,H,W], lat_weights[H])."""
     import xarray as xr
@@ -115,7 +154,14 @@ def _to_tensors(ap, at):  # type: ignore[no-untyped-def]
     return pv.unsqueeze(1), tv.unsqueeze(1), w
 
 
-def _score_variable(pred_path: Path, truth_path: Path, var: str, temporal: list[str], isel_kw: dict) -> list[dict]:
+def _score_variable(
+    pred_path: Path,
+    truth_path: Path,
+    var: str,
+    temporal: list[str],
+    isel_kw: dict,
+    domain_box: tuple | None = None,
+) -> list[dict]:
     rows: list[dict] = []
     dsp = _open_xarray(pred_path)
     dst = _open_xarray(truth_path)
@@ -125,6 +171,9 @@ def _score_variable(pred_path: Path, truth_path: Path, var: str, temporal: list[
         if isel_kw:
             ap = ap.isel(**isel_kw)
             at = at.isel(**isel_kw)
+        if domain_box is not None:
+            ap = _crop_domain(ap, domain_box[0], domain_box[1])
+            at = _crop_domain(at, domain_box[0], domain_box[1])
         for res in temporal:
             if res == "daily":
                 ap_r = _aggregate_daily(ap, var)
@@ -172,6 +221,11 @@ def main() -> int:
     )
     p.add_argument("--variables", default=None, help="Comma list overriding config (e.g. t2m,tp,u10,v10)")
     p.add_argument("--temporal", default=None, help="Comma list overriding config (e.g. 6h,daily)")
+    p.add_argument(
+        "--domain",
+        default=None,
+        help="Evaluation domain from config (e.g. africa, global). Default: config domain.default",
+    )
     p.add_argument("--isel", default=None, help="xarray.isel applied to both, e.g. step=-1")
     p.add_argument("--out", type=Path, default=None, help="Write JSON scorecard here (default: stdout)")
     p.add_argument("--markdown", action="store_true", help="Also print a Markdown table to stderr")
@@ -182,16 +236,20 @@ def main() -> int:
     temporal = _split_csv(args.temporal) or cfg.get("temporal_resolutions") or _DEFAULT_TEMPORAL
     isel_kw = _parse_isel_arg(args.isel)
 
+    resolved = _resolve_domain(cfg, args.domain)
+    domain_name = resolved[0] if resolved else "global"
+    domain_box = (resolved[1], resolved[2]) if resolved else None
+
     print(
         f"# scorecard: ground_truth={cfg.get('ground_truth', 'era5')} "
-        f"variables={variables} temporal={temporal}",
+        f"variables={variables} temporal={temporal} domain={domain_name}",
         file=sys.stderr,
     )
 
     rows: list[dict] = []
     for var in variables:
         try:
-            rows.extend(_score_variable(args.pred, args.truth, var, temporal, isel_kw))
+            rows.extend(_score_variable(args.pred, args.truth, var, temporal, isel_kw, domain_box))
         except Exception as exc:  # noqa: BLE001 - record per-variable failure, keep scoring others
             print(f"[scorecard] {var}: {exc}", file=sys.stderr)
             for res in temporal:
@@ -200,6 +258,7 @@ def main() -> int:
     scorecard = {
         "ground_truth": cfg.get("ground_truth", "era5"),
         "test_period": cfg.get("test_period"),
+        "domain": domain_name,
         "results": rows,
     }
     payload = json.dumps(scorecard, indent=2)
