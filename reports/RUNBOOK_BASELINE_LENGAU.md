@@ -148,3 +148,66 @@ python -m evaluation.run_scorecard \
 Precipitation (`tp`) is accumulated when aggregating to daily; other variables are averaged.
 For input-attribution / pruning diagnostics on a checkpoint, see
 [`evaluation/attribution_shap.py`](../evaluation/attribution_shap.py) (`--demo` runs without one).
+
+## 8a. Fetch ERA5 ground truth (2023–2025, Africa box)
+
+Use this **before** scoring so `--truth` matches the Mvua protocol in
+[`configs/eval.yaml`](../configs/eval.yaml): variables `t2m,tp,u10,v10`, 6-hourly steps,
+test years **2023–2025**, domain **Africa** (`lat -40..40`, `lon -20..55`).
+
+### CDS account (one-time)
+
+1. Register at [Copernicus CDS](https://cds.climate.copernicus.eu/) and accept the ERA5 licence.
+2. Create `~/.cdsapirc` (Unix) or `%USERPROFILE%\.cdsapirc` (Windows):
+
+   ```
+   url: https://cds.climate.copernicus.eu/api/v2
+   key: <UID>:<API-key>
+   ```
+
+3. Install the downloader extra: `pip install -e '.[cds]'` (add `.[data]` if you will `--convert`).
+
+### Download (workstation or `chpclic1` with outbound network)
+
+From repo root. Start with a dry-run to confirm the CDS request (no queue job):
+
+```bash
+python scripts/download_era5_eval_truth.py --dry-run
+```
+
+Then pull **one year** first (smoke), then the full test window:
+
+```bash
+python scripts/download_era5_eval_truth.py --years 2023
+python scripts/download_era5_eval_truth.py --years 2023,2024,2025
+```
+
+GRIB files land under `data/raw/lapai/era5/eval/grib/` (gitignored). CDS jobs can take hours;
+re-run the same command if a year file is missing.
+
+### Convert GRIB → scorecard-ready Zarr
+
+Conversion needs **cfgrib + eccodes** (not in the minimal `nogrib` conda env). On a machine
+with eccodes available:
+
+```bash
+pip install cfgrib eccodes  # or use a full lapai-anemoi env with GRIB stack
+python scripts/download_era5_eval_truth.py --years 2023,2024,2025 --convert-only
+# or download + convert in one step:
+python scripts/download_era5_eval_truth.py --years 2023,2024,2025 --convert
+```
+
+Default output: `data/processed/lapai/era5_eval_truth_africa.zarr` (canonical names
+`t2m`, `tp`, `u10`, `v10`; dims `time`, `latitude`, `longitude`).
+
+### Score against that truth
+
+```bash
+python -m evaluation.run_scorecard \
+  --pred data/processed/lapai/forecast.zarr \
+  --truth data/processed/lapai/era5_eval_truth_africa.zarr \
+  --variables t2m,tp,u10,v10 --temporal 6h,daily \
+  --out reports/scorecard_africa.json --markdown
+```
+
+Global benchmark (full grid): add `--domain global` to both download and scorecard.
