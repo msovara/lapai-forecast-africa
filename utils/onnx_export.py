@@ -33,6 +33,7 @@ def export_onnx(model: LapAIStudentCNN, path: Path, opset: int = 17) -> None:
         output_names=["pred"],
         opset_version=opset,
         dynamic_axes={"state_in": {0: "batch"}, "pred": {0: "batch"}},
+        dynamo=False,
     )
 
 
