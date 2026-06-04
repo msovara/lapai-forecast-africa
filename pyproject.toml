@@ -15,7 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.4"]
-ort = ["onnx>=1.16", "onnxruntime>=1.17"]
+ort = ["onnx>=1.16", "onnxruntime>=1.17", "onnxscript>=0.1"]
 data = ["zarr>=2.16", "h5py>=3.10", "xarray>=2024.1"]
 hf = ["huggingface_hub>=0.21"]
 

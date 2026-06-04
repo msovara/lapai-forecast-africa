@@ -33,7 +33,7 @@ def africa_crop(tensor_nchw: torch.Tensor, lat_slice: slice, lon_slice: slice) -
 def area_rmse(pred: torch.Tensor, target: torch.Tensor, lat_weights: torch.Tensor) -> torch.Tensor:
     w = lat_weights.view(1, 1, -1, 1).to(pred)
     num = (w * (pred - target) ** 2).sum()
-    den = w.expand_as(pred[..., :1, :]).sum() * pred.shape[1]
+    den = w.expand_as(pred).sum()
     return torch.sqrt(num / den)
 
 
