@@ -15,7 +15,7 @@ def test_student_forward_shapes():
 
 
 def test_onnx_export_tmp_path(tmp_path):
-    cfg = LapAIStudentConfig(in_channels_raw=16, lat=17, lon=18, base_channels=64, stages=(1, 1, 1))
+    cfg = LapAIStudentConfig(in_channels_raw=65, lat=17, lon=18, base_channels=64, stages=(1, 1, 1))
     net = LapAIStudentCNN(cfg)
     onnx_p = tmp_path / "m.onnx"
     export_onnx(net, onnx_p, opset=17)
