@@ -129,3 +129,22 @@ _Use a short SHA or full commit as in **`configs/teacher_aifs.yaml`**._
 | **`torch: NOT IMPORTABLE`** | Same env — avoid mixing login-node system Python with LapAI conda for these scripts. |
 | **`--dry-run` OK but real run fails** | Use **GPU**: **`pbs/inference_aifs_teacher.pbs`**. Inspect **`LAPAI`** template/checkpoint lines on **stderr**. |
 | **YAML rejected by `anemoi-inference run`** | Align with [Quickstart](https://anemoi-inference.readthedocs.io/en/latest/usage/quickstart.html) and [Saving Outputs](https://anemoi.readthedocs.io/projects/inference/en/latest/usage/advanced/saving.html). |
+
+## 8. Score forecasts vs ERA5 (Africa default)
+
+Once you have a forecast file and matching ERA5 truth (NetCDF or Zarr), score with the
+Mvua protocol in [`configs/eval.yaml`](../configs/eval.yaml). Needs the `data` extra
+(`pip install -e '.[data]'` — xarray, zarr, pyyaml). Defaults to the **Africa** domain
+(`lat -40..40`, `lon -20..55`); use `--domain global` for full-grid benchmark runs.
+
+```bash
+python -m evaluation.run_scorecard \
+  --pred data/processed/lapai/forecast.nc \
+  --truth data/processed/lapai/era5_truth.nc \
+  --variables t2m,tp,u10,v10 --temporal 6h,daily \
+  --out reports/scorecard_africa.json --markdown
+```
+
+Precipitation (`tp`) is accumulated when aggregating to daily; other variables are averaged.
+For input-attribution / pruning diagnostics on a checkpoint, see
+[`evaluation/attribution_shap.py`](../evaluation/attribution_shap.py) (`--demo` runs without one).

@@ -2,7 +2,7 @@
 
 **Project:** LapAI-Forecast (Code for Earth, African Stream)
 **Goal:** A compressed, laptop-deployable AI NWP model distilled from ECMWF AIFS, with regional adaptation for Africa.
-**Status:** Phase 0 in progress. Scaffolding, inference scripts, gate, PBS, CI, and tests are implemented; outstanding work is the Lengau/`chpclic1` environment + the first saved baseline forecast. This document remains the contract for Phases 0–3.
+**Status:** Phase 0 in progress. Scaffolding, inference scripts, gate, PBS, tests, and **green CI** are implemented; the whole repo was normalised to UTF-8/LF (it had been UTF-16, which silently broke `pip install`/imports on Linux CI). The Mvua evaluation protocol is wired — ERA5 truth, 2023–2025 test window, `t2m/tp/u10/v10`, 6h+daily, **Africa as the default evaluation domain** (`configs/eval.yaml`, global retained for HPC benchmark runs), with `evaluation/run_scorecard.py` (multi-variable RMSE/ACC scorecard, domain-aware) and `evaluation/attribution_shap.py` (saliency now, captum SHAP-ready). Outstanding work is the Lengau/`chpclic1` environment, the first saved baseline forecast, and the first Africa scorecard. This document remains the contract for Phases 0–3.
 **Teacher checkpoint:** Two options are wired — the public **`ecmwf/aifs-single-1.0`** (`configs/teacher_aifs.yaml`, regression harness) and the gated Code-for-Earth challenge model **`C4E-Mvula/n320_gt6`** (`configs/teacher_n320_gt6.yaml`, `inference.ckpt`). Select with `LAPAI_TEACHER_CONFIG` / `--config`.
 **Project root:** `lapai-forecast/` — a dedicated, self-contained directory.
 ---
