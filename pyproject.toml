@@ -23,6 +23,9 @@ forecast = [
   "ecmwf-opendata>=0.3.29",
   "earthkit-regrid>=0.4",
   "earthkit-data<1",
+  "matplotlib>=3.8",
+  "netCDF4>=1.6",
+  "pyyaml>=6",
 ]
 
 [project.scripts]

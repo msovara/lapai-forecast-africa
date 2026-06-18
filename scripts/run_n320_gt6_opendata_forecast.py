@@ -15,7 +15,7 @@ Notebook pins (Colab/HPCF) differ slightly from public PyPI on Windows:
 
 Examples:
   python scripts/run_n320_gt6_opendata_forecast.py --dry-run
-  python scripts/run_n320_gt6_opendata_forecast.py --lead-time 12
+  python scripts/run_n320_gt6_opendata_forecast.py --lead-time 12 --output data/forecasts/n320_gt6/latest.nc --plot
   python scripts/run_n320_gt6_opendata_forecast.py --checkpoint models/teacher_n320_gt6/inference.ckpt
 """
 
@@ -36,6 +36,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from utils.n320_forecast_io import (  # noqa: E402
+    attach_grid_coords,
+    default_plot_path,
+    plot_temperature_celsius,
+    write_forecast_netcdf,
+)
 from utils.teacher_yaml import (  # noqa: E402
     resolve_teacher_config_path,
     teacher_checkpoint_resolved,
@@ -358,8 +364,25 @@ def main() -> int:
         default=_REPO_ROOT / "data" / "cache" / "earthkit",
         help="Root for earthkit-data + earthkit-regrid caches (default: data/cache/earthkit)",
     )
+    p.add_argument(
+        "--output",
+        type=Path,
+        default=_REPO_ROOT / "data" / "forecasts" / "n320_gt6" / "latest.nc",
+        help="Write forecast NetCDF to this path (parent dirs created)",
+    )
+    p.add_argument(
+        "--plot",
+        action="store_true",
+        help="After inference, write 2t Africa map PNG alongside --output NetCDF",
+    )
+    p.add_argument(
+        "--plot-var",
+        default="2t",
+        help="Variable for --plot (default: 2t)",
+    )
     args = p.parse_args()
 
+    os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
     _configure_anemoi_inference_without_triton()
 
     import torch
@@ -402,14 +425,63 @@ def main() -> int:
 
     print("Loading model …")
     runner = _make_open_data_runner(str(ckpt), static_forcings)
+    dataset_name = next(iter(runner.tensor_handlers))
+    handler = runner.tensor_handlers[dataset_name]
+    latitudes = np.asarray(handler.metadata.latitudes, dtype=np.float32)
+    longitudes = np.asarray(handler.metadata.longitudes, dtype=np.float32)
+    input_state = attach_grid_coords(input_state, latitudes, longitudes)
 
     print(f"Running {args.lead_time}h forecast …")
     states = []
     for state in runner.run(input_states=input_state, lead_time=args.lead_time):
+        state = attach_grid_coords(state, latitudes, longitudes)
         states.append(state)
         _print_state_summary(state, label="forecast")
 
     print(f"OK: {len(states)} state(s) produced")
+
+    netcdf_path = write_forecast_netcdf(
+        states,
+        args.output.resolve(),
+        reference_date=date,
+        latitudes=latitudes,
+        longitudes=longitudes,
+    )
+    print(f"NetCDF: {netcdf_path}")
+
+    if args.plot:
+        last = states[-1]
+        fields = last["fields"]
+        if args.plot_var not in fields:
+            raise SystemExit(f"--plot-var {args.plot_var} not in forecast fields")
+        png_path = default_plot_path(netcdf_path, args.plot_var)
+        valid = last["date"]
+        step_h = (
+            int((valid - date).total_seconds() // 3600)
+            if isinstance(valid, datetime.datetime)
+            else args.lead_time
+        )
+        title = f"n320_gt6 2m temperature (+{step_h}h from {date:%Y-%m-%d %HZ})"
+        if args.plot_var == "2t":
+            plot_temperature_celsius(
+                latitudes,
+                longitudes,
+                fields[args.plot_var],
+                title=title,
+                output=png_path,
+            )
+        else:
+            from utils.n320_forecast_io import plot_unstructured_map
+
+            plot_unstructured_map(
+                latitudes,
+                longitudes,
+                fields[args.plot_var],
+                title=title,
+                output=png_path,
+            )
+        print(f"Plot: {png_path}")
+
     return 0
 
 
