@@ -113,6 +113,27 @@ def write_forecast_netcdf(
     return path
 
 
+def _bin_to_latlon(
+    lat: np.ndarray,
+    lon: np.ndarray,
+    values: np.ndarray,
+    *,
+    lat_bounds: tuple[float, float],
+    lon_bounds: tuple[float, float],
+    resolution: float = 0.25,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Average unstructured points onto a regular lat/lon grid for plotting."""
+    lon_bins = np.arange(lon_bounds[0], lon_bounds[1] + resolution, resolution)
+    lat_bins = np.arange(lat_bounds[0], lat_bounds[1] + resolution, resolution)
+
+    weighted, _, _ = np.histogram2d(lon, lat, bins=[lon_bins, lat_bins], weights=values)
+    counts, _, _ = np.histogram2d(lon, lat, bins=[lon_bins, lat_bins])
+    grid = np.full(weighted.shape, np.nan, dtype=np.float64)
+    np.divide(weighted, counts, out=grid, where=counts > 0)
+    # pcolormesh expects (nlat, nlon); histogram2d returns (nlon, nlat)
+    return lon_bins, lat_bins, grid.T
+
+
 def plot_unstructured_map(
     latitudes: np.ndarray,
     longitudes: np.ndarray,
@@ -125,8 +146,9 @@ def plot_unstructured_map(
     units: str | None = None,
     vmin: float | None = None,
     vmax: float | None = None,
+    resolution: float = 0.25,
 ) -> Path:
-    """Scatter map for one unstructured field over an eval.yaml domain."""
+    """Map one unstructured N320 field by binning to lat/lon (not raw scatter)."""
     import matplotlib.pyplot as plt
 
     bounds = load_eval_domain(domain)
@@ -148,29 +170,65 @@ def plot_unstructured_map(
     lon_m = lon[mask]
     val_m = val[mask]
 
+    if vmin is None or vmax is None:
+        p2, p98 = np.percentile(val_m, [2, 98])
+        vmin = p2 if vmin is None else vmin
+        vmax = p98 if vmax is None else vmax
+    if vmin >= vmax:
+        vmin, vmax = float(val_m.min()), float(val_m.max())
+
+    lon_bins, lat_bins, grid = _bin_to_latlon(
+        lat_m,
+        lon_m,
+        val_m,
+        lat_bounds=bounds["lat"],
+        lon_bounds=bounds["lon"],
+        resolution=resolution,
+    )
+
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
 
-    fig, ax = plt.subplots(figsize=(9, 7), constrained_layout=True)
-    sc = ax.scatter(
-        lon_m,
-        lat_m,
-        c=val_m,
-        s=0.35,
-        cmap=cmap,
-        vmin=vmin,
-        vmax=vmax,
-        linewidths=0,
-        rasterized=True,
-    )
-    ax.set_xlim(bounds["lon"])
-    ax.set_ylim(bounds["lat"])
-    ax.set_xlabel("Longitude")
-    ax.set_ylabel("Latitude")
+    try:
+        import cartopy.crs as ccrs
+        import cartopy.feature as cfeature
+
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+        ax.set_extent([bounds["lon"][0], bounds["lon"][1], bounds["lat"][0], bounds["lat"][1]], crs=ccrs.PlateCarree())
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.6)
+        ax.add_feature(cfeature.BORDERS, linewidth=0.4, alpha=0.5)
+        ax.gridlines(draw_labels=True, linewidth=0.4, alpha=0.5, linestyle="--")
+        mesh = ax.pcolormesh(
+            lon_bins,
+            lat_bins,
+            grid,
+            transform=ccrs.PlateCarree(),
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            shading="auto",
+        )
+    except ImportError:
+        fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
+        mesh = ax.pcolormesh(
+            lon_bins,
+            lat_bins,
+            grid,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            shading="auto",
+        )
+        ax.set_xlim(bounds["lon"])
+        ax.set_ylim(bounds["lat"])
+        ax.set_xlabel("Longitude")
+        ax.set_ylabel("Latitude")
+        ax.set_aspect("equal", adjustable="box")
+        ax.grid(True, alpha=0.25, linewidth=0.5)
+
     ax.set_title(title)
-    ax.set_aspect("equal", adjustable="box")
-    ax.grid(True, alpha=0.25, linewidth=0.5)
-    cbar = fig.colorbar(sc, ax=ax, shrink=0.85, pad=0.02)
+    cbar = fig.colorbar(mesh, ax=ax, shrink=0.85, pad=0.02)
     if units:
         cbar.set_label(units)
     fig.savefig(output, dpi=160, bbox_inches="tight")
@@ -198,8 +256,6 @@ def plot_temperature_celsius(
         domain=domain,
         cmap="RdYlBu_r",
         units="degC",
-        vmin=-10,
-        vmax=45,
     )
 
 
