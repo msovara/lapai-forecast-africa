@@ -122,16 +122,29 @@ def _bin_to_latlon(
     lon_bounds: tuple[float, float],
     resolution: float = 0.25,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Average unstructured points onto a regular lat/lon grid for plotting."""
-    lon_bins = np.arange(lon_bounds[0], lon_bounds[1] + resolution, resolution)
-    lat_bins = np.arange(lat_bounds[0], lat_bounds[1] + resolution, resolution)
+    """Interpolate unstructured points onto a regular lat/lon grid for plotting."""
+    from scipy.interpolate import griddata
 
-    weighted, _, _ = np.histogram2d(lon, lat, bins=[lon_bins, lat_bins], weights=values)
-    counts, _, _ = np.histogram2d(lon, lat, bins=[lon_bins, lat_bins])
-    grid = np.full(weighted.shape, np.nan, dtype=np.float64)
-    np.divide(weighted, counts, out=grid, where=counts > 0)
-    # pcolormesh expects (nlat, nlon); histogram2d returns (nlon, nlat)
-    return lon_bins, lat_bins, grid.T
+    n_lon = int(round((lon_bounds[1] - lon_bounds[0]) / resolution)) + 1
+    n_lat = int(round((lat_bounds[1] - lat_bounds[0]) / resolution)) + 1
+    lon_1d = np.linspace(lon_bounds[0], lon_bounds[1], n_lon)
+    lat_1d = np.linspace(lat_bounds[0], lat_bounds[1], n_lat)
+    lon_grid, lat_grid = np.meshgrid(lon_1d, lat_1d)
+
+    grid = griddata(
+        (lon, lat),
+        values,
+        (lon_grid, lat_grid),
+        method="linear",
+    )
+    # Fill coastal / sparse gaps near observations (avoid checkerboard from empty bins).
+    if np.isnan(grid).any():
+        nearest = griddata((lon, lat), values, (lon_grid, lat_grid), method="nearest")
+        grid = np.where(np.isnan(grid), nearest, grid)
+
+    lon_edges = np.linspace(lon_bounds[0], lon_bounds[1], n_lon + 1)
+    lat_edges = np.linspace(lat_bounds[0], lat_bounds[1], n_lat + 1)
+    return lon_edges, lat_edges, grid
 
 
 def plot_unstructured_map(
@@ -198,7 +211,9 @@ def plot_unstructured_map(
         ax.set_extent([bounds["lon"][0], bounds["lon"][1], bounds["lat"][0], bounds["lat"][1]], crs=ccrs.PlateCarree())
         ax.add_feature(cfeature.COASTLINE, linewidth=0.6)
         ax.add_feature(cfeature.BORDERS, linewidth=0.4, alpha=0.5)
-        ax.gridlines(draw_labels=True, linewidth=0.4, alpha=0.5, linestyle="--")
+        gl = ax.gridlines(draw_labels=True, linewidth=0.3, alpha=0.35, linestyle="--")
+        gl.xlines = False
+        gl.ylines = False
         mesh = ax.pcolormesh(
             lon_bins,
             lat_bins,
@@ -207,7 +222,7 @@ def plot_unstructured_map(
             cmap=cmap,
             vmin=vmin,
             vmax=vmax,
-            shading="auto",
+            shading="flat",
         )
     except ImportError:
         fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
@@ -218,7 +233,7 @@ def plot_unstructured_map(
             cmap=cmap,
             vmin=vmin,
             vmax=vmax,
-            shading="auto",
+            shading="flat",
         )
         ax.set_xlim(bounds["lon"])
         ax.set_ylim(bounds["lat"])
