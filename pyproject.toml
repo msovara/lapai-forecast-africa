@@ -19,6 +19,11 @@ ort = ["onnx>=1.16", "onnxruntime>=1.17", "onnxscript>=0.1"]
 data = ["zarr>=2.16", "h5py>=3.10", "xarray>=2024.1", "pyyaml>=6"]
 hf = ["huggingface_hub>=0.21"]
 cds = ["cdsapi>=0.6"]
+forecast = [
+  "ecmwf-opendata>=0.3.29",
+  "earthkit-regrid>=0.4",
+  "earthkit-data<1",
+]
 
 [project.scripts]
 lapai-inference = "lapai_inference.cli:main"
