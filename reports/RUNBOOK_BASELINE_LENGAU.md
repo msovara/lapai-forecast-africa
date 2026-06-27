@@ -149,6 +149,20 @@ Precipitation (`tp`) is accumulated when aggregating to daily; other variables a
 For input-attribution / pruning diagnostics on a checkpoint, see
 [`evaluation/attribution_shap.py`](../evaluation/attribution_shap.py) (`--demo` runs without one).
 
+## 9. Phase 0 closure (baseline teacher scorecard)
+
+Full checklist: [`PHASE0_CLOSURE.md`](PHASE0_CLOSURE.md).
+
+```bash
+# Lengau — forecast all Jan 2023 inits + write reports/PHASE0_BASELINE_SCORECARD.json
+qsub pbs/phase0_baseline_lengau.pbs
+
+# Laptop — score existing forecasts only (needs gcloud application-default login)
+python scripts/run_phase0_closure.py --score-only
+```
+
+Config: [`configs/phase0_baseline.yaml`](../configs/phase0_baseline.yaml).
+
 ## 8a. Fetch ERA5 ground truth (2023–2025, Africa box)
 
 Use this **before** scoring so `--truth` matches the Mvua protocol in

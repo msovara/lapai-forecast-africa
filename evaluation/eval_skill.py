@@ -73,9 +73,20 @@ def _open_xarray(path: Path):  # type: ignore[no-untyped-def]
     return xr.open_dataset(str(p))
 
 
+_VAR_ALIASES: dict[str, tuple[str, ...]] = {
+    "t2m": ("t2m", "2t"),
+    "tp": ("tp",),
+    "u10": ("u10", "10u"),
+    "v10": ("v10", "10v"),
+}
+
+
 def _dataarray_from_dataset(ds, var: str):  # type: ignore[no-untyped-def]
     if isinstance(var, str) and var in ds:
         return ds[var]
+    for alt in _VAR_ALIASES.get(var, ()):
+        if alt in ds:
+            return ds[alt]
     raise KeyError(f"Variable {var!r} not in dataset")
 
 

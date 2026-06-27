@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N lapai_phase0
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64GB
+#PBS -l walltime=12:00:00
+#
+# Phase 0 baseline closure on Lengau GPU:
+#   1) gate check (checkpoint + anemoi stack)
+#   2) five Jan 2023 weekly inits -> eval NetCDF (t2m/tp/u10/v10)
+#   3) Africa scorecard vs gs://code4earth/era5 -> reports/PHASE0_BASELINE_SCORECARD.json
+#
+# Submit from lapai-forecast repo root:
+#   qsub pbs/phase0_baseline_lengau.pbs
+#
+# Dry-run plan only (no GPU inference):
+#   qsub -v LAPAI_PHASE0_DRY=1 pbs/phase0_baseline_lengau.pbs
+#
+# Score-only (forecasts already on disk):
+#   qsub -v LAPAI_PHASE0_SCORE_ONLY=1 pbs/phase0_baseline_lengau.pbs
+#
+# Operator guide: reports/PHASE0_CLOSURE.md
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
+
+source pbs/inc_conda_lengau.sh
+lapai_load_cuda_gpu
+lapai_activate_track_a
+
+echo "[lapai phase0] PBS_O_WORKDIR=${PWD}"
+echo "[lapai phase0] LAPAI_PHASE0_DRY=${LAPAI_PHASE0_DRY:-0} LAPAI_PHASE0_SCORE_ONLY=${LAPAI_PHASE0_SCORE_ONLY:-0}"
+
+if [[ "${LAPAI_PHASE0_DRY:-0}" == 1 ]]; then
+  exec python scripts/run_phase0_closure.py --dry-run
+fi
+
+export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
+python scripts/download_teacher_ckpt.py --config "${LAPAI_TEACHER_CONFIG}" --local-dir models/teacher_n320_gt6
+LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG}" bash scripts/lapai_inference_gate.sh
+
+if [[ "${LAPAI_PHASE0_SCORE_ONLY:-0}" == 1 ]]; then
+  exec python scripts/run_phase0_closure.py --score-only
+fi
+
+exec python scripts/run_phase0_closure.py

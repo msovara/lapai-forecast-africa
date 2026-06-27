@@ -2,7 +2,7 @@
 
 **Project:** LapAI-Forecast (Code for Earth, African Stream)
 **Goal:** A compressed, laptop-deployable AI NWP model distilled from ECMWF AIFS, with regional adaptation for Africa.
-**Status:** Phase 0 in progress. Scaffolding, inference scripts, gate, PBS, tests, and **green CI** are implemented; the whole repo was normalised to UTF-8/LF (it had been UTF-16, which silently broke `pip install`/imports on Linux CI). The Mvua evaluation protocol is wired — ERA5 truth, 2023–2025 test window, `t2m/tp/u10/v10`, 6h+daily, **Africa as the default evaluation domain** (`configs/eval.yaml`, global retained for HPC benchmark runs), with `evaluation/run_scorecard.py` (multi-variable RMSE/ACC scorecard, domain-aware) and `evaluation/attribution_shap.py` (saliency now, captum SHAP-ready). Outstanding work is the Lengau/`chpclic1` environment, the first saved baseline forecast, and the first Africa scorecard. This document remains the contract for Phases 0–3.
+**Status:** Phase 0 closure pipeline implemented (`configs/phase0_baseline.yaml`, `scripts/run_phase0_closure.py`, `pbs/phase0_baseline_lengau.pbs`, `reports/PHASE0_CLOSURE.md`). Scaffolding, inference scripts, gate, PBS, tests, and **green CI** are implemented; the whole repo was normalised to UTF-8/LF (it had been UTF-16, which silently broke `pip install`/imports on Linux CI). The Mvua evaluation protocol is wired — ERA5 truth, 2023–2025 test window, `t2m/tp/u10/v10`, 6h+daily, **Africa as the default evaluation domain** (`configs/eval.yaml`, global retained for HPC benchmark runs), with `evaluation/run_scorecard.py` (multi-variable RMSE/ACC scorecard, domain-aware), `evaluation/phase0_scorecard.py` (multi-init GCS/local closure), and `evaluation/attribution_shap.py` (saliency now, captum SHAP-ready). **Outstanding:** run `qsub pbs/phase0_baseline_lengau.pbs` on Lengau and commit `reports/PHASE0_BASELINE_SCORECARD.json`. This document remains the contract for Phases 0–3.
 **Teacher checkpoint:** Two options are wired — the public **`ecmwf/aifs-single-1.0`** (`configs/teacher_aifs.yaml`, regression harness) and the gated Code-for-Earth challenge model **`C4E-Mvula/n320_gt6`** (`configs/teacher_n320_gt6.yaml`, `inference.ckpt`). Select with `LAPAI_TEACHER_CONFIG` / `--config`.
 **Project root:** `lapai-forecast/` — a dedicated, self-contained directory.
 ---
@@ -537,9 +537,13 @@ To keep scope realistic for 12 weeks and 1,650 GPU-h:
 
 ## 14. Next concrete actions (when you say "go")
 
+1. **Close Phase 0 on Lengau:** `qsub pbs/phase0_baseline_lengau.pbs` — see [`reports/PHASE0_CLOSURE.md`](reports/PHASE0_CLOSURE.md).
+2. Archive `reports/PHASE0_BASELINE_SCORECARD.json` as the teacher skill ceiling.
+3. Start **Track A** coarsening (`training/train_trackA.py`, `qsub pbs/trackA.pbs`) once the baseline scorecard exists.
+
+Legacy Week-1 items (already scaffolded):
+
 1. Resolve the remaining open decisions in §10 (teacher checkpoint is already pinned to AIFS Single v1.0).
 2. Inside `lapai-forecast/`, create `requirements.txt`, `environment-anemoi.yml`, `environment-credit.yml`, `recipes/recipe_era5_n320.yaml`, `recipes/recipe_era5_n96.yaml`, and the three PBS templates under `pbs/`.
 3. Stand up `lapai-anemoi` and `lapai-credit` conda envs on CHPC.
 4. Reproduce the AIFS baseline rollout (Phase 0 §3.4) and write the result to `lapai-forecast/data/processed/aifs_baseline_20220601.nc`.
-
-These four items are the entire content of Week 1 and unblock every subsequent phase.
