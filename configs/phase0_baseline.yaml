@@ -1,0 +1,45 @@
+# Phase 0 baseline closure — teacher forecast + Africa scorecard (Mvua protocol).
+# Used by scripts/run_phase0_closure.py and pbs/phase0_baseline_lengau.pbs.
+
+phase: 0
+status: baseline_teacher
+
+teacher_config: configs/teacher_n320_gt6.yaml
+checkpoint: models/teacher_n320_gt6/inference.ckpt
+
+# Jan 2023 weekly inits (Code for Earth test window subset).
+inits:
+  - "20230101"
+  - "20230108"
+  - "20230115"
+  - "20230122"
+  - "20230129"
+
+init_time: "0000"
+lead_time_hours: 240
+leads_hours: [24, 48, 72, 120, 168, 240]
+
+variables: [t2m, tp, u10, v10]
+temporal_resolutions: [6h, daily]
+domain: africa
+
+forecast_dir: data/processed/phase0/forecasts
+forecast_pattern: "*_00Z.nc"
+scorecard_out: reports/PHASE0_BASELINE_SCORECARD.json
+
+# Initial conditions: ECMWF open-data mirror (Lengau GPU inference).
+open_data_source: ecmwf
+num_chunks: 16
+cache_dir: data/cache/earthkit
+
+truth:
+  # gcs — team bucket (fast path; needs gcloud application-default login)
+  # local — CDS download via scripts/download_era5_eval_truth.py --years 2023 --convert
+  source: gcs
+  gcs_bucket: gs://code4earth/era5
+  local_zarr: data/processed/lapai/era5_eval_truth_africa.zarr
+
+notes: >-
+  Phase 0 closes when all inits in this file are forecast on Lengau with the four
+  eval variables and reports/PHASE0_BASELINE_SCORECARD.json is written. This JSON
+  is the teacher skill ceiling for Track A/B compression gates.

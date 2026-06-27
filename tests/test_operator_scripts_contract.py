@@ -62,6 +62,12 @@ def test_lora_pbs_links_ops_docs() -> None:
     assert "LENGAU.md" in text
 
 
+def test_phase0_pbs_links_closure_doc() -> None:
+    text = (_REPO / "pbs" / "phase0_baseline_lengau.pbs").read_text(encoding="utf-8")
+    assert "PHASE0_CLOSURE.md" in text
+    assert "run_phase0_closure.py" in text
+
+
 def test_shell_and_pbs_batches_utf8_no_utf16_bom() -> None:
     paths = sorted((_REPO / "pbs").glob("*.pbs"))
     paths += sorted((_REPO / "pbs").glob("*.sh"))
