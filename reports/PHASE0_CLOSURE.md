@@ -27,6 +27,17 @@ Scoring alignment is **correct** (forecast `valid_time` matches init + lead for 
 | Duplicate fields at all lead times | `snapshot_forecast_state()` when saving runner output |
 | tp GCS Zarr `(time, step)` layout | `_select_tp_at_valid_time()` in `gcs_era5_truth.py` |
 
+### CDS pipeline vs aifs-africa (regrid map)
+
+| Step | Module | Function | Direction |
+|------|--------|----------|-----------|
+| CDS IC download | `utils/cds_ic.py` | `ensure_cds_grib_cached`, `build_cds_input_state` | ERA5 GRIB 0.25° (cached under `~/.cache/aifs-africa/era5`, same MD5 keys as aifs-africa) |
+| IC regrid to model | `utils/regrid.py` | `regrid_to_n320` | 0.25° → N320 |
+| GPU inference | `scripts/run_phase0_forecast.py` | Anemoi runner | N320 state |
+| Eval NetCDF | `utils/eval_forecast_io.py` | `regrid_state_fields_to_africa` | via `utils/regrid.regrid_n320_to_latlon025` (N320 → 0.25°), then Africa crop |
+
+Canonical public regrid API: **`utils/regrid.py`**. Lower-level helpers remain in `utils/cds_ic.py` (input) and `utils/n320_forecast_io.py` (plotting / legacy `_regrid_*` names).
+
 ---
 
 ## Next steps (do in order)
