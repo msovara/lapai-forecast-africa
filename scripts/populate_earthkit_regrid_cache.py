@@ -28,15 +28,7 @@ from scripts.run_n320_gt6_opendata_forecast import (  # noqa: E402
     _patch_earthkit_regrid_windows_urls,
 )
 from utils.cds_ic import _regrid_to_n320  # noqa: E402
-
-
-def _regrid_n320_to_latlon025(values: np.ndarray) -> np.ndarray:
-    import earthkit.regrid as ekr
-
-    return np.asarray(
-        ekr.interpolate(values, {"grid": "N320"}, {"grid": (0.25, 0.25)}),
-        dtype=np.float64,
-    )
+from utils.regrid import regrid_n320_to_latlon025  # noqa: E402
 
 
 def main() -> int:
@@ -54,7 +46,7 @@ def main() -> int:
     latlon = np.zeros((721, 1440), dtype=np.float32)
     n320 = _regrid_to_n320(latlon)
     print(f"  0.25 -> N320: shape={n320.shape}")
-    back = _regrid_n320_to_latlon025(n320.astype(np.float64))
+    back = regrid_n320_to_latlon025(n320.astype(np.float64), cache_root=args.cache_dir.resolve())
     print(f"  N320 -> 0.25: shape={back.shape}")
     print(f"OK: regrid cache ready under {args.cache_dir / 'regrid'}")
     return 0

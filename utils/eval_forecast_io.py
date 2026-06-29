@@ -8,12 +8,8 @@ from typing import Any
 
 import numpy as np
 
-from utils.n320_forecast_io import (
-    EVAL_ALIASES,
-    _crop_global_latlon025,
-    _regrid_n320_to_latlon025,
-    load_eval_domain,
-)
+from utils.n320_forecast_io import EVAL_ALIASES, load_eval_domain
+from utils.regrid import crop_global_latlon025, regrid_n320_to_latlon025
 
 # Model short names -> scorecard names written to NetCDF.
 MODEL_TO_EVAL = {
@@ -68,11 +64,11 @@ def regrid_state_fields_to_africa(
     out_fields: dict[str, np.ndarray] = {}
     lat_1d = lon_1d = None
     for eval_name, model_name in model_names.items():
-        global_field = _regrid_n320_to_latlon025(
+        global_field = regrid_n320_to_latlon025(
             raw[model_name],
             cache_root=cache_root,
         )
-        lat_1d, lon_1d, _, _, cropped = _crop_global_latlon025(
+        lat_1d, lon_1d, _, _, cropped = crop_global_latlon025(
             global_field,
             lat_bounds=lat_bounds,
             lon_bounds=lon_bounds,
