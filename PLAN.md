@@ -539,7 +539,7 @@ To keep scope realistic for 12 weeks and 1,650 GPU-h:
 
 1. ~~**Close Phase 0 on Lengau**~~ — **Done (2026-06-29).** See [`reports/PHASE0_CLOSURE.md`](reports/PHASE0_CLOSURE.md) and [`reports/PHASE0_BASELINE_SCORECARD.json`](reports/PHASE0_BASELINE_SCORECARD.json).
 2. **Commit / archive** the scorecard as the teacher skill ceiling (short-lead reference: t2m +24h RMSE ~2.2 K, ACC ~0.93 on Africa).
-3. **Start Track A** coarsening (`training/train_trackA.py`, `qsub pbs/trackA.pbs`); gate vs Phase 0 baseline (< 5 % RMSE on 2t/msl/z500/t850 per §4.1).
+3. **Start Track A** coarsening — config `configs/trackA_coarsen.yaml`, gate via `scripts/run_trackA_gate.py` (+24/+48h, t2m/u10/v10, ≤5% RMSE vs Phase 0). See `reports/MVULA_PHASE0_SYNC.md`.
 4. **Investigate long-lead t2m** (+120–240 h skill collapse in scorecard) — confirm rollout length / scoring alignment before using long leads as compression gates.
 5. **Harden offline workflow** — document laptop→Lengau rsync checklist (CDS IC, earthkit regrid both directions, score-only on laptop with GCS ADC).
 
