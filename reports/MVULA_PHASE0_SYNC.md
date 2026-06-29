@@ -9,7 +9,8 @@ Share this note with the Mvula team when publishing Phase 0 artifacts.
 | Item | Location |
 |------|----------|
 | Git repo | https://github.com/msovara/lapai-forecast-africa |
-| Baseline scorecard | `reports/PHASE0_BASELINE_SCORECARD.json` (commit `c1633c7`) |
+| Baseline scorecard | `reports/PHASE0_BASELINE_SCORECARD.json` (commit `491b6db`) |
+| Team GCS copies | `gs://code4earth/lapai/PHASE0_BASELINE_SCORECARD.json`, `gs://code4earth/lapai/MVULA_PHASE0_SYNC.md` |
 | Forecast NetCDFs | Lengau `~/repos/lapai-forecast/data/processed/phase0/forecasts/` |
 | Runbook | `reports/PHASE0_CLOSURE.md` |
 
