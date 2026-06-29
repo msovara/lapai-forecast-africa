@@ -1,10 +1,16 @@
 #!/bin/bash
 #PBS -N lapai_phase0
-#PBS -l select=1:ncpus=8:ngpus=1:mem=64GB
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
 #PBS -l walltime=12:00:00
+#PBS -o lapai_phase0.o
+#PBS -e lapai_phase0.e
+#PBS -j oe
+#PBS -k oe
 #
 # Phase 0 baseline closure on Lengau GPU:
-#   1) gate check (checkpoint + anemoi stack)
+#   1) checkpoint smoke (lustre python)
 #   2) five Jan 2023 weekly inits -> eval NetCDF (t2m/tp/u10/v10)
 #   3) Africa scorecard vs gs://code4earth/era5 -> reports/PHASE0_BASELINE_SCORECARD.json
 #
@@ -24,21 +30,50 @@ cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
 
 source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
-lapai_activate_track_a
 
-echo "[lapai phase0] PBS_O_WORKDIR=${PWD}"
+LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  lapai_activate_track_a
+  LAPAI_PYTHON=python
+fi
+export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+
+# lustre lapai-anemoi python has eccodes pip but not libeccodes.so — use grib_env (or override).
+LAPAI_ECCODES_LIB="${LAPAI_ECCODES_LIB:-/home/msovara/.conda/envs/grib_env/lib}"
+if [[ -f "${LAPAI_ECCODES_LIB}/libeccodes.so" ]]; then
+  export LD_LIBRARY_PATH="${LAPAI_ECCODES_LIB}:${LD_LIBRARY_PATH:-}"
+  _eccodes_defs="${LAPAI_ECCODES_LIB%/lib}/share/eccodes/definitions"
+  if [[ -d "${_eccodes_defs}" ]]; then
+    export ECCODES_DEFINITION_PATH="${_eccodes_defs}"
+  fi
+  echo "[lapai phase0] ecCodes lib=${LAPAI_ECCODES_LIB}"
+else
+  echo "[lapai phase0] WARNING: libeccodes.so not found at ${LAPAI_ECCODES_LIB}" >&2
+fi
+
+echo "[lapai phase0] host=$(hostname) PBS_O_WORKDIR=${PWD} LAPAI_PYTHON=${LAPAI_PYTHON}"
+"${LAPAI_PYTHON}" -c "import torch; print('[lapai phase0] cuda', torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else '')"
 echo "[lapai phase0] LAPAI_PHASE0_DRY=${LAPAI_PHASE0_DRY:-0} LAPAI_PHASE0_SCORE_ONLY=${LAPAI_PHASE0_SCORE_ONLY:-0}"
 
 if [[ "${LAPAI_PHASE0_DRY:-0}" == 1 ]]; then
-  exec python scripts/run_phase0_closure.py --dry-run
+  exec "${LAPAI_PYTHON}" scripts/run_phase0_closure.py --dry-run
 fi
 
+export LAPAI_CDS_OFFLINE=1
 export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
-python scripts/download_teacher_ckpt.py --config "${LAPAI_TEACHER_CONFIG}" --local-dir models/teacher_n320_gt6
-LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG}" bash scripts/lapai_inference_gate.sh
+CKPT="models/teacher_n320_gt6/inference.ckpt"
+if [[ ! -f "${CKPT}" && -f "${HOME}/models/teacher_n320_gt6/inference.ckpt" ]]; then
+  mkdir -p models/teacher_n320_gt6
+  ln -sf "${HOME}/models/teacher_n320_gt6/inference.ckpt" "${CKPT}"
+fi
+if [[ ! -f "${CKPT}" ]]; then
+  "${LAPAI_PYTHON}" scripts/download_teacher_ckpt.py --config "${LAPAI_TEACHER_CONFIG}" --local-dir models/teacher_n320_gt6
+fi
+echo "[lapai phase0] checkpoint OK: ${CKPT}"
+"${LAPAI_PYTHON}" scripts/smoke_teacher_ckpt.py --config "${LAPAI_TEACHER_CONFIG}"
 
 if [[ "${LAPAI_PHASE0_SCORE_ONLY:-0}" == 1 ]]; then
-  exec python scripts/run_phase0_closure.py --score-only
+  exec "${LAPAI_PYTHON}" scripts/run_phase0_closure.py --score-only
 fi
 
-exec python scripts/run_phase0_closure.py
+exec "${LAPAI_PYTHON}" scripts/run_phase0_closure.py

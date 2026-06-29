@@ -57,6 +57,29 @@ def subset_africa(da: xr.DataArray) -> xr.DataArray:
     return da.sel(latitude=lat_slice, longitude=AFRICA_LON)
 
 
+def _select_tp_at_valid_time(da: xr.DataArray, when: np.datetime64) -> xr.DataArray:
+    """Pick tp slice where reference time + step offset best matches valid time."""
+    if "step" not in da.dims:
+        return da
+    time_vals = np.asarray(da["time"].values, dtype="datetime64[ns]")
+    step_vals = np.asarray(da["step"].values, dtype=np.float64)
+    target = np.datetime64(when, "ns")
+    best_t = best_s = 0
+    best_err_ns = np.iinfo(np.int64).max
+    hour_offsets = [step_vals.astype(np.int64)]
+    if step_vals.max() <= 12:
+        hour_offsets.append((step_vals.astype(np.int64) * 6))
+    for offsets in hour_offsets:
+        for ti, ref in enumerate(time_vals):
+            for si, hours in enumerate(offsets):
+                valid = ref + np.timedelta64(int(hours), "h")
+                err_ns = abs(int((valid - target) / np.timedelta64(1, "ns")))
+                if err_ns < best_err_ns:
+                    best_err_ns = err_ns
+                    best_t, best_s = ti, si
+    return da.isel(time=best_t, step=best_s)
+
+
 def open_era5_slice(path: str, when: np.datetime64) -> xr.DataArray:
     ds = xr.open_zarr(path, storage_options=GCS_OPTS)
     var = pick_era5_var(ds)
@@ -64,10 +87,13 @@ def open_era5_slice(path: str, when: np.datetime64) -> xr.DataArray:
     for drop in ("number", "surface", "expver"):
         if drop in da.dims and da.sizes[drop] == 1:
             da = da.isel({drop: 0})
-    time_dim = "time" if "time" in da.dims else da.dims[0]
-    da = da.isel({time_dim: valid_time_index(ds, when)})
-    if "step" in da.dims and da.sizes["step"] == 1:
-        da = da.isel(step=0)
+    if var == "tp" and "step" in da.dims:
+        da = _select_tp_at_valid_time(da, when)
+    else:
+        time_dim = "time" if "time" in da.dims else da.dims[0]
+        da = da.isel({time_dim: valid_time_index(ds, when)})
+        if "step" in da.dims and da.sizes["step"] == 1:
+            da = da.isel(step=0)
     return da.squeeze(drop=True)
 
 
@@ -82,6 +108,13 @@ def open_era5_at_valid_time(var: str, when: np.datetime64, *, bucket: str = "gs:
 def align_truth_to_pred(truth: xr.DataArray, pred: xr.DataArray) -> xr.DataArray:
     truth = truth.load()
     pred = pred.load()
+    if "latitude" in truth.dims and truth.latitude.size > 1:
+        if float(truth.latitude[0]) > float(truth.latitude[-1]):
+            truth = truth.sortby("latitude")
+    if "longitude" in truth.dims and truth.longitude.size > 1:
+        truth = normalize_lon(truth)
+        if float(truth.longitude[0]) > float(truth.longitude[-1]):
+            truth = truth.sortby("longitude")
     return truth.reindex(
         latitude=pred.latitude,
         longitude=pred.longitude,

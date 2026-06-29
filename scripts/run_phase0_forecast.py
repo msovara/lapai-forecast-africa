@@ -22,11 +22,12 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from evaluation.phase0_scorecard import load_phase0_config  # noqa: E402
-from utils.eval_forecast_io import write_eval_regridded_netcdf  # noqa: E402
+from utils.eval_forecast_io import snapshot_forecast_state, write_eval_regridded_netcdf  # noqa: E402
 
 # Reuse the open-data inference stack from the notebook-aligned driver.
+from utils.aifs_fields import STATIC_FORCING_VARS  # noqa: E402
+from utils.cds_ic import AIFS_AFRICA_CACHE_DIR, build_cds_input_state  # noqa: E402
 from scripts.run_n320_gt6_opendata_forecast import (  # noqa: E402
-    STATIC_FORCING_VARS,
     _configure_anemoi_inference_without_triton,
     _configure_eccodes,
     _configure_earthkit_caches,
@@ -54,7 +55,25 @@ def main() -> int:
     p.add_argument("--lead-time", type=int, default=int(cfg.get("lead_time_hours", 240)))
     p.add_argument("--teacher-config", default=cfg.get("teacher_config", "configs/teacher_n320_gt6.yaml"))
     p.add_argument("--checkpoint", type=Path, default=None)
+    p.add_argument(
+        "--ic-source",
+        choices=("cds", "opendata"),
+        default=cfg.get("ic_source", "cds"),
+        help="Initial conditions: CDS cache (offline on Lengau) or ECMWF open-data",
+    )
     p.add_argument("--source", default=cfg.get("open_data_source", "ecmwf"))
+    p.add_argument(
+        "--cds-cache-dir",
+        type=Path,
+        default=None,
+        help=f"CDS GRIB cache (default: config cds_cache_dir or {AIFS_AFRICA_CACHE_DIR})",
+    )
+    p.add_argument(
+        "--cds-offline",
+        action="store_true",
+        default=os.environ.get("LAPAI_CDS_OFFLINE", "").lower() in ("1", "true", "yes"),
+        help="Fail if CDS cache miss (set on Lengau; populate cache on laptop first)",
+    )
     p.add_argument("--num-chunks", type=int, default=int(cfg.get("num_chunks", 16)))
     p.add_argument(
         "--cache-dir",
@@ -77,7 +96,7 @@ def main() -> int:
     out = args.output or (
         _REPO_ROOT
         / cfg.get("forecast_dir", "data/processed/phase0/forecasts")
-        / f"{args.init}_{args.init_time}Z.nc"
+        / f"{args.init}_00Z.nc"
     )
     if not str(out).endswith(".nc"):
         out = Path(str(out) + ".nc")
@@ -108,7 +127,22 @@ def main() -> int:
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     os.environ["ANEMOI_INFERENCE_NUM_CHUNKS"] = str(args.num_chunks)
 
-    input_state = build_input_state(init_dt, args.source)
+    cds_cache = args.cds_cache_dir or Path(
+        os.path.expanduser(
+            str(cfg.get("cds_cache_dir") or cfg.get("ic", {}).get("cache_dir") or AIFS_AFRICA_CACHE_DIR)
+        )
+    )
+    if args.ic_source == "cds":
+        print("IC source: CDS cache ->", cds_cache, "offline=", args.cds_offline)
+        input_state = build_cds_input_state(
+            init_dt,
+            cache_dir=cds_cache,
+            allow_download=not args.cds_offline,
+        )
+    else:
+        print("IC source: ECMWF open-data ->", args.source)
+        input_state = build_input_state(init_dt, args.source)
+    _print_state_summary(input_state, label="input")
     static_forcings = {k: input_state["fields"][k] for k in STATIC_FORCING_VARS}
 
     runner = _make_open_data_runner(str(ckpt), static_forcings)
@@ -121,7 +155,7 @@ def main() -> int:
     states = []
     for state in runner.run(input_states=input_state, lead_time=args.lead_time):
         state = attach_grid_coords(state, latitudes, longitudes)
-        states.append(state)
+        states.append(snapshot_forecast_state(state))
         _print_state_summary(state, label="forecast")
 
     netcdf_path = write_eval_regridded_netcdf(

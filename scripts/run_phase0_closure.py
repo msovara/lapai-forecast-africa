@@ -34,9 +34,12 @@ from evaluation.phase0_scorecard import (  # noqa: E402
 )
 
 
+def _forecast_filename(init: str) -> str:
+    return f"{init}_00Z.nc"
+
+
 def _forecast_path(cfg: dict, init: str) -> Path:
-    init_time = str(cfg.get("init_time", "0000"))
-    return _REPO_ROOT / cfg.get("forecast_dir", "data/processed/phase0/forecasts") / f"{init}_{init_time}Z.nc"
+    return _REPO_ROOT / cfg.get("forecast_dir", "data/processed/phase0/forecasts") / _forecast_filename(init)
 
 
 def _run_forecast(init: str, cfg: dict, config_path: Path) -> None:
@@ -82,14 +85,14 @@ def main() -> int:
 
     if args.dry_run:
         for init in inits:
-            fp = forecast_dir / f"{init}_{cfg.get('init_time', '0000')}Z.nc"
+            fp = forecast_dir / _forecast_filename(init)
             exists = fp.is_file()
             print(f"  init {init}: forecast {'EXISTS' if exists else 'MISSING'} -> {fp}")
         return 0
 
     if not args.score_only:
         for init in inits:
-            fp = forecast_dir / f"{init}_{cfg.get('init_time', '0000')}Z.nc"
+            fp = forecast_dir / _forecast_filename(init)
             if fp.is_file():
                 print(f"# skip existing forecast {fp}")
                 continue

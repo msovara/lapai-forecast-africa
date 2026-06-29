@@ -2,7 +2,7 @@
 
 **Project:** LapAI-Forecast (Code for Earth, African Stream)
 **Goal:** A compressed, laptop-deployable AI NWP model distilled from ECMWF AIFS, with regional adaptation for Africa.
-**Status:** Phase 0 closure pipeline implemented (`configs/phase0_baseline.yaml`, `scripts/run_phase0_closure.py`, `pbs/phase0_baseline_lengau.pbs`, `reports/PHASE0_CLOSURE.md`). Scaffolding, inference scripts, gate, PBS, tests, and **green CI** are implemented; the whole repo was normalised to UTF-8/LF (it had been UTF-16, which silently broke `pip install`/imports on Linux CI). The Mvua evaluation protocol is wired — ERA5 truth, 2023–2025 test window, `t2m/tp/u10/v10`, 6h+daily, **Africa as the default evaluation domain** (`configs/eval.yaml`, global retained for HPC benchmark runs), with `evaluation/run_scorecard.py` (multi-variable RMSE/ACC scorecard, domain-aware), `evaluation/phase0_scorecard.py` (multi-init GCS/local closure), and `evaluation/attribution_shap.py` (saliency now, captum SHAP-ready). **Outstanding:** run `qsub pbs/phase0_baseline_lengau.pbs` on Lengau and commit `reports/PHASE0_BASELINE_SCORECARD.json`. This document remains the contract for Phases 0–3.
+**Status:** **Phase 0 closed (2026-06-29).** C4E `n320_gt6` teacher runs on Lengau V100; five Jan 2023 weekly inits forecast with `t2m/tp/u10/v10` on the Africa eval grid; baseline scorecard at `reports/PHASE0_BASELINE_SCORECARD.json` (GCS truth, scored locally). Closure pipeline: `configs/phase0_baseline.yaml`, `scripts/run_phase0_closure.py`, `pbs/phase0_baseline_lengau.pbs`, `reports/PHASE0_CLOSURE.md`. Offline Lengau workflow uses CDS IC cache + earthkit regrid cache (laptop populate → rsync). Scaffolding, inference scripts, gate, PBS, tests, and **green CI** are implemented. Mvua evaluation protocol wired — ERA5 truth, 2023–2025 test window, 6h+daily, **Africa default domain** (`configs/eval.yaml`). **Next:** Track A coarsening (`training/train_trackA.py`, `qsub pbs/trackA.pbs`) gated against the Phase 0 scorecard. This document remains the contract for Phases 0–3.
 **Teacher checkpoint:** Two options are wired — the public **`ecmwf/aifs-single-1.0`** (`configs/teacher_aifs.yaml`, regression harness) and the gated Code-for-Earth challenge model **`C4E-Mvula/n320_gt6`** (`configs/teacher_n320_gt6.yaml`, `inference.ckpt`). Select with `LAPAI_TEACHER_CONFIG` / `--config`.
 **Project root:** `lapai-forecast/` — a dedicated, self-contained directory.
 ---
@@ -537,9 +537,11 @@ To keep scope realistic for 12 weeks and 1,650 GPU-h:
 
 ## 14. Next concrete actions (when you say "go")
 
-1. **Close Phase 0 on Lengau:** `qsub pbs/phase0_baseline_lengau.pbs` — see [`reports/PHASE0_CLOSURE.md`](reports/PHASE0_CLOSURE.md).
-2. Archive `reports/PHASE0_BASELINE_SCORECARD.json` as the teacher skill ceiling.
-3. Start **Track A** coarsening (`training/train_trackA.py`, `qsub pbs/trackA.pbs`) once the baseline scorecard exists.
+1. ~~**Close Phase 0 on Lengau**~~ — **Done (2026-06-29).** See [`reports/PHASE0_CLOSURE.md`](reports/PHASE0_CLOSURE.md) and [`reports/PHASE0_BASELINE_SCORECARD.json`](reports/PHASE0_BASELINE_SCORECARD.json).
+2. **Commit / archive** the scorecard as the teacher skill ceiling (short-lead reference: t2m +24h RMSE ~2.2 K, ACC ~0.93 on Africa).
+3. **Start Track A** coarsening (`training/train_trackA.py`, `qsub pbs/trackA.pbs`); gate vs Phase 0 baseline (< 5 % RMSE on 2t/msl/z500/t850 per §4.1).
+4. **Investigate long-lead t2m** (+120–240 h skill collapse in scorecard) — confirm rollout length / scoring alignment before using long leads as compression gates.
+5. **Harden offline workflow** — document laptop→Lengau rsync checklist (CDS IC, earthkit regrid both directions, score-only on laptop with GCS ADC).
 
 Legacy Week-1 items (already scaffolded):
 
