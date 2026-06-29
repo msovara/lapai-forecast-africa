@@ -1,4 +1,22 @@
+# Track A Step A1 — grid coarsening (PLAN §4.1)
 input_grid: N320
 target_grid: N96
 processor_mesh: O48
 interp: bilinear
+
+# Short-lead gate vs Phase 0 teacher baseline (Africa eval grid).
+gate:
+  baseline_scorecard: reports/PHASE0_BASELINE_SCORECARD.json
+  leads_hours: [24, 48]
+  variables: [t2m, u10, v10]
+  max_rmse_degradation_pct: 5.0
+
+# Anemoi-training integration (operator fills Hydra config name when ready).
+anemoi:
+  config_name: null
+  output_ckpt: models/teacher_coarsened.ckpt
+
+notes: >-
+  After coarsened processor fine-tune, forecast the same Phase 0 inits, score with
+  run_phase0_closure.py --score-only, then: python scripts/run_trackA_gate.py
+  --candidate reports/TRACKA_COARSEN_SCORECARD.json
