@@ -1,0 +1,18 @@
+{
+  "phase": 0,
+  "forecasts": [
+    "data\\processed\\phase0\\forecasts\\20230101_00Z.nc",
+    "data\\processed\\phase0\\forecasts\\20230108_00Z.nc",
+    "data\\processed\\phase0\\forecasts\\20230115_00Z.nc",
+    "data\\processed\\phase0\\forecasts\\20230122_00Z.nc",
+    "data\\processed\\phase0\\forecasts\\20230129_00Z.nc"
+  ],
+  "scorecard": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\reports\\PHASE0_BASELINE_SCORECARD.json",
+  "inits": [
+    "20230101",
+    "20230108",
+    "20230115",
+    "20230122",
+    "20230129"
+  ]
+}

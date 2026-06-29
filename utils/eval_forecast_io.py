@@ -29,11 +29,17 @@ PHASE0_VARS = ("t2m", "tp", "u10", "v10")
 def _as_numpy(fields: dict[str, Any]) -> dict[str, np.ndarray]:
     out: dict[str, np.ndarray] = {}
     for name, value in fields.items():
-        arr = np.asarray(value)
         if hasattr(value, "detach"):
             arr = value.detach().cpu().numpy()
-        out[name] = np.asarray(arr, dtype=np.float32)
+        else:
+            arr = np.asarray(value)
+        out[name] = np.asarray(arr, dtype=np.float32).copy()
     return out
+
+
+def snapshot_forecast_state(state: dict[str, Any]) -> dict[str, Any]:
+    """Copy fields so runner in-place updates do not alias across saved steps."""
+    return {**state, "fields": _as_numpy(state["fields"])}
 
 
 def regrid_state_fields_to_africa(

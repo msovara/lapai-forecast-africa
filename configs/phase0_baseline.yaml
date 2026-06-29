@@ -27,7 +27,10 @@ forecast_dir: data/processed/phase0/forecasts
 forecast_pattern: "*_00Z.nc"
 scorecard_out: reports/PHASE0_BASELINE_SCORECARD.json
 
-# Initial conditions: ECMWF open-data mirror (Lengau GPU inference).
+# Initial conditions: CDS ERA5 cache (aifs-africa layout; populate on laptop, rsync to Lengau).
+# Use ic_source: opendata only where ecmwf-opendata is installed and outbound internet works.
+ic_source: cds
+cds_cache_dir: ~/.cache/aifs-africa/era5
 open_data_source: ecmwf
 num_chunks: 16
 cache_dir: data/cache/earthkit

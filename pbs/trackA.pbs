@@ -1,9 +1,19 @@
 #!/bin/bash
 #PBS -N lapai_trackA
-#PBS -l select=1:ncpus=8:ngpus=1
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
+#PBS -l walltime=01:00:00
+#PBS -o lapai_trackA.o
+#PBS -e lapai_trackA.e
+#PBS -j oe
+#PBS -k oe
 #
 # Submit from LapAI repo root (directory containing pbs/ and training/):
-#   cd /path/to/lapai-forecast && qsub pbs/trackA.pbs
+#   cd ~/repos/lapai-forecast && qsub pbs/trackA.pbs
+#
+# Dry-run (print operator hints only; no training):
+#   qsub -v LAPAI_TRACKA_DRY=1 pbs/trackA.pbs
 #
 # Teacher inference smoke gate (interactive): bash scripts/lapai_inference_gate.sh
 
@@ -12,6 +22,18 @@ cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
 
 source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
-lapai_activate_track_a
 
-exec python training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml
+LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  lapai_activate_track_a
+  LAPAI_PYTHON=python
+fi
+export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+
+echo "[lapai trackA] host=$(hostname) LAPAI_PYTHON=${LAPAI_PYTHON} LAPAI_TRACKA_DRY=${LAPAI_TRACKA_DRY:-0}"
+
+if [[ "${LAPAI_TRACKA_DRY:-0}" == 1 ]]; then
+  exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml --suggest-invocation
+fi
+
+exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml
