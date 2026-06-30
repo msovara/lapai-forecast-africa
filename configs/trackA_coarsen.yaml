@@ -22,6 +22,11 @@ anemoi:
   max_epochs: null
   load_weights_only: true
   hydra_overrides:
+    # V100 GPUs have no native bf16; the default 16-mixed AMP overflows fp16 (65504) on
+    # warm-started coarsening and yields intermittent NaN losses. Full fp32 removes the
+    # overflow path (gradient_clip val=32 is already on by default but can't fix a NaN
+    # forward loss). Cheap for an 8.9M-param, 50-step smoke run.
+    - training.precision="32"
     # anemoi-training 0.14 native_grid dataloader nests dates under datasets.data.
     - dataloader.training.datasets.data.start=2018-01-01
     - dataloader.training.datasets.data.end=2018-02-28
