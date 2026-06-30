@@ -26,16 +26,22 @@ export ANEMOI_BASE_SEED="${JOB_NUM}"
 source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
 
-# Training needs CHPC anemoi-training (lustre lapai-anemoi sklearn hits GLIBC_2.23 on GPU nodes).
-export LAPAI_CONDA_TRACK_A="${LAPAI_CONDA_TRACK_A:-/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training}"
-lapai_activate_track_a
-LAPAI_PYTHON="$(command -v python)"
+# Unified lustre env: anemoi-training 0.14 / anemoi-models 0.16 / anemoi-inference 0.11
+# with the glibc-2.17 scikit-learn 1.7.2 fix (scripts/install_sklearn_fix.sh).
+# This removes the train(CHPC 0.11)/infer(lustre 0.16) checkpoint version skew so the
+# coarsened student loads cleanly for forecasting on the same stack.
+export LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  echo "ERROR: lustre env python not found/executable: ${LAPAI_PYTHON}" >&2
+  echo "       set LAPAI_PYTHON or rebuild the lapai-anemoi venv." >&2
+  exit 1
+fi
 export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
 export HYDRA_FULL_ERROR=1
 export PYTHONUNBUFFERED=1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-echo "[lapai trackA] host=$(hostname) job=${JOB_NUM} ANEMOI_BASE_SEED=${ANEMOI_BASE_SEED} LAPAI_PYTHON=${LAPAI_PYTHON} LAPAI_CONDA_TRACK_A=${LAPAI_CONDA_TRACK_A} LAPAI_TRACKA_DRY=${LAPAI_TRACKA_DRY:-0}"
+echo "[lapai trackA] host=$(hostname) job=${JOB_NUM} ANEMOI_BASE_SEED=${ANEMOI_BASE_SEED} LAPAI_PYTHON=${LAPAI_PYTHON} LAPAI_TRACKA_DRY=${LAPAI_TRACKA_DRY:-0}"
 
 export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
 export LD_LIBRARY_PATH="${HOME}/.conda/envs/grib_env/lib:${LD_LIBRARY_PATH:-}"
