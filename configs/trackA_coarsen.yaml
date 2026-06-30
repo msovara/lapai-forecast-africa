@@ -22,10 +22,11 @@ anemoi:
   max_epochs: null
   load_weights_only: true
   hydra_overrides:
-    - dataloader.training.start=2018-01-01
-    - dataloader.training.end=2018-02-28
-    - dataloader.validation.start=2018-03-01
-    - dataloader.validation.end=2018-03-31
+    # anemoi-training 0.14 native_grid dataloader nests dates under datasets.data.
+    - dataloader.training.datasets.data.start=2018-01-01
+    - dataloader.training.datasets.data.end=2018-02-28
+    - dataloader.validation.datasets.data.start=2018-03-01
+    - dataloader.validation.datasets.data.end=2018-03-31
     - model.num_channels=256
     - model.processor.num_layers=8
     - +graph.edges.1.edge_builders.0.scale_resolutions=[1]
