@@ -11,10 +11,38 @@ gate:
   variables: [t2m, u10, v10]
   max_rmse_degradation_pct: 5.0
 
-# Anemoi-training integration (operator fills Hydra config name when ready).
+# Anemoi-training — Zarr built on laptop; synced to Lengau.
 anemoi:
-  config_name: null
+  dataset: data/processed/lapai/era5_n96_smoke.zarr
+  warm_start: models/teacher_n320_gt6/inference.ckpt
+  output_root: models/trackA_coarsen_runs
   output_ckpt: models/teacher_coarsened.ckpt
+  processor_resolution: 6
+  max_steps: 50
+  max_epochs: null
+  load_weights_only: true
+  hydra_overrides:
+    - dataloader.training.start=2018-01-01
+    - dataloader.training.end=2018-02-28
+    - dataloader.validation.start=2018-03-01
+    - dataloader.validation.end=2018-03-31
+    - model.num_channels=256
+    - model.processor.num_layers=8
+    - +graph.edges.1.edge_builders.0.scale_resolutions=[1]
+    - dataloader.num_workers.training=2
+    - dataloader.num_workers.validation=2
+
+# Forecast + score paths (same inits as Phase 0; swap checkpoint after A1 train).
+forecast:
+  inits: [20230101, 20230108, 20230115, 20230122, 20230129]
+  init_time: "0000"
+  lead_time_hours: 240
+  forecast_dir: data/processed/trackA/forecasts
+  scorecard_out: reports/TRACKA_COARSEN_SCORECARD.json
+  teacher_config: configs/teacher_n320_gt6.yaml
+  checkpoint: models/teacher_coarsened.ckpt
+  ic_source: cds
+  cds_cache_dir: ~/.cache/aifs-africa/era5
 
 notes: >-
   After coarsened processor fine-tune, forecast the same Phase 0 inits, score with

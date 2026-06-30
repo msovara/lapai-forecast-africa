@@ -85,6 +85,10 @@ multirun/
 wandb/
 lightning_logs/
 
+# --- Offline pip wheelhouses (transient, regenerable) ---
+wheelhouse*/
+*.whl
+
 # --- Secrets ---
 .env
 .env.*

@@ -150,6 +150,39 @@ def main() -> int:
     handler = runner.tensor_handlers[dataset_name]
     latitudes = handler.metadata.latitudes
     longitudes = handler.metadata.longitudes
+
+    # Offline IC grid bridge: regrid CDS N320 initial conditions onto the model's
+    # data grid (e.g. O96 for a coarsened Track A student). Lazy forcings/input let
+    # us read the model grid from the runner, then regrid in place before run().
+    # Avoids earthkit-regrid matrix downloads (Lengau compute nodes are offline).
+    import numpy as _np
+
+    _sample = next(iter(input_state["fields"].values()))
+    n_src = int(_np.asarray(_sample).shape[-1])
+    n_tgt = int(len(latitudes))
+    if n_src != n_tgt:
+        from utils.grid_bridge import build_grid_bridge
+
+        ic_latlons_path = Path(
+            os.environ.get(
+                "LAPAI_IC_LATLONS",
+                str(_REPO_ROOT / "data" / "processed" / "lapai" / "n320_latlons.npy"),
+            )
+        )
+        if not ic_latlons_path.is_file():
+            raise SystemExit(
+                f"IC grid bridge needs source coords {ic_latlons_path}; "
+                "run scripts/extract_grid_latlons.py on the teacher checkpoint first."
+            )
+        src_latlons = _np.load(ic_latlons_path)
+        tgt_latlons = _np.stack([_np.asarray(latitudes), _np.asarray(longitudes)], axis=1)
+        print(f"IC grid bridge: {n_src} -> {n_tgt} (k-NN IDW, offline)")
+        bridge = build_grid_bridge(src_latlons, tgt_latlons)
+        for _name in list(input_state["fields"].keys()):
+            input_state["fields"][_name] = bridge.apply(_np.asarray(input_state["fields"][_name]))
+        for _name in list(static_forcings.keys()):
+            static_forcings[_name] = bridge.apply(_np.asarray(static_forcings[_name]))
+
     input_state = attach_grid_coords(input_state, latitudes, longitudes)
 
     states = []
