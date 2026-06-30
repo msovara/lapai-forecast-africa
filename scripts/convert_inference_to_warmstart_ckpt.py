@@ -13,6 +13,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+# Bump when the emitted checkpoint structure changes so stale warm-starts regenerate.
+# v2: data_indices stored as the 0.14 multi-dataset dict {name: IndexCollection}.
+_WARMSTART_FORMAT = 2
+
 
 def _processor_topology(state_dict: dict[str, torch.Tensor]) -> tuple[int, int]:
     """Infer processor layer/chunk counts from flat proc.* keys (C4E inference ckpt)."""
@@ -27,14 +31,21 @@ def _processor_topology(state_dict: dict[str, torch.Tensor]) -> tuple[int, int]:
     return n, n
 
 
-def _resolve_data_indices(obj) -> object:
+def _resolve_data_indices(obj, dataset_name: str = "data") -> dict:
+    """Return data_indices in the anemoi-training 0.14 multi-dataset dict form.
+
+    0.14's transfer_learning_loading requires hyper_parameters.data_indices to be a
+    ``{dataset_name: IndexCollection}`` mapping (each value exposing ``name_to_index``).
+    Older C4E inference checkpoints store a single IndexCollection, so wrap it under the
+    training dataset name (``data`` for the native_grid dataloader).
+    """
     data_indices = obj.data_indices
     if isinstance(data_indices, dict):
-        if "data" in data_indices:
-            return data_indices["data"]
+        if data_indices and all(hasattr(v, "name_to_index") for v in data_indices.values()):
+            return data_indices
         if len(data_indices) == 1:
-            return next(iter(data_indices.values()))
-    return data_indices
+            return {dataset_name: next(iter(data_indices.values()))}
+    return {dataset_name: data_indices}
 
 
 def _resolve_config(obj, metadata: dict | None) -> object:
@@ -58,6 +69,17 @@ def _resolve_config(obj, metadata: dict | None) -> object:
     )
 
 
+def _existing_warmstart_format(path: Path) -> int:
+    """Read the warm-start format stamp without loading tensors (defaults to 1=legacy)."""
+    try:
+        meta = torch.load(path, map_location="cpu", weights_only=False)
+    except Exception:
+        return -1
+    if isinstance(meta, dict):
+        return int(meta.get("lapai_warmstart_format", 1))
+    return -1
+
+
 def convert_inference_to_warmstart(in_path: Path, out_path: Path, *, force: bool = False) -> Path:
     """Build a PyTorch Lightning-style checkpoint for anemoi-training transfer learning."""
     in_path = in_path.resolve()
@@ -70,6 +92,7 @@ def convert_inference_to_warmstart(in_path: Path, out_path: Path, *, force: bool
         out_path.is_file()
         and not force
         and out_path.stat().st_mtime >= in_path.stat().st_mtime
+        and _existing_warmstart_format(out_path) == _WARMSTART_FORMAT
     ):
         return out_path
 
@@ -98,6 +121,7 @@ def convert_inference_to_warmstart(in_path: Path, out_path: Path, *, force: bool
             "data_indices": data_indices,
         },
         "pytorch-lightning_version": "2.4.0",
+        "lapai_warmstart_format": _WARMSTART_FORMAT,
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(ckpt, out_path)
