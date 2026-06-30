@@ -3,7 +3,7 @@
 #PBS -P RCHPC
 #PBS -q gpu_1
 #PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
-#PBS -l walltime=01:00:00
+#PBS -l walltime=06:00:00
 #PBS -o lapai_trackA.o
 #PBS -e lapai_trackA.e
 #PBS -j oe
@@ -20,17 +20,36 @@
 set -euo pipefail
 cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
 
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+export ANEMOI_BASE_SEED="${JOB_NUM}"
+
 source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
 
-LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
-if [[ ! -x "${LAPAI_PYTHON}" ]]; then
-  lapai_activate_track_a
-  LAPAI_PYTHON=python
-fi
+# Training needs CHPC anemoi-training (lustre lapai-anemoi sklearn hits GLIBC_2.23 on GPU nodes).
+export LAPAI_CONDA_TRACK_A="${LAPAI_CONDA_TRACK_A:-/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training}"
+lapai_activate_track_a
+LAPAI_PYTHON="$(command -v python)"
 export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-echo "[lapai trackA] host=$(hostname) LAPAI_PYTHON=${LAPAI_PYTHON} LAPAI_TRACKA_DRY=${LAPAI_TRACKA_DRY:-0}"
+echo "[lapai trackA] host=$(hostname) job=${JOB_NUM} ANEMOI_BASE_SEED=${ANEMOI_BASE_SEED} LAPAI_PYTHON=${LAPAI_PYTHON} LAPAI_CONDA_TRACK_A=${LAPAI_CONDA_TRACK_A} LAPAI_TRACKA_DRY=${LAPAI_TRACKA_DRY:-0}"
+
+export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
+export LD_LIBRARY_PATH="${HOME}/.conda/envs/grib_env/lib:${LD_LIBRARY_PATH:-}"
+
+if [[ "${LAPAI_SKIP_GATE:-0}" != 1 ]]; then
+  echo "[lapai trackA] inference gate (teacher smoke)..."
+  # Gate may use lustre inference stack if CHPC env lacks teacher deps.
+  GATE_PYTHON="${LAPAI_GATE_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+  if [[ -x "${GATE_PYTHON}" ]]; then
+    LAPAI_PYTHON="${GATE_PYTHON}" bash scripts/lapai_inference_gate.sh
+  else
+    LAPAI_PYTHON="${LAPAI_PYTHON}" bash scripts/lapai_inference_gate.sh
+  fi
+fi
 
 if [[ "${LAPAI_TRACKA_DRY:-0}" == 1 ]]; then
   exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml --suggest-invocation

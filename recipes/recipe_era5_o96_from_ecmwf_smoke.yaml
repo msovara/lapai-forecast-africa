@@ -1,0 +1,29 @@
+# Track A smoke training Zarr — subset ECMWF public O96 ERA5 (no team copy required).
+#
+# Build on a machine with internet (laptop):
+#   pip install "anemoi-datasets>=0.5.22"
+#   python scripts/build_trackA_era5_zarr.py --smoke
+#
+# Source: https://anemoi.readthedocs.io/projects/training/en/latest/user-guide/download-era5-o96.html
+# Full archive (~0.5 TB): https://data.ecmwf.int/anemoi-datasets/era5-o96-1979-2023-6h-v8.zarr
+
+name: lapai-era5-o96-smoke-v1
+description: Track A smoke — 2018 Q1 subset from ECMWF public O96 ERA5
+attribution: ECMWF/C3S
+licence: CC-BY-4.0
+
+dates:
+  start: 2018-01-01T00:00:00
+  end: 2018-03-31T18:00:00
+  frequency: 6h
+
+input:
+  anemoi-dataset:
+    dataset: https://data.ecmwf.int/anemoi-datasets/era5-o96-1979-2023-6h-v8.zarr
+
+output:
+  dtype: float32
+  chunking:
+    dates: 1
+    ensembles: 1
+  path: data/processed/lapai/era5_n96_smoke.zarr

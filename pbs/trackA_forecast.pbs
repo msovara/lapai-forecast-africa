@@ -1,0 +1,69 @@
+#!/bin/bash
+#PBS -N lapai_trackA_fc
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
+#PBS -l walltime=06:00:00
+#PBS -o lapai_trackA_fc.o
+#PBS -e lapai_trackA_fc.e
+#PBS -j oe
+#PBS -k oe
+#
+# Track A coarsened-teacher forecast on Lengau GPU (offline CDS IC cache).
+# Produces eval NetCDF for the same Phase 0 inits, into the Track A forecast dir.
+#
+# Submit from lapai-forecast repo root:
+#   qsub pbs/trackA_forecast.pbs
+#
+# Single-init smoke (fail fast):
+#   qsub -v LAPAI_TRACKA_FC_INIT=20230101 pbs/trackA_forecast.pbs
+#
+# Score + gate run on the laptop (GCS ADC); this job only forecasts.
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
+
+source pbs/inc_conda_lengau.sh
+lapai_load_cuda_gpu
+
+LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  lapai_activate_track_a
+  LAPAI_PYTHON=python
+fi
+export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+
+# lustre lapai-anemoi has eccodes pip but not libeccodes.so — use grib_env.
+LAPAI_ECCODES_LIB="${LAPAI_ECCODES_LIB:-/home/msovara/.conda/envs/grib_env/lib}"
+if [[ -f "${LAPAI_ECCODES_LIB}/libeccodes.so" ]]; then
+  export LD_LIBRARY_PATH="${LAPAI_ECCODES_LIB}:${LD_LIBRARY_PATH:-}"
+  _eccodes_defs="${LAPAI_ECCODES_LIB%/lib}/share/eccodes/definitions"
+  [[ -d "${_eccodes_defs}" ]] && export ECCODES_DEFINITION_PATH="${_eccodes_defs}"
+  echo "[lapai trackA fc] ecCodes lib=${LAPAI_ECCODES_LIB}"
+fi
+
+export LAPAI_CDS_OFFLINE=1
+export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+
+CKPT="models/teacher_coarsened.ckpt"
+if [[ ! -e "${CKPT}" ]]; then
+  echo "ERROR: ${CKPT} missing — run scripts/trackA_setup_coarsened.sh first" >&2
+  exit 1
+fi
+
+echo "[lapai trackA fc] host=$(hostname) LAPAI_PYTHON=${LAPAI_PYTHON} ckpt=$(readlink -f ${CKPT})"
+"${LAPAI_PYTHON}" -c "import torch; print('[lapai trackA fc] cuda', torch.cuda.is_available())"
+
+if [[ -n "${LAPAI_TRACKA_FC_INIT:-}" ]]; then
+  exec "${LAPAI_PYTHON}" scripts/run_phase0_forecast.py \
+    --init "${LAPAI_TRACKA_FC_INIT}" \
+    --teacher-config "${LAPAI_TEACHER_CONFIG}" \
+    --checkpoint "${CKPT}" \
+    --output "data/processed/trackA/forecasts/${LAPAI_TRACKA_FC_INIT}_00Z.nc" \
+    --cds-offline
+fi
+
+exec "${LAPAI_PYTHON}" scripts/run_trackA_closure.py --forecast-only
