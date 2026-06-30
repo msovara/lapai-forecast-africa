@@ -36,7 +36,7 @@ def _variable_names(z, nvars: int) -> list[str]:
 
 
 def main() -> int:
-    path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT
+    path = next((a for a in sys.argv[1:] if not a.startswith("-")), DEFAULT)
     z = zarr.open(path, mode="r")
 
     mean = np.asarray(z["mean"][:], dtype=np.float64)
@@ -86,7 +86,81 @@ def main() -> int:
         flag = "  <-- RISK" if (not np.isfinite(norm)) or norm > 1000 else ""
         nrm = "inf" if not np.isfinite(norm) else f"{norm:11.1f}"
         print(f"  {name:14s} {m:12.4g} {s:12.4g} {lo:12.4g} {hi:12.4g} {nrm:>11}{flag}")
+
+    if "--scan-data" in sys.argv:
+        _scan_data_for_nan(z, variables)
+    else:
+        print("\n(pass --scan-data to scan the raw data array for NaN/inf)")
     return 0
+
+
+def _scan_data_for_nan(z, variables: list[str]) -> None:
+    """Scan the raw `data` array (time, var, ensemble, grid) for NaN/inf per variable/time."""
+    print("\n=== raw data NaN/inf scan (anemoi stats are NaN-aware, so check raw data) ===")
+    data = z["data"]
+    shape = data.shape
+    ntime = shape[0]
+    nvar = shape[1]
+    print(f"  data shape: {shape}")
+    per_var_nan = np.zeros(nvar, dtype=np.int64)
+    per_var_inf = np.zeros(nvar, dtype=np.int64)
+    times_with_nan: list[int] = []
+    chunk = 20
+    for t0 in range(0, ntime, chunk):
+        t1 = min(t0 + chunk, ntime)
+        block = np.asarray(data[t0:t1])  # (t, var, ens, grid)
+        nan_mask = np.isnan(block)
+        inf_mask = np.isinf(block)
+        axes = tuple(a for a in range(block.ndim) if a != 1)
+        per_var_nan += nan_mask.sum(axis=axes).astype(np.int64)
+        per_var_inf += inf_mask.sum(axis=axes).astype(np.int64)
+        per_time = nan_mask.any(axis=tuple(a for a in range(block.ndim) if a != 0))
+        for j, has in enumerate(per_time):
+            if has:
+                times_with_nan.append(t0 + j)
+    total_nan = int(per_var_nan.sum())
+    total_inf = int(per_var_inf.sum())
+    print(f"  total NaN: {total_nan:,}   total inf: {total_inf:,}")
+    print(f"  timesteps containing NaN: {len(times_with_nan)} / {ntime}")
+    if times_with_nan[:10]:
+        print(f"    first such time indices: {times_with_nan[:10]}")
+
+    nan_set = set(times_with_nan)
+    ranges: list[tuple[int, int]] = []
+    start = None
+    for t in range(ntime):
+        if t not in nan_set:
+            if start is None:
+                start = t
+        elif start is not None:
+            ranges.append((start, t - 1))
+            start = None
+    if start is not None:
+        ranges.append((start, ntime - 1))
+    ranges.sort(key=lambda r: r[1] - r[0], reverse=True)
+    try:
+        dates = z["dates"][:]
+    except Exception:
+        dates = None
+    print("  longest contiguous NaN-free time ranges (index -> date):")
+    for lo_i, hi_i in ranges[:5]:
+        n = hi_i - lo_i + 1
+        if dates is not None:
+            print(f"    [{lo_i:3d}..{hi_i:3d}] n={n:3d}  {dates[lo_i]} .. {dates[hi_i]}")
+        else:
+            print(f"    [{lo_i:3d}..{hi_i:3d}] n={n:3d}")
+    offenders = [
+        (variables[i], int(per_var_nan[i]), int(per_var_inf[i]))
+        for i in range(nvar)
+        if per_var_nan[i] or per_var_inf[i]
+    ]
+    offenders.sort(key=lambda r: r[1] + r[2], reverse=True)
+    print("  variables with NaN/inf:")
+    if offenders:
+        for name, nn, ni in offenders[:40]:
+            print(f"    {name:14s} nan={nn:,}  inf={ni:,}")
+    else:
+        print("    none")
 
 
 if __name__ == "__main__":
