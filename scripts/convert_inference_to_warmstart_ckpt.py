@@ -15,7 +15,8 @@ if str(_REPO_ROOT) not in sys.path:
 
 # Bump when the emitted checkpoint structure changes so stale warm-starts regenerate.
 # v2: data_indices stored as the 0.14 multi-dataset dict {name: IndexCollection}.
-_WARMSTART_FORMAT = 2
+# v3: config coerced to DotDict with processor topology (chunking_fix attribute access).
+_WARMSTART_FORMAT = 3
 
 
 def _processor_topology(state_dict: dict[str, torch.Tensor]) -> tuple[int, int]:
@@ -51,22 +52,26 @@ def _resolve_data_indices(obj, dataset_name: str = "data") -> dict:
 def _resolve_config(obj, metadata: dict | None) -> object:
     from anemoi.utils.config import DotDict
 
+    cfg = None
     if metadata and metadata.get("config") is not None:
-        return metadata["config"]
-    if getattr(obj, "config", None) is not None:
-        return obj.config
+        cfg = metadata["config"]
+    elif getattr(obj, "config", None) is not None:
+        cfg = obj.config
 
+    # Migrations (e.g. chunking_fix) use attribute access: config.model.processor.num_layers.
+    # Coerce plain dicts (as stored in inference-ckpt metadata) to DotDict and guarantee the
+    # processor topology keys exist, inferring them from the state_dict when absent.
     num_layers, num_chunks = _processor_topology(obj.state_dict())
-    return DotDict(
-        {
-            "model": {
-                "processor": {
-                    "num_layers": num_layers,
-                    "num_chunks": num_chunks,
-                }
-            }
-        }
-    )
+    if cfg is None:
+        cfg = {}
+    if isinstance(cfg, DotDict):
+        cfg = cfg.todict() if hasattr(cfg, "todict") else dict(cfg)
+    if not isinstance(cfg, dict):
+        return cfg
+    proc = cfg.setdefault("model", {}).setdefault("processor", {})
+    proc.setdefault("num_layers", num_layers)
+    proc.setdefault("num_chunks", num_chunks)
+    return DotDict(cfg)
 
 
 def _existing_warmstart_format(path: Path) -> int:
