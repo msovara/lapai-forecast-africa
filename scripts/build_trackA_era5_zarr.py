@@ -11,8 +11,14 @@ Examples:
   # Smoke (2018 Q1, ~few GB) — unblocks Track A pipeline test
   python scripts/build_trackA_era5_zarr.py --smoke
 
-  # Two-year subset (better fine-tune than smoke)
+  # Two-year subset (better fine-tune than smoke; expect several hours over HTTP)
   python scripts/build_trackA_era5_zarr.py --recipe recipes/recipe_era5_o96_from_ecmwf_2020_2021.yaml
+
+  # Monitor a background build:
+  #   Get-Content reports/zarr_build_stderr.log -Wait -Tail 5
+  #   (data chunks appear only after the load task finishes; init ~1 min, load hours)
+
+  # Note: anemoi-datasets 0.5.x --threads can fail with TypeError; use default (no --threads).
 
   # Full ECMWF O96 archive (~0.5 TB) — resume-safe
   python scripts/build_trackA_era5_zarr.py --full-copy --target data/processed/lapai/era5_o96_full.zarr

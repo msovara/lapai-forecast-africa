@@ -1,5 +1,6 @@
-﻿# ERA5 pipeline coarsened for student / Track A compressor input (~1°, O96/N96 per your graphs).
-# `regrid` keys depend on your anemoi-transform / graphs version — validate against cluster env.
+﻿# ERA5 pipeline coarsened for Track A (~1°, O96/N96).
+# Preferred: subset ECMWF public O96 Zarr (see recipe_era5_o96_from_ecmwf_smoke.yaml).
+# Fallback: CDS GRIB under data/raw/lapai/era5/n320/ + regrid below.
 
 dates:
   start: 1979-01-01T00:00:00Z
@@ -7,19 +8,14 @@ dates:
   frequency: 6h
 
 input:
-  grib:
-    param:
-      - 2t
-      - 10u
-      - 10v
-      - msl
-      - sp
-      - tp
-    path: data/raw/lapai/era5/n320/*.grib
-
-# Uncomment and align with ECMWF tooling once graph target is fixed:
-# regrid:
-#   target_grid: n96
+  pipe:
+    - grib:
+        param: [2t, 10u, 10v, msl, sp, tp]
+        path: data/raw/lapai/era5/n320/*.grib
+    - regrid:
+        method: linear
+        in_grid: [0.25, 0.25]
+        out_grid: O96
 
 output:
   dtype: float32

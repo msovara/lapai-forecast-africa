@@ -1,8 +1,9 @@
 #!/bin/bash
+#PBS -N lapai_setup_conda
+#PBS -P RCHPC
 #PBS -q smp
 #PBS -l select=1:ncpus=4:mem=32GB
 #PBS -l walltime=4:00:00
-#PBS -N lapai_setup_conda
 #
 # Submit from lapai-forecast repo root long conda solves off the login node.
 

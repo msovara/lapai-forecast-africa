@@ -45,9 +45,9 @@ conda activate lapai-anemoi
 Optionally recreate isolated env — **prefer running this on interactive node `chpclic1`** (RAM + outbound network for conda/pip). Example:
 
 ```bash
-qsub -I -P CHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
+qsub -I -P RCHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
   -l place=scatter:excl -W x=FLAGS:ADVRES:chpclic1
-# then hostname should show chpclic1 — replace CHPC with your PBS project code if denied
+# then hostname should show chpclic1
 # setup defaults to environment-anemoi-nogrib.yml (conda eccodes/cfgrib omitted for old glibc hosts)
 bash scripts/setup_lengau_envs.sh
 # workstation with glibc ~2.28+ and conda GRIB: LAPAI_ENV_ANEMOI_YML=environment-anemoi.yml bash scripts/setup_lengau_envs.sh

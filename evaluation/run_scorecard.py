@@ -20,16 +20,6 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import torch
-
-from evaluation.eval_skill import (
-    _dataarray_from_dataset,
-    _open_xarray,
-    _parse_isel_arg,
-    _resolve_lat_lon_names,
-    compute_skill_metrics,
-)
-from lapai_inference.cache_schema import cosine_latitude_weights
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -109,6 +99,8 @@ def _resolve_domain(cfg: dict, override: str | None) -> tuple[str, tuple, tuple]
 
 def _crop_domain(da, lat_range: tuple, lon_range: tuple):  # type: ignore[no-untyped-def]
     """Crop to a lat/lon box, tolerant of 0..360 vs -180..180 longitude conventions."""
+    from evaluation.eval_skill import _resolve_lat_lon_names
+
     dims = tuple(str(d) for d in da.dims)
     lat_n, lon_n = _resolve_lat_lon_names(dims)
     if lat_n is None or lon_n is None:
@@ -126,7 +118,11 @@ def _crop_domain(da, lat_range: tuple, lon_range: tuple):  # type: ignore[no-unt
 
 def _to_tensors(ap, at):  # type: ignore[no-untyped-def]
     """Aligned DataArrays -> (pred[T,1,H,W], truth[T,1,H,W], lat_weights[H])."""
+    import torch
     import xarray as xr
+
+    from evaluation.eval_skill import _resolve_lat_lon_names
+    from lapai_inference.cache_schema import cosine_latitude_weights
 
     ap, at = xr.align(ap, at, join="inner")
     dims = tuple(str(d) for d in ap.dims)
@@ -162,6 +158,13 @@ def _score_variable(
     isel_kw: dict,
     domain_box: tuple | None = None,
 ) -> list[dict]:
+    from evaluation.eval_skill import (
+        _dataarray_from_dataset,
+        _open_xarray,
+        _parse_isel_arg,
+        compute_skill_metrics,
+    )
+
     rows: list[dict] = []
     dsp = _open_xarray(pred_path)
     dst = _open_xarray(truth_path)
@@ -210,6 +213,8 @@ def _markdown_table(rows: list[dict]) -> str:
 
 
 def main() -> int:
+    from evaluation.eval_skill import _parse_isel_arg
+
     p = argparse.ArgumentParser(description="Mvua multi-variable skill scorecard vs ERA5")
     p.add_argument("--pred", type=Path, required=True, help="Forecast NetCDF or Zarr store")
     p.add_argument("--truth", type=Path, required=True, help="ERA5 ground-truth NetCDF or Zarr store")

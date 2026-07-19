@@ -1,6 +1,8 @@
 #!/bin/bash
 #PBS -N lapai_student
-#PBS -l select=1:ncpus=8:ngpus=1
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
 #
 # Submit from lapai-forecast repo root.
 # TRACK_B defaults to lapai-credit (PyTorch+CUDA stack). Create via:

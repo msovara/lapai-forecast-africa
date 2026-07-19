@@ -1,6 +1,8 @@
 #!/bin/bash
 #PBS -N lapai_lora
-#
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
 # Requires models/student.pt from a prior student training job (or symlink).
 #
 # Pipeline order: docs/LENGAU.md -> Phase 0 teacher inference -> Track B student -> LoRA.

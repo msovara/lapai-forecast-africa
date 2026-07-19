@@ -1,6 +1,8 @@
 #!/bin/bash
 #PBS -N lapai_aifs_infer
-#PBS -l select=1:ncpus=8:ngpus=1
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
 #
 # Teacher AIFS inference on a GPU node (after checkpoint download).
 # Submit from lapai-forecast repo root:
