@@ -446,6 +446,7 @@ def main() -> int:
         reference_date=date,
         latitudes=latitudes,
         longitudes=longitudes,
+        static_fields={"lsm": static_forcings["lsm"]},
     )
     print(f"NetCDF: {netcdf_path}")
 
@@ -469,6 +470,7 @@ def main() -> int:
                 fields[args.plot_var],
                 title=title,
                 output=png_path,
+                lsm=static_forcings.get("lsm"),
             )
         else:
             from utils.n320_forecast_io import plot_unstructured_map

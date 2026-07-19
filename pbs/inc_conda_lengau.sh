@@ -27,7 +27,7 @@ source "$CONDA_SH"
 
 # Isolated conda env built from environment-anemoi.yml (recommended on Lengau).
 # Site-wide fallback (chem stack): LAPAI_CONDA_TRACK_A=/apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training
-export LAPAI_CONDA_TRACK_A="${LAPAI_CONDA_TRACK_A:-lapai-anemoi}"
+export LAPAI_PBS_PROJECT="${LAPAI_PBS_PROJECT:-RCHPC}"
 export LAPAI_CONDA_TRACK_B="${LAPAI_CONDA_TRACK_B:-lapai-credit}"
 
 lapai_activate_track_a() {

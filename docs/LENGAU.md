@@ -25,11 +25,11 @@ Submit **from inside** `lapai-forecast/`, not from a parent repo unless you deli
 **First-time environment creation belongs on compute node `chpclic1`**, not `login*`:
 login-node conda solves often get **OOM-killed**; some batch queues have **no outbound HTTPS**, so conda/pip stalls. Mirror the allocation pattern used elsewhere on CHPC (see also project notes on **`chpclic1`**).
 
-Interactive (recommended first run — replace **`CHPC`** in **`-P`** if your allocations use another project code):
+Interactive (recommended first run — project code **RCHPC**):
 
 ```bash
 ssh msovara@lengau.chpc.ac.za   # or your login node path
-qsub -I -P CHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
+qsub -I -P RCHPC -q normal -l select=1:ncpus=4:mem=48GB -l walltime=8:00:00 \
   -l place=scatter:excl -W x=FLAGS:ADVRES:chpclic1
 hostname   # expect chpclic1
 module purge

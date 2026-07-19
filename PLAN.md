@@ -238,6 +238,38 @@ Config: `lapai-forecast/configs/trackA_coarsen.yaml`.
 
 Driver: `python lapai-forecast/training/train_trackA.py --step coarsen --config lapai-forecast/configs/trackA_coarsen.yaml`.
 
+#### Design decision: IC regridding (Track A coarsened benchmark)
+
+**Context.** For the coarsened O96 student, initial conditions must land on the **model data grid** (40 320 O96 points), not the N320 teacher grid (542 080 points). Mario suggested interpolating ERA5 to **O96 inside the open-data / IC fetch path** (anemoi-inference `get_open_data()` or equivalent), using **`earthkit-regrid`**, so the model receives O96-native states from the start. That is the right **benchmark definition** for production verification (2024–2025 paired runs with Oxford).
+
+**What we implemented first (Lengau offline).** Phase 0 closed with a **hard-coded N320 IC pipeline** (`utils/cds_ic.py` → `regrid_to_n320`; see [`reports/PHASE0_CLOSURE.md`](reports/PHASE0_CLOSURE.md)). Track A reuses that CDS cache and adds a **post-fetch offline bridge** in `scripts/run_phase0_forecast.py` (`utils/grid_bridge.py`: scipy k-NN IDW on lat/lons) when the loaded checkpoint grid ≠ IC grid. Output regridding for non-N320 models uses the same bridge pattern in `utils/eval_forecast_io.py`.
+
+**Why not Mario’s hook from day one?**
+
+| Factor | Effect |
+| ------ | ------ |
+| **Build order** | Phase 0 (N320 teacher) was the first milestone; IC code, CDS cache keys, and earthkit matrix prep were all N320-centric before Track A existed. |
+| **Lengau offline** | GPU compute nodes have no outbound internet. Phase 0 workflow pre-syncs CDS GRIB + **N320** earthkit matrices from laptop; O96 IC matrices were not prepared. |
+| **Speed to green pipeline** | Reusing `run_phase0_forecast.py` + a small grid adapter unblocked train → forecast → score → gate without refactoring `cds_ic.py` or repopulating caches. |
+| **Training vs forecasting** | Coarsened **training** already uses native **O96 ERA5 Zarr**; only **inference ICs** needed a workaround — which masked the need for an IC-builder refactor until verification scale-up. |
+
+**Scientific note.** The bridge delivers O96 ICs before `runner.run()` (same intent as Mario’s design), but **k-NN IDW ≠ earthkit-regrid O96** — small differences are possible. For paired N320 / O96 / coarsened-O96 verification, align on one regrid toolchain.
+
+**Forward path (agreed with team).**
+
+1. **Oxford / online (2024–2025):** adopt Mario’s pattern — O96 at fetch time via `earthkit-regrid` in the IC builder (`utils/cds_ic.py`: model-grid-aware `_regrid_to_target("N320" \| "O96")` from checkpoint metadata).
+2. **Lengau / offline:** keep `utils/grid_bridge.py` as **fallback only** when O96 IC caches or earthkit O96 matrices are not pre-synced.
+3. **Shared:** same init calendar, leads, and scorecard; drop the post-fetch bridge when IC grid already matches the checkpoint.
+
+**Code map.**
+
+| Stage | Phase 0 (N320 teacher) | Track A today (coarsened O96) | Target (production) |
+| ----- | ---------------------- | ----------------------------- | ------------------- |
+| IC fetch | `build_cds_input_state` | same (N320) | `build_cds_input_state` → O96 when checkpoint is O96 |
+| IC regrid | `regrid_to_n320` | post-fetch `grid_bridge` (offline) | `regrid_to_o96` in IC builder (earthkit) |
+| Inference | N320 runner | O96 runner | O96 runner |
+| Eval NetCDF | N320 → 0.25° (earthkit) | O96 → 0.25° (grid bridge) | O96 → 0.25° (earthkit or bridge fallback) |
+
 ### 4.2 Step A2 — Attention-head pruning (Weeks 4–5)
 
 Config: `lapai-forecast/configs/trackA_prune.yaml`.

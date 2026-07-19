@@ -38,6 +38,19 @@ Scoring alignment is **correct** (forecast `valid_time` matches init + lead for 
 
 Canonical public regrid API: **`utils/regrid.py`**. Lower-level helpers remain in `utils/cds_ic.py` (input) and `utils/n320_forecast_io.py` (plotting / legacy `_regrid_*` names).
 
+### Track A extension — IC regridding (design decision)
+
+Phase 0 intentionally stops at **N320 ICs**. Track A adds a coarsened **O96** student whose inference grid differs from that pipeline.
+
+| Approach | Where | When |
+| -------- | ----- | ---- |
+| **Mario (canonical benchmark)** | O96 interpolation in the open-data / IC builder (`get_open_data()` / `utils/cds_ic.py`), via `earthkit-regrid` | Oxford / online; **2024–2025 verification** |
+| **Implemented first (Lengau offline)** | N320 CDS ICs → post-fetch `utils/grid_bridge.py` in `run_phase0_forecast.py` when IC grid ≠ checkpoint grid | Track A smoke / offline CHPC |
+
+We did **not** implement Mario’s hook first because (1) Phase 0 locked in N320 before Track A existed, (2) Lengau offline caches were built for N320 + N320→0.25° earthkit matrices only, and (3) the bridge was the smallest change to prove train → forecast → score → gate on Lengau. Coarsened **training** uses native O96 Zarr; only **forecast ICs** used the bridge.
+
+**Going forward:** O96-at-fetch is the production definition; the grid bridge remains an **offline fallback** on Lengau. Full rationale and code map: [`PLAN.md` §4.1 — Design decision: IC regridding](../PLAN.md).
+
 ---
 
 ## Next steps (do in order)

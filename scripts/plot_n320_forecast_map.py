@@ -30,6 +30,11 @@ def main() -> int:
     p.add_argument("--time-index", type=int, default=-1, help="Time index to plot (default: last step)")
     p.add_argument("--domain", default="africa", help="Domain from configs/eval.yaml")
     p.add_argument("--output", type=Path, default=None, help="PNG path (default: alongside NetCDF)")
+    p.add_argument(
+        "--no-mask-ocean",
+        action="store_true",
+        help="Show temperature over ocean (default: land-only with ocean masked)",
+    )
     args = p.parse_args()
 
     from netCDF4 import Dataset
@@ -49,6 +54,7 @@ def main() -> int:
         if idx < 0 or idx >= n_time:
             raise SystemExit(f"time-index {args.time_index} out of range (n_time={n_time})")
         values = np.asarray(nc.variables[args.var][idx])
+        lsm = np.asarray(nc.variables["lsm"][:]) if "lsm" in nc.variables else None
         ref = getattr(nc, "reference_time", "forecast")
         step_h = int(nc.variables["time"][idx]) // 3600
 
@@ -56,8 +62,19 @@ def main() -> int:
     eval_name = EVAL_ALIASES.get(args.var, args.var)
     title = f"n320_gt6 {eval_name} (+{step_h}h from {ref})"
 
+    mask_ocean = not args.no_mask_ocean
+
     if args.var == "2t":
-        plot_temperature_celsius(lat, lon, values, title=title, output=out, domain=args.domain)
+        plot_temperature_celsius(
+            lat,
+            lon,
+            values,
+            title=title,
+            output=out,
+            domain=args.domain,
+            lsm=lsm,
+            mask_ocean=mask_ocean,
+        )
     else:
         plot_unstructured_map(
             lat,
@@ -66,6 +83,8 @@ def main() -> int:
             title=title,
             output=out,
             domain=args.domain,
+            lsm=lsm,
+            mask_ocean=mask_ocean,
         )
 
     print(f"Wrote {out}")
