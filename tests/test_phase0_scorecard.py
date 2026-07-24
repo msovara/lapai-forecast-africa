@@ -18,7 +18,7 @@ def _make_eval_forecast(seed: int, init: str = "20230101"):
         [np.datetime64(f"{init[:4]}-{init[4:6]}-{init[6:8]}T00") + np.timedelta64(6 * i, "h") for i in range(40)]
     )
     lat = np.arange(-40.0, 40.25, 0.25)
-    lon = np.arange(-20.0, 55.25, 0.25)
+    lon = np.arange(-20.0, 70.25, 0.25)
     shape = (times.size, lat.size, lon.size)
     return xr.Dataset(
         {

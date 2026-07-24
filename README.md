@@ -17,6 +17,16 @@ A compressed, laptop-deployable AI Numerical Weather Prediction (NWP) model dist
 - **Compute budget:** 1,650 GPU-hours total on CHPC.
 - **Schedule:** 12 weeks.
 
+## Pathways (one repo)
+
+| Pathway | Location | Role |
+| ------- | -------- | ---- |
+| **AIFS teacher** | `teachers/aifs/` | Phase 0 Anemoi `n320_gt6` compression teacher |
+| **GraphCast Africa teacher** | `teachers/graphcast/` | Africa-cropped baseline (GCS); avoids global polar NaNs |
+| **Student** | `students/` | Track A O96 / laptop target |
+
+Shared Africa eval box: **lat [−40, 40] × lon [−20, 70]** — see `config/domains.yaml` (aligned with graphcast-africa).
+
 ## Approach
 
 Two complementary tracks:

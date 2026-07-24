@@ -384,7 +384,7 @@ Config: `lapai-forecast/configs/lora_africa.yaml`. Helper: `lapai-forecast/utils
 | Adapter form          | Conv with low-rank decomposition `W + (B · A)` where `A: r×Cin`, `B: Cout×r` |
 | Ranks tested          | `r ∈ {4, 8, 16, 32}` — full sweep per the brief                          |
 | Frozen weights        | All non-adapter parameters frozen                                        |
-| Domain                | Africa box: lat ∈ [−40, 38], lon ∈ [−20, 55]                             |
+| Domain                | Africa box: lat ∈ [−40, 40], lon ∈ [−20, 70] (aligned with graphcast-africa) |
 | Training data         | ERA5 (Africa subset) + ENACTS where licensed; weighted 70 / 30           |
 | Epochs                | 3–5 per rank                                                             |
 | Wall-clock target     | ≤ 6 h on a single consumer GPU (RTX 4090 ref.)                           |
@@ -513,7 +513,7 @@ Pin the **teacher** to Hugging Face [**ecmwf/aifs-single-1.0**](https://huggingf
 
 1. **Variable list V** — final set of surface + pressure-level fields (drives student input channel count and parameter budget).
 2. **ENACTS access** — confirm which African countries' data is available under what licence.
-3. **Africa box** — keep the proposed `[−40, 38] × [−20, 55]` or extend to include Mascarenes / Madagascar offshore.
+3. **Africa box** — canonical `[−40, 40] × [−20, 70]` (aligned with graphcast-africa; see `config/domains.yaml`).
 4. **Quantisation scope** — INT8 dynamic only, or also weight-only INT4? (Affects accuracy vs. RAM trade-off.)
 5. **CI** — add a lightweight GitHub Actions matrix for the `lapai_inference` package now or only at Week 12?
 

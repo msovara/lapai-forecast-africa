@@ -19,8 +19,8 @@ def _load_module():
 
 def test_cds_area_africa():
     mod = _load_module()
-    area = mod._cds_area_nws_e(((-40.0, 40.0), (-20.0, 55.0)))
-    assert area == [40.0, -20.0, -40.0, 55.0]
+    area = mod._cds_area_nws_e(((-40.0, 40.0), (-20.0, 70.0)))
+    assert area == [40.0, -20.0, -40.0, 70.0]
 
 
 def test_build_cds_request_maps_variables():
@@ -28,13 +28,13 @@ def test_build_cds_request_maps_variables():
     req = mod.build_cds_request(
         2024,
         ["t2m", "tp", "u10", "v10"],
-        [40.0, -20.0, -40.0, 55.0],
+        [40.0, -20.0, -40.0, 70.0],
         {"cds": {"times": ["00:00", "06:00", "12:00", "18:00"]}},
     )
     assert req["year"] == "2024"
     assert "2m_temperature" in req["variable"]
     assert "total_precipitation" in req["variable"]
-    assert req["area"] == [40.0, -20.0, -40.0, 55.0]
+    assert req["area"] == [40.0, -20.0, -40.0, 70.0]
     assert req["time"] == ["00:00", "06:00", "12:00", "18:00"]
 
 
