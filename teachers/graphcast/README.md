@@ -15,6 +15,14 @@ experiments; wire into LapAI scorecards once 1° Zarrs/NetCDFs are published.
 **LapAI adapter:** `teachers.graphcast.gcs_forecasts` — open year/variable Zarrs and
 select `(init, lead)` slices for the shared Africa scorecard.
 
+```bash
+# Dry-run planned inits/leads
+python scripts/score_graphcast_africa.py --dry-run
+
+# Score Jan 2022 weekly inits vs GCS ERA5 → reports/GRAPHCAST_AFRICA_SCORECARD.json
+python scripts/score_graphcast_africa.py
+```
+
 ```python
 from teachers.graphcast import open_graphcast_forecast, select_init_lead
 
