@@ -12,7 +12,7 @@ from evaluation.gcs_era5_truth import _select_tp_at_valid_time, align_truth_to_p
 
 def test_align_truth_sorts_descending_latitude():
     lat = np.arange(-40.0, 40.25, 0.25)
-    lon = np.arange(-20.0, 55.25, 0.25)
+    lon = np.arange(-20.0, 70.25, 0.25)
     pred = xr.DataArray(
         np.full((lat.size, lon.size), 280.0),
         coords={"latitude": lat, "longitude": lon},

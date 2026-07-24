@@ -16,7 +16,7 @@ ERA5_GCS_STEMS = {
 }
 
 AFRICA_LAT = slice(-40, 40)
-AFRICA_LON = slice(-20, 55)
+AFRICA_LON = slice(-20, 70)
 
 
 def era5_gcs_path(var: str, year: int, bucket: str = "gs://code4earth/era5") -> str:

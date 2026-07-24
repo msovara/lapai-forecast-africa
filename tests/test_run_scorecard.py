@@ -19,7 +19,7 @@ _AFRICA_CFG = {
     "domain": {
         "default": "africa",
         "regions": {
-            "africa": {"lat": [-40.0, 40.0], "lon": [-20.0, 55.0]},
+            "africa": {"lat": [-40.0, 40.0], "lon": [-20.0, 70.0]},
             "global": {"lat": [-90.0, 90.0], "lon": [-180.0, 180.0]},
         },
     }
@@ -50,7 +50,7 @@ def test_resolve_domain_default_and_global():
     name, lat_r, lon_r = _resolve_domain(_AFRICA_CFG, None)
     assert name == "africa"
     assert lat_r == (-40.0, 40.0)
-    assert lon_r == (-20.0, 55.0)
+    assert lon_r == (-20.0, 70.0)
     # global is an explicit no-op (full grid, no crop)
     assert _resolve_domain(_AFRICA_CFG, "global") is None
     # no domain config -> no crop
@@ -66,14 +66,14 @@ def test_crop_domain_handles_0_360_longitude():
         dims=("latitude", "longitude"),
         coords={"latitude": lat, "longitude": lon},
     )
-    cropped = _crop_domain(da, (-40.0, 40.0), (-20.0, 55.0))
+    cropped = _crop_domain(da, (-40.0, 40.0), (-20.0, 70.0))
     # latitude trimmed into the box
     assert float(cropped.latitude.min()) >= -40.0
     assert float(cropped.latitude.max()) <= 40.0
-    # longitude wraps: -20..55 maps to 340..360 and 0..55 in the 0..360 grid
+    # longitude wraps: -20..70 maps to 340..360 and 0..70 in the 0..360 grid
     lon180 = ((cropped.longitude.values + 180) % 360) - 180
     assert lon180.min() >= -20.0
-    assert lon180.max() <= 55.0
+    assert lon180.max() <= 70.0
     assert cropped.longitude.size < da.longitude.size
 
 
