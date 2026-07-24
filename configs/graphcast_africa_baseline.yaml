@@ -1,0 +1,34 @@
+# GraphCast Africa baseline scorecard (LapAI pathway B).
+# Scores AfriClimate GCS forecasts vs gs://code4earth/era5 on the shared Africa box.
+#
+# Note: published GraphCast Africa Zarrs currently cover 2016–2022 (not Jan 2023).
+# Use overlapping Jan 2022 weekly inits until 2023 products are available.
+
+pathway: graphcast_africa
+status: baseline_teacher
+
+forecast_bucket: gs://africlimate-ai-fcst-training/graphcast-africa
+
+# Jan 2022 weekly inits (00Z) — present in the GCS archive.
+inits:
+  - "20220101"
+  - "20220108"
+  - "20220115"
+  - "20220122"
+  - "20220129"
+
+leads_hours: [24, 48]
+variables: [t2m, tp, u10, v10]
+domain: africa
+
+scorecard_out: reports/GRAPHCAST_AFRICA_SCORECARD.json
+
+truth:
+  source: gcs
+  gcs_bucket: gs://code4earth/era5
+
+notes: >-
+  Pathway B teacher baseline for LapAI. Domain lat [-40,40] lon [-20,70].
+  Skip all-NaN GraphCast hole days automatically (recorded as errors in the JSON).
+  Compare alongside reports/PHASE0_BASELINE_SCORECARD.json once Phase 0 is
+  rematerialised on the same 70E box.
