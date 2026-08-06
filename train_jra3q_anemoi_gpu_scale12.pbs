@@ -1,0 +1,94 @@
+#!/bin/bash
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
+#PBS -l walltime=03:00:00
+#PBS -N jra3q_gpu_scale12
+#PBS -o train_jra3q_anemoi_gpu_scale12.o
+#PBS -e train_jra3q_anemoi_gpu_scale12.e
+#PBS -m abe
+#PBS -M msovara@chpc.ac.za
+# GPU Stage C: widen graph to scale=[1,2] only (256ch / 8 layers unchanged).
+# Based on successful 500-step run 7318076 (scale=[1]). Watch log for OOM.
+
+set -u
+
+WORK_DIR="/home/msovara/lustre/anemoi-weather-quest"
+cd "$WORK_DIR"
+
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+mkdir -p "${WORK_DIR}/logs"
+LOG_FILE="${WORK_DIR}/logs/gpu_train_scale12_${JOB_NUM}.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+echo "========================================"
+echo "Anemoi JRA-3Q GPU scale=[1,2] (max_steps=500)"
+echo "Job ID: ${PBS_JOBID}"
+echo "Node:   ${HOSTNAME}"
+echo "Start:  $(date)"
+echo "Log:    ${LOG_FILE}"
+echo "========================================"
+
+nvidia-smi || true
+
+module purge
+module load chpc/python/anaconda/3-2024.10.1
+module load chpc/cuda/12.0/12.0 2>/dev/null || module load chpc/cuda/11.8/11.8 2>/dev/null || true
+
+export LD_LIBRARY_PATH=/usr/lib64:/lib64:/usr/lib:${LD_LIBRARY_PATH:-}
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+export ANEMOI_BASE_SEED=${JOB_NUM}
+
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+conda activate /apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training
+
+COMBINED_DATASET="${WORK_DIR}/data/jra3q_processed/jra3q_anemoi_format.zarr"
+MODEL_OUTPUT="${WORK_DIR}/models/jra3q_gpu_scale12_${JOB_NUM}"
+mkdir -p "${MODEL_OUTPUT}"
+
+echo "Dataset: ${COMBINED_DATASET}"
+echo "Output : ${MODEL_OUTPUT}"
+
+python -m anemoi.training train \
+    data=zarr \
+    data.frequency="24h" \
+    data.timestep="24h" \
+    data.forcing=[] \
+    data.diagnostic=[] \
+    data.normalizer.std=[] \
+    data.normalizer.min-max=[] \
+    data.normalizer.max=[] \
+    data.normalizer.none=["hgt_1000","hgt_500","hgt_850","pres","rh_1000","rh_500","rh_850","tmp2m","tp","sdor","slor","cp","z","cos_latitude","cos_longitude","sin_latitude","sin_longitude","cos_julian_day","sin_julian_day","cos_local_time","sin_local_time","insolation","lsm"] \
+    system.input.dataset="${COMBINED_DATASET}" \
+    system.output.root="${MODEL_OUTPUT}" \
+    model.num_channels=256 \
+    model.processor.num_layers=8 \
+    dataloader.batch_size.training=1 \
+    dataloader.batch_size.validation=1 \
+    dataloader.limit_batches.validation=1 \
+    dataloader.num_workers.training=2 \
+    dataloader.num_workers.validation=2 \
+    training.max_epochs=999 \
+    training.max_steps=500 \
+    training.accum_grad_batches=1 \
+    training.num_sanity_val_steps=0 \
+    ~training.scalers.pressure_level \
+    training.training_loss.scalers=["general_variable","node_weights"] \
+    +diagnostics.plot.callbacks=[] \
+    diagnostics.checkpoint.every_n_train_steps.save_frequency=5 \
+    diagnostics.checkpoint.every_n_train_steps.num_models_saved=3 \
+    diagnostics.checkpoint.every_n_minutes.save_frequency=10 \
+    +graph.edges.1.edge_builders.0.scale_resolutions=[1,2] \
+    model=gnn
+
+TRAIN_EXIT=$?
+
+echo "========================================"
+echo "End:    $(date)"
+echo "Exit:   $TRAIN_EXIT"
+echo "========================================"
+echo "--- checkpoints ---"
+find "${MODEL_OUTPUT}" -name '*.ckpt' -type f 2>/dev/null
+exit $TRAIN_EXIT

@@ -1,0 +1,41 @@
+{
+  "pathway": "graphcast_africa",
+  "status": "baseline_teacher",
+  "generated_at": "2026-07-24T10:24:38Z",
+  "forecast_bucket": "gs://africlimate-ai-fcst-training/graphcast-africa",
+  "domain": "africa",
+  "domain_box": {
+    "lat": [
+      -40.0,
+      40.0
+    ],
+    "lon": [
+      -20.0,
+      70.0
+    ]
+  },
+  "variables": [
+    "t2m"
+  ],
+  "leads_hours": [
+    24
+  ],
+  "truth_source": "gcs",
+  "truth_bucket": "gs://code4earth/era5",
+  "inits_scored": [
+    "20220115"
+  ],
+  "results": [
+    {
+      "init_date": "20220115",
+      "lead_hours": 24,
+      "valid_time": "2022-01-16T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "error": "No such file or directory: 'gs://code4earth/era5/2m_temperature_2022.zarr'"
+        }
+      }
+    }
+  ],
+  "notes": "Pathway B teacher baseline for LapAI. Domain lat [-40,40] lon [-20,70]. Skip all-NaN GraphCast hole days automatically (recorded as errors in the JSON). Compare alongside reports/PHASE0_BASELINE_SCORECARD.json once Phase 0 is rematerialised on the same 70E box."
+}

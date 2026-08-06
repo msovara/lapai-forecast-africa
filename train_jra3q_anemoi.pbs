@@ -1,0 +1,83 @@
+#!/bin/bash
+#PBS -P RCHPC
+#PBS -q bigmem
+#PBS -W group_list=bigmemq
+#PBS -l select=1:ncpus=56:mpiprocs=56
+#PBS -l walltime=48:00:00
+#PBS -N jra3q_anemoi_train
+#PBS -o train_jra3q_anemoi.o
+#PBS -e train_jra3q_anemoi.e
+#PBS -m abe
+#PBS -M msovara@chpc.ac.za
+# Anemoi JRA-3Q training on bigmem (48h, resume-capable).
+# May 2026 fixes: batch 8, 2 dataloader workers, step checkpoints every 10 steps,
+# skip sanity val, zarr read probe before training.
+
+set -u
+
+echo "=========================================="
+echo "Anemoi JRA-3Q Training Job (bigmem)"
+echo "Job ID: ${PBS_JOBID}"
+echo "Node: ${HOSTNAME}"
+echo "Start: $(date)"
+echo "=========================================="
+
+WORK_DIR="/home/msovara/lustre/anemoi-weather-quest"
+cd "$WORK_DIR"
+
+module purge
+module load chpc/python/anaconda/3-2024.10.1
+export LD_LIBRARY_PATH=/usr/lib64:/lib64:/usr/lib:${LD_LIBRARY_PATH:-}
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+export ANEMOI_BASE_SEED=${JOB_NUM}
+
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+conda activate /apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training
+
+DATA_DIR="${WORK_DIR}/data/jra3q_processed"
+COMBINED_DATASET="${DATA_DIR}/jra3q_anemoi_format.zarr"
+MODEL_OUTPUT="${WORK_DIR}/models/jra3q_model_bigmem"
+mkdir -p "${DATA_DIR}" "${MODEL_OUTPUT}"
+
+CKPT_PATH=""
+LAST_CKPT=$(find "${MODEL_OUTPUT}" -name "last.ckpt" -type f 2>/dev/null | head -1)
+if [ -n "${LAST_CKPT}" ] && [ -f "${LAST_CKPT}" ]; then
+    CKPT_PATH="${LAST_CKPT}"
+    echo "Resume: ${CKPT_PATH}"
+else
+    RECENT_CKPT=$(find "${MODEL_OUTPUT}" -name "*.ckpt" -type f -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+    if [ -n "${RECENT_CKPT}" ] && [ -f "${RECENT_CKPT}" ]; then
+        CKPT_PATH="${RECENT_CKPT}"
+        echo "Resume: ${CKPT_PATH}"
+    else
+        echo "Fresh run (no checkpoint)"
+    fi
+fi
+
+if [ ! -d "${COMBINED_DATASET}" ]; then
+    echo "ERROR: dataset missing: ${COMBINED_DATASET}"
+    exit 1
+fi
+
+echo "Dataset: ${COMBINED_DATASET} ($(du -sh "${COMBINED_DATASET}" | cut -f1))"
+source "${WORK_DIR}/anemoi_train_common.sh"
+anemoi_probe_zarr
+
+TRAIN_ARGS=(
+    dataloader.limit_batches.training=100
+    training.max_epochs=50
+)
+if [ -n "${CKPT_PATH}" ]; then
+    TRAIN_ARGS+=( "system.input.warm_start=${CKPT_PATH}" )
+fi
+
+anemoi_run_train "${TRAIN_ARGS[@]}"
+TRAIN_EXIT=$?
+
+echo "--- checkpoints ---"
+find "${MODEL_OUTPUT}" \( -name '*.ckpt' -o -name 'last.ckpt' \) -type f 2>/dev/null | head -20 || true
+echo "End: $(date) exit=${TRAIN_EXIT}"
+exit $TRAIN_EXIT

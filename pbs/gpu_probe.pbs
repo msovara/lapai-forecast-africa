@@ -1,0 +1,54 @@
+#!/bin/bash
+#PBS -N lapai_gpu_probe
+#PBS -P RCHPC
+#PBS -q gpu_1
+#PBS -l select=1:ncpus=4:ngpus=1
+#PBS -l walltime=00:05:00
+#PBS -o lapai_gpu_probe.o
+#PBS -e lapai_gpu_probe.e
+#PBS -j oe
+#
+# Throwaway probe. Two questions in one job:
+#   1. Does a gpu_1 job under project RCHPC start at all when it is NOT pinned to
+#      node_type=32GB?  (trackA_full.pbs was system-held after 21 failed attempts
+#      while pinned to gpu2005/gpu2006, which have run nothing since 23 July.)
+#   2. What GPU model and memory do the other node types actually have?  The Track A
+#      config is tuned for a 32 GB V100, so we need to know before moving off it.
+#
+# Submit:  qsub pbs/gpu_probe.pbs
+
+cd "${PBS_O_WORKDIR:-$HOME}" || exit 1
+
+OUT="${PBS_O_WORKDIR}/reports/gpu_probe_last.txt"
+mkdir -p "$(dirname "$OUT")"
+
+{
+  echo "=== identity ==="
+  echo "host      : $(hostname)"
+  echo "job       : ${PBS_JOBID}"
+  echo "date      : $(date)"
+  echo
+
+  echo "=== node type ==="
+  pbsnodes "$(hostname -s)" 2>/dev/null | grep -Ei 'node_type|resources_available.ncpus|resources_available.ngpus' \
+    | sed 's/^[[:space:]]*/  /'
+  echo
+
+  echo "=== GPU hardware ==="
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    nvidia-smi --query-gpu=index,name,memory.total,driver_version,compute_cap \
+               --format=csv 2>&1
+    echo
+    nvidia-smi 2>&1 | head -20
+  else
+    echo "  nvidia-smi not on PATH"
+    ls /usr/bin/nvidia* /usr/local/cuda*/bin/nvidia-smi 2>/dev/null
+  fi
+  echo
+
+  echo "=== CUDA visible ==="
+  echo "  CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
+  echo
+
+  echo "PROBE_OK"
+} | tee "$OUT"

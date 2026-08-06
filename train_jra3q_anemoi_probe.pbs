@@ -1,0 +1,60 @@
+#!/bin/bash
+#PBS -P RCHPC
+#PBS -q bigmem
+#PBS -W group_list=bigmemq
+#PBS -l select=1:ncpus=56:mpiprocs=56
+#PBS -l walltime=02:00:00
+#PBS -N jra3q_anemoi_probe
+#PBS -o train_jra3q_anemoi_probe.o
+#PBS -e train_jra3q_anemoi_probe.e
+#PBS -m abe
+#PBS -M msovara@chpc.ac.za
+# Diagnostic: 10 training steps on bigmem to verify first-step throughput + checkpoints.
+
+set -u
+
+echo "=========================================="
+echo "Anemoi JRA-3Q PROBE (bigmem, 10 steps)"
+echo "Job ID: ${PBS_JOBID}"
+echo "Node: ${HOSTNAME}"
+echo "Start: $(date)"
+echo "=========================================="
+
+WORK_DIR="/home/msovara/lustre/anemoi-weather-quest"
+cd "$WORK_DIR"
+
+module purge
+module load chpc/python/anaconda/3-2024.10.1
+export LD_LIBRARY_PATH=/usr/lib64:/lib64:/usr/lib:${LD_LIBRARY_PATH:-}
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+export ANEMOI_BASE_SEED=${JOB_NUM}
+
+source /home/apps/chpc/bio/anaconda3-2024.10.1/etc/profile.d/conda.sh
+conda activate /apps/chpc/chem/anaconda3-2021.11/envs/anemoi-training
+
+COMBINED_DATASET="${WORK_DIR}/data/jra3q_processed/jra3q_anemoi_format.zarr"
+MODEL_OUTPUT="${WORK_DIR}/models/jra3q_probe_${JOB_NUM}"
+mkdir -p "${MODEL_OUTPUT}"
+
+if [ ! -d "${COMBINED_DATASET}" ]; then
+    echo "ERROR: dataset missing: ${COMBINED_DATASET}"
+    exit 1
+fi
+
+echo "Output: ${MODEL_OUTPUT}"
+source "${WORK_DIR}/anemoi_train_common.sh"
+anemoi_probe_zarr
+
+anemoi_run_train \
+    training.max_steps=10 \
+    training.max_epochs=1 \
+    dataloader.limit_batches.training=10
+TRAIN_EXIT=$?
+
+echo "--- checkpoints ---"
+find "${MODEL_OUTPUT}" -name '*.ckpt' -type f 2>/dev/null
+echo "End: $(date) exit=${TRAIN_EXIT}"
+exit $TRAIN_EXIT
