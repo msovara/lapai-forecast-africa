@@ -26,6 +26,22 @@ def suggested_invocation(step: str, config: Path) -> str:
     rr = repo_root()
     cfg = _read_eval_config(config) if config.exists() else {}
     gate = cfg.get("gate") or {}
+    if step == "prune":
+        return (
+            f"# Track A A2 prune operator hints\n"
+            f"cd {rr}\n"
+            f"export LAPAI_PYTHON=${{LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}}\n"
+            f"# PREREQ — GraphTransformer O96 (A1b), not GNN A1:\n"
+            f"#   LAPAI_TRACKA_CONFIG=configs/trackA_gt_coarsen.yaml qsub -v LAPAI_TRACKA_CONFIG,LAPAI_SKIP_GATE=1 pbs/trackA_full.pbs\n"
+            f"#   ln -sfn .../inference-last.ckpt models/teacher_gt_coarsened.ckpt\n"
+            f"# Round-1 soft-mask + recovery fine-tune:\n"
+            f"#   $LAPAI_PYTHON training/train_trackA.py --step prune --config {config}\n"
+            f"#   qsub pbs/trackA_prune.pbs\n"
+            f"# Gate vs A1 scorecard (<={gate.get('max_rmse_degradation_pct', 3.0)}% RMSE proxy, vars={gate.get('variables')}):\n"
+            f"#   $LAPAI_PYTHON scripts/run_trackA_gate.py --candidate reports/TRACKA_PRUNE_SCORECARD.json \\\n"
+            f"#     --config {config} --out reports/TRACKA_A2_GATE.json\n"
+            f"# See reports/TRACKA_A2_START.md\n"
+        )
     return (
         f"# Track A operator hints (step={step})\n"
         f"cd {rr}\n"
@@ -71,6 +87,7 @@ def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
     max_steps = int(anemoi.get("max_steps", 500))
     max_epochs = anemoi.get("max_epochs")
     load_weights_only = anemoi.get("load_weights_only", True)
+    model_name = str(anemoi.get("model", "gnn"))
 
     rr = repo_root()
     dataset_path = Path(dataset)
@@ -98,7 +115,7 @@ def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
     overrides = [
         "data=zarr",
         "graph=multi_scale",
-        "model=gnn",
+        f"model={model_name}",
         f"system.input.dataset={dataset_path.as_posix()}",
         "system.input.graph=null",
         f"system.input.warm_start={warm_start_path.as_posix()}",
@@ -121,6 +138,58 @@ def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
     cmd = _anemoi_train_cmd(overrides)
     print("exec:", " ".join(cmd))
     return subprocess.call(cmd)
+
+
+def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
+    """Soft-mask attention heads on a GraphTransformer ckpt, then recovery fine-tune."""
+    from utils.head_prune import prune_checkpoint, write_prune_report
+
+    anemoi = cfg.get("anemoi") or {}
+    prune_cfg = cfg.get("prune") or {}
+    rr = repo_root()
+
+    warm = Path(anemoi.get("warm_start", "models/teacher_gt_coarsened.ckpt"))
+    if not warm.is_absolute():
+        warm = rr / warm
+    if not warm.exists():
+        print(
+            "ERROR: A2 prune warm_start missing:",
+            warm,
+            "\nFine-tune GraphTransformer on O96 first:",
+            "configs/trackA_gt_coarsen.yaml → models/teacher_gt_coarsened.ckpt",
+            "\n(A1 GNN teacher_coarsened.ckpt has no attention heads.)",
+        )
+        return 2
+
+    masked = Path(anemoi.get("masked_ckpt", "models/teacher_pruned_masked.ckpt"))
+    if not masked.is_absolute():
+        masked = rr / masked
+    fraction = float(prune_cfg.get("fraction_per_round", cfg.get("prune_fraction_per_round", 0.10)))
+    scope = str(prune_cfg.get("scope", "processor"))
+    if isinstance(scope, list):
+        scope = scope[0] if len(scope) == 1 else "processor"
+    importance = str(prune_cfg.get("importance", "weight_l1"))
+
+    print(f"[A2 prune] masking heads on {warm} → {masked} (fraction={fraction}, scope={scope})")
+    report = prune_checkpoint(
+        warm,
+        masked,
+        fraction=fraction,
+        scope=scope if scope != "all" else "processor",
+        importance=importance,
+    )
+    report_path = rr / "reports" / f"TRACKA_A2_PRUNE_ROUND{int(prune_cfg.get('round', 1))}.json"
+    write_prune_report(report, report_path)
+    print(f"[A2 prune] wrote {report_path}")
+    print(f"[A2 prune] dropped_heads sample:", list(report["dropped_heads"].items())[:3])
+
+    # Recovery fine-tune from masked weights.
+    ft_cfg = dict(cfg)
+    ft_anemoi = dict(anemoi)
+    ft_anemoi["warm_start"] = str(masked)
+    ft_anemoi["model"] = anemoi.get("model", "graphtransformer")
+    ft_cfg["anemoi"] = ft_anemoi
+    return _run_coarsen_anemoi(ft_cfg)
 
 
 def main() -> None:
@@ -158,11 +227,12 @@ def main() -> None:
         return
 
     if args.check_gate is not None:
-        if args.step != "coarsen":
-            raise SystemExit("--check-gate only applies to --step coarsen")
         report = run_coarsen_gate(args.check_gate, config=load_trackA_coarsen_config(args.config))
-        write_gate_report(report, repo_root() / args.gate_out)
-        print(f"Track A coarsen gate passed={report['passed']} -> {args.gate_out}")
+        out = repo_root() / args.gate_out
+        if args.step == "prune" and args.gate_out == Path("reports/TRACKA_A1_GATE.json"):
+            out = repo_root() / "reports" / "TRACKA_A2_GATE.json"
+        write_gate_report(report, out)
+        print(f"Track A gate passed={report['passed']} -> {out}")
         raise SystemExit(0 if report["passed"] else 1)
 
     if args.anemoi_train is not None and len(args.anemoi_train) > 0:
@@ -175,17 +245,10 @@ def main() -> None:
     if args.step == "coarsen":
         raise SystemExit(_run_coarsen_anemoi(cfg))
 
-    gate = cfg.get("gate") or {}
-    print(
-        "Track A stub: integrate anemoi-training here; PBS uses lustre LAPAI_PYTHON.\n"
-        f"  step={args.step} config={args.config}\n"
-        f"  coarsen gate: {gate.get('variables')} @ leads {gate.get('leads_hours')} "
-        f"(max {gate.get('max_rmse_degradation_pct', 5.0)}% RMSE vs Phase 0 baseline)\n"
-        "Run: python training/train_trackA.py --step coarsen --suggest-invocation\n"
-        "Gate:  python training/train_trackA.py --step coarsen --check-gate reports/TRACKA_COARSEN_SCORECARD.json\n"
-        "Or:    python scripts/run_trackA_gate.py --candidate reports/TRACKA_COARSEN_SCORECARD.json\n"
-        "Grid coarsening helpers: utils/grid_coarsen.py"
-    )
+    if args.step == "prune":
+        raise SystemExit(_run_prune_anemoi(cfg))
+
+    raise SystemExit(f"unknown step {args.step}")
 
 
 if __name__ == "__main__":
