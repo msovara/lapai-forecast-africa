@@ -1,0 +1,49 @@
+{
+  "phase": 0,
+  "status": "baseline_teacher",
+  "generated_at": "2026-06-27T06:40:03Z",
+  "teacher_config": "configs/teacher_n320_gt6.yaml",
+  "checkpoint": "models/teacher_n320_gt6/inference.ckpt",
+  "domain": "africa",
+  "variables": [
+    "t2m",
+    "tp",
+    "u10",
+    "v10"
+  ],
+  "leads_hours": [
+    24
+  ],
+  "truth_source": "gcs",
+  "inits_scored": [
+    "20230101"
+  ],
+  "forecasts": [
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\aifs-africa\\output\\20230101_00Z.nc"
+  ],
+  "results": [
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\aifs-africa\\output\\20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": NaN,
+          "acc": NaN
+        },
+        "tp": {
+          "rmse": NaN,
+          "acc": NaN,
+          "pod_1mm": 0.38595730176928084
+        },
+        "u10": {
+          "error": "missing in forecast file"
+        },
+        "v10": {
+          "error": "missing in forecast file"
+        }
+      }
+    }
+  ]
+}
