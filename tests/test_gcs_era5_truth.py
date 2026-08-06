@@ -44,3 +44,26 @@ def test_select_tp_at_valid_time_hour_offset():
     picked = _select_tp_at_valid_time(da, np.datetime64("2023-01-02T00:00:00"))
     assert picked.shape == (2, 2)
     assert float(picked.mean()) == pytest.approx(0.42)
+
+
+def test_select_tp_handles_timedelta_step_and_valid_time():
+    """xarray CF-decodes step as timedelta64 ns — must not treat ns as hours."""
+    ref = np.datetime64("2023-01-01T18:00:00")
+    times = np.array([ref], dtype="datetime64[ns]")
+    steps = np.arange(1, 13) * np.timedelta64(1, "h")
+    valid = times[:, None] + steps[None, :]
+    data = np.full((1, steps.size, 2, 2), np.nan, dtype=np.float32)
+    data[0, 5, :, :] = 0.11  # +6h -> 2023-01-02 00Z
+    da = xr.DataArray(
+        data,
+        coords={
+            "time": times,
+            "step": steps,
+            "valid_time": (("time", "step"), valid),
+            "latitude": [0, 1],
+            "longitude": [0, 1],
+        },
+        dims=("time", "step", "latitude", "longitude"),
+    )
+    picked = _select_tp_at_valid_time(da, np.datetime64("2023-01-02T00:00:00"))
+    assert float(picked.mean()) == pytest.approx(0.11)

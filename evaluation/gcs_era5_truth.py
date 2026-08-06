@@ -57,22 +57,48 @@ def subset_africa(da: xr.DataArray) -> xr.DataArray:
     return da.sel(latitude=lat_slice, longitude=AFRICA_LON)
 
 
+def _step_hours(step_vals: np.ndarray) -> np.ndarray:
+    """Convert step coordinate values to hour offsets (handles timedelta64)."""
+    if np.issubdtype(step_vals.dtype, np.timedelta64):
+        return step_vals.astype("timedelta64[h]").astype(np.int64).astype(np.float64)
+    vals = np.asarray(step_vals, dtype=np.float64)
+    # Nanosecond timedeltas sometimes arrive as plain floats/ints.
+    if np.nanmax(np.abs(vals)) > 1e11:
+        return vals / 3.6e12
+    return vals
+
+
 def _select_tp_at_valid_time(da: xr.DataArray, when: np.datetime64) -> xr.DataArray:
-    """Pick tp slice where reference time + step offset best matches valid time."""
+    """Pick tp slice whose valid time best matches ``when``.
+
+    Prefers an explicit ``valid_time`` (time, step) coordinate when present.
+    Otherwise reconstructs valid = reference time + step. Step may be hours,
+    6-hour indices, or timedelta64 — all are normalised to hours.
+    """
     if "step" not in da.dims:
         return da
-    time_vals = np.asarray(da["time"].values, dtype="datetime64[ns]")
-    step_vals = np.asarray(da["step"].values, dtype=np.float64)
     target = np.datetime64(when, "ns")
     best_t = best_s = 0
     best_err_ns = np.iinfo(np.int64).max
-    hour_offsets = [step_vals.astype(np.int64)]
-    if step_vals.max() <= 12:
-        hour_offsets.append((step_vals.astype(np.int64) * 6))
+
+    # Fast path: 2-D valid_time from ERA5 short-range precip Zarrs.
+    vt = da.coords.get("valid_time")
+    if vt is not None and set(getattr(vt, "dims", ())) >= {"time", "step"}:
+        vt_ns = np.asarray(vt.values, dtype="datetime64[ns]").astype("int64")
+        tgt = int(target.astype("int64"))
+        err = np.abs(vt_ns - tgt)
+        best_t, best_s = [int(i) for i in np.unravel_index(int(np.argmin(err)), err.shape)]
+        return da.isel(time=best_t, step=best_s)
+
+    time_vals = np.asarray(da["time"].values, dtype="datetime64[ns]")
+    hours = _step_hours(np.asarray(da["step"].values))
+    hour_offsets = [hours]
+    if float(np.nanmax(hours)) <= 12:
+        hour_offsets.append(hours * 6)
     for offsets in hour_offsets:
         for ti, ref in enumerate(time_vals):
-            for si, hours in enumerate(offsets):
-                valid = ref + np.timedelta64(int(hours), "h")
+            for si, h in enumerate(offsets):
+                valid = ref + np.timedelta64(int(h), "h")
                 err_ns = abs(int((valid - target) / np.timedelta64(1, "ns")))
                 if err_ns < best_err_ns:
                     best_err_ns = err_ns
@@ -81,7 +107,7 @@ def _select_tp_at_valid_time(da: xr.DataArray, when: np.datetime64) -> xr.DataAr
 
 
 def open_era5_slice(path: str, when: np.datetime64) -> xr.DataArray:
-    ds = xr.open_zarr(path, storage_options=GCS_OPTS)
+    ds = xr.open_zarr(path, storage_options=GCS_OPTS, consolidated=True)
     var = pick_era5_var(ds)
     da = ds[var]
     for drop in ("number", "surface", "expver"):

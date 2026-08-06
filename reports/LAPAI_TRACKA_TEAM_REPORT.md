@@ -2,23 +2,24 @@
 
 **Author:** Mthetho Sovara (CHPC Lengau)  
 **Project:** LapAI-Forecast · Code for Earth, African Stream  
-**Date:** July 2026  
-**Status:** Phase 0 closed · Track A smoke pipeline end-to-end · A1 gate not passed (expected)
+**Date:** August 2026  
+**Status:** Phase 0 closed · **Track A Step A1 PASSED** (30/30) · next: A2 pruning
 
 ---
 
 ## 1. Executive summary
 
-We have **closed Phase 0** (N320 AIFS teacher baseline on Lengau) and **validated the full Track A coarsening pipeline end-to-end**: train coarsened O96 student → offline forecast → GCS scorecard → A1 acceptance gate.
+We have **closed Phase 0** (N320 AIFS teacher baseline on Lengau) and **passed Track A Step A1** (grid coarsening): train coarsened O96 student → offline forecast → GCS scorecard → acceptance gate vs Phase 0.
 
-The **A1 gate did not pass** on the current **smoke configuration** (50-step fine-tune, reduced model size, partial training Zarr). That outcome was **expected** and does **not** indicate a broken pipeline — it reflects insufficient training and model capacity, not a fundamental architecture failure.
+**A1 gate: PASSED 30/30** (2026-08-06). After a 2000-step full fine-tune left t2m +24h cold-biased, a **+15 000-step extend** from `teacher_coarsened.ckpt` recovered skill. On all five Jan 2023 inits, coarsened **t2m +24h RMSE is ~25–33% better** than the Phase 0 teacher (gate allows ≤5% worse).
 
 **Key messages for discussion:**
 
-1. **Infrastructure is ready** on Lengau for coarsened student work (offline CDS, grid bridge, lustre Python stack, PBS jobs).
-2. **Scalar verification** (domain RMSE/ACC vs ERA5 on GCS) is automated; **spatial map comparison** (ERA5 vs teacher vs coarsened) is now available in the Streamlit status dashboard.
-3. **Initial-condition handling** for the coarsened benchmark should align with **Mario’s O96-at-fetch design** for 2024–2025 production; our current **post-fetch grid bridge** is an offline Lengau workaround, not the long-term definition.
-4. **2024–2025 verification** should be split: **Oxford (Sh)** for N320 (+ optional native O96 AIFS) production runs; **Lengau** for coarsened O96 student train/infer and paired scoring.
+1. **A1 is closed** — artefact `reports/TRACKA_A1_GATE.json`; checkpoint via `models/teacher_coarsened.ckpt` → extend `inference-last.ckpt`.
+2. **Infrastructure is ready** on Lengau for coarsened student work (offline CDS, grid bridge, lustre Python stack, PBS jobs).
+3. **Scalar verification** (domain RMSE/ACC vs ERA5 on GCS) is automated; **spatial map comparison** is in the Streamlit status dashboard.
+4. **Initial-condition handling** for production should still align with **Mario’s O96-at-fetch design**; our post-fetch grid bridge remains the Lengau offline fallback.
+5. **Next technical step:** Track A **A2** (attention-head pruning) — CRPS gate includes **`tp`**.
 
 ---
 
@@ -28,17 +29,18 @@ The **A1 gate did not pass** on the current **smoke configuration** (50-step fin
 
 **Goal:** Compress the C4E `n320_gt6` AIFS teacher to a deployable O96 student while preserving forecast skill over Africa, measured against a Phase 0 teacher baseline and ERA5 truth (Mvula evaluation protocol).
 
-**Track A Step A1 (current focus):**
+**Track A Step A1 (closed 2026-08-06):**
 
 
 | Item               | Target                                                             |
 | ------------------ | ------------------------------------------------------------------ |
 | Input grid         | N320 teacher → **O96** coarsened student                           |
-| Training           | Warm-start from teacher; native **O96 ERA5 Zarr**                  |
-| Verification inits | Jan 2023 weekly (pipeline shakedown); **2024–2025** for production |
+| Training           | Warm-start from teacher; native **O96 ERA5 Zarr** (2020–2021)      |
+| Verification inits | Jan 2023 weekly (A1 gate); **2024–2025** for production            |
 | Gate variables     | t2m, u10, v10 at **+24 h** and **+48 h**                           |
 | Gate criterion     | ≤ **5%** RMSE degradation vs Phase 0 teacher (Africa domain)       |
 | Truth              | ERA5 on GCS (`gs://code4earth/era5`)                               |
+| Outcome            | **PASSED 30/30**                                                   |
 
 
 **Compute:** CHPC Lengau V100 GPUs (offline — no outbound internet on compute nodes).
@@ -66,7 +68,7 @@ The **A1 gate did not pass** on the current **smoke configuration** (50-step fin
 
 **Offline workflow proven:** CDS GRIB cache + earthkit N320 regrid matrices populated on laptop → rsync to Lengau → GPU inference with `--cds-offline` → scoring on laptop with GCS.
 
-### 3.2 Track A — coarsened O96 smoke pipeline (closed machinery)
+### 3.2 Track A — coarsened O96 smoke pipeline (machinery proven)
 
 
 | Step             | Result                                                                                                                            | Lengau job (example) |
@@ -74,11 +76,31 @@ The **A1 gate did not pass** on the current **smoke configuration** (50-step fin
 | Environment      | Unified lustre stack: anemoi-training 0.14, anemoi-models 0.16, anemoi-inference 0.11; offline fixes for sklearn (GLIBC), trimesh | —                    |
 | Coarsen training | 50-step smoke; **finite loss** (~0.13); O96 checkpoint saved                                                                      | 7318569              |
 | Forecast         | All **5** Jan 2023 inits; N320→O96 IC bridge; eval NetCDF ~59 MB each                                                             | 7318585              |
-| Scorecard        | `reports/TRACKA_COARSEN_SCORECARD.json` (GCS truth, laptop)                                                                       | —                    |
-| A1 gate          | `reports/TRACKA_A1_GATE.json` — **FAILED**                                                                                        | —                    |
+| Scorecard        | Early smoke scorecard (superseded by full/extend)                                                                                 | —                    |
+| A1 gate (smoke)  | **FAILED** (expected — under-trained)                                                                                             | —                    |
 
 
-**Example coarsened skill (20230101, +24 h, Africa, t2m):** RMSE **3.52 K**, ACC **0.88** (vs teacher 2.23 K / 0.93).
+**Smoke skill (20230101, +24 h, Africa, t2m):** RMSE **3.52 K** (vs teacher 2.23 K) — not a fair A1 attempt.
+
+### 3.2b Track A — full A1 (passed 2026-08-06)
+
+
+| Step | Result | Lengau job |
+| ---- | ------ | ---------- |
+| Full Zarr | `era5_n96_2020_2021.zarr` (2924 × 6h, O96, on lustre) | — |
+| Full fine-tune | 2000 steps, ~8.5 min, epoch loss ~0.070 | **7353532** (gpu2005) |
+| Gate after 2k | **25/30** — all five **t2m +24h** failed (cold bias ~−1.5 K) | — |
+| Extend fine-tune | +15 000 steps from coarsened ckpt, epoch loss ~0.042 | **7357693** (gpu2005) |
+| Forecast | 5 Jan 2023 inits, Exit 0 | **7357781** / **7357782** |
+| Scorecard | `reports/TRACKA_COARSEN_SCORECARD.json` | laptop / GCS |
+| **A1 gate** | **`reports/TRACKA_A1_GATE.json` — PASSED 30/30** | — |
+
+
+**Production A1 skill (20230101, +24 h, Africa, t2m):** RMSE **1.67 K** (teacher 2.23 K) — **~25% better** than Phase 0.
+
+Checkpoint: `models/teacher_coarsened.ckpt` →  
+`models/trackA_coarsen_full_extend_runs/checkpoint/b828d680-6d0e-4665-a5da-b9d0c8d56649/inference-last.ckpt`  
+Configs: `trackA_coarsen_full.yaml`, `trackA_coarsen_full_extend.yaml`. Operator notes: `reports/TRACKA_FULL_TRAIN_CHECKLIST.md`.
 
 ### 3.3 Documentation and team artefacts
 
@@ -160,55 +182,53 @@ Lengau remains offline: O96 earthkit matrices must be **pre-cached on laptop/log
 
 
 
-## 6. A1 gate results (smoke run)
+## 6. A1 gate results
 
 **Gate definition:** t2m, u10, v10 at +24 h and +48 h; pass if RMSE degradation vs Phase 0 teacher ≤ 5%.
 
-**Outcome:** **FAILED** — **15 / 30** checks passed.
+### 6.0 Production A1 (extend 15k) — PASSED 30/30
 
-### 6.1 Main pattern
+| Variable | +24 h (mean deg vs Phase 0) | +48 h (mean deg) |
+| -------- | --------------------------- | ---------------- |
+| **t2m**  | **−29%** (all pass; better than teacher) | **−69%** |
+| **u10**  | **−38%** | **−20%** |
+| **v10**  | **−47%** | **−35%** |
 
+**t2m +24 h (Africa RMSE, K):**
+
+| Init     | Phase 0 | Coarsened (15k) | Degradation |
+| -------- | ------- | --------------- | ----------- |
+| 20230101 | 2.234   | 1.667           | −25.4%      |
+| 20230108 | 2.312   | 1.675           | −27.6%      |
+| 20230115 | 2.170   | 1.561           | −28.1%      |
+| 20230122 | 2.343   | 1.593           | −32.0%      |
+| 20230129 | 2.499   | 1.664           | −33.4%      |
+
+**Path to pass:** 2000-step full train → t2m +24h still failed (cold bias). Extend +15 000 steps fixed skill without score hacks. Constant mean debias alone cleared only 2/5 inits.
+
+### 6.1 Smoke run (historical) — FAILED 15/30
 
 | Variable | +24 h                                               | +48 h            |
 | -------- | --------------------------------------------------- | ---------------- |
 | **t2m**  | **Failed all 5 inits** (~37–58% worse than teacher) | Mixed            |
-| **u10**  | Mixed (often **better** than teacher at +24 h)      | Several failures |
+| **u10**  | Mixed                                               | Several failures |
 | **v10**  | Mixed                                               | Several failures |
 
+### 6.2 Why smoke failure was expected
 
-**t2m +24 h degradation (% vs teacher), all inits:**
-
-
-| Init     | Degradation |
-| -------- | ----------- |
-| 20230101 | +57.8%      |
-| 20230108 | +37.7%      |
-| 20230115 | +48.0%      |
-| 20230122 | +36.1%      |
-| 20230129 | +40.5%      |
-| **Mean** | **~44%**    |
-
-
-
-
-### 6.2 Why failure is expected (not alarming)
-
-
-| Factor          | Smoke configuration                                                          |
-| --------------- | ---------------------------------------------------------------------------- |
-| Training length | **50 steps** only                                                            |
-| Model capacity  | OOM-reduced: 256 channels, 8 layers                                          |
-| Training data   | Partial smoke Zarr (90/360 timesteps missing; restricted to NaN-free window) |
-| Purpose         | Prove **machinery**, not production skill                                    |
-
-
-
+| Factor          | Smoke configuration                 |
+| --------------- | ----------------------------------- |
+| Training length | **50 steps** only                   |
+| Model capacity  | OOM-reduced: 256 channels, 8 layers |
+| Training data   | Partial smoke Zarr                  |
+| Purpose         | Prove **machinery**, not skill      |
 
 ### 6.3 Interpretation
 
 - The **pipeline** (train → forecast → score → gate) is **correct and repeatable**.
-- The **coarsened smoke model** is not yet a fair test of A1 skill — a **longer fine-tune on a complete Zarr** with full model capacity is required before treating gate failure as a scientific conclusion.
-- **Short-lead gates (+24–48 h)** remain appropriate; long-lead teacher RMSE growth on the Africa box is a separate known issue (see `PHASE0_CLOSURE.md`).
+- **A1 is closed** on the full 2020–2021 Zarr + extend fine-tune.
+- **`tp`** is on the scorecard for reporting; it is **not** an A1 gate variable — planned for **A2**.
+- **Short-lead gates (+24–48 h)** remain appropriate; long-lead teacher issues are separate (`PHASE0_CLOSURE.md`).
 
 ---
 
@@ -228,7 +248,7 @@ Plus difference fields: Teacher − ERA5, Coarsened − ERA5, Coarsened − Teac
 **Data:** `data/processed/phase0/forecasts/` and `data/processed/trackA/forecasts/` (Africa 0.25° grid).  
 **ERA5:** Requires GCS ADC locally; can compare teacher vs coarsened without ERA5 if offline.
 
-**Known gap:** `tp` is **NaN** in coarsened forecast NetCDF — precipitation not yet in spatial or gate comparisons for Track A.
+**Known gap (updated):** `tp` is present in forecast NetCDFs and scored on the scorecard; it is **not** in the A1 gate. Prefer 6h-accumulated ERA5 truth before treating precip RMSE as primary.
 
 ---
 
@@ -273,23 +293,18 @@ Based on discussion with **Sh (Oxford)**:
 
 ## 10. Next steps (prioritised)
 
+### Near term
 
-
-### Near term (Lengau)
-
-1. **Rebuild training Zarr** — full 2018 Q1 or 2020–2021 subset; fix missing timesteps.
-2. **Longer coarsening fine-tune** — drop OOM overrides where GPU memory allows.
-3. **Re-run** forecast → score → gate; target A1 pass on t2m/u10/v10 @ +24/+48 h.
-4. **Implement Mario IC path** — `_regrid_to_o96` in `cds_ic.py`; extend `populate_earthkit_regrid_cache.py` for O96 matrices.
-5. **Fix** `tp` **in forecast NetCDF** for full Mvula protocol.
-
-
+1. ~~Rebuild training Zarr / longer fine-tune / re-run A1 gate~~ — **done** (A1 30/30, 2026-08-06).
+2. **Start A2** — attention-head pruning (`configs/trackA_prune.yaml`); CRPS gate includes `tp`.
+3. **Implement Mario IC path** — `_regrid_to_o96` in `cds_ic.py`; extend earthkit O96 matrix cache for Lengau offline.
+4. **Harden `tp` scoring** — sum GCS hourly precip to 6h to match forecast accumulation.
 
 ### Medium term (team)
 
 1. **Lock 2024–2025 init calendar** and file naming with Oxford.
 2. **Paired verification campaign** — three streams scored with common scorecard.
-3. **Track A report** with diagnostics plots (`diagnostics/plot/lapai.yaml`) after real gate attempt.
+3. **Track A report** (`TRACKA_REPORT.md`) + diagnostics after A2.
 
 ---
 
@@ -300,7 +315,7 @@ Based on discussion with **Sh (Oxford)**:
 1. **Init calendar:** Weekly vs bi-weekly through 2024–2025? Same dates for all three model streams?
 2. **O96 reference:** Native O96 AIFS from Oxford only, or also required from Lengau?
 3. **IC benchmark:** Confirm adoption of Mario’s O96-at-fetch as canonical; bridge as Lengau fallback only?
-4. **Gate thresholds:** Is 5% RMSE @ +24/+48 h still the right A1 bar, or adjust for coarsened smoke vs production?
+4. **Gate thresholds:** A1 5% bar is met (with margin). Keep the same for A2 CRPS (&lt;3%), or adjust?
 5. **Spatial diagnostics:** Which variables/leads should be standard in team reports (t2m +24 h minimum)?
 6. **Meeting:** Sh suggested debrief + slides for Mario — use `LAPAI_STATUS_DECK.pdf` and Streamlit dashboard?
 
@@ -316,7 +331,9 @@ Based on discussion with **Sh (Oxford)**:
 | Repo              | `lapai-forecast` (GitHub: `lapai-forecast-africa`) |
 | Phase 0 scorecard | `reports/PHASE0_BASELINE_SCORECARD.json`           |
 | Track A scorecard | `reports/TRACKA_COARSEN_SCORECARD.json`            |
-| A1 gate           | `reports/TRACKA_A1_GATE.json`                      |
+| A1 gate           | `reports/TRACKA_A1_GATE.json` (**passed 30/30**)   |
+| Team note (A1)    | `reports/TEAM_NOTE_A1_PASSED.md`                   |
+| Operator checklist| `reports/TRACKA_FULL_TRAIN_CHECKLIST.md`           |
 | Slide deck        | `reports/LAPAI_STATUS_DECK.pdf`                    |
 | Dashboard         | `streamlit run streamlit_status.py`                |
 | Design doc (IC)   | `PLAN.md` §4.1, `reports/PHASE0_CLOSURE.md`        |

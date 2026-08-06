@@ -1,9 +1,8 @@
 {
-  "phase": 0,
-  "status": "baseline_teacher",
-  "generated_at": "2026-06-30T13:16:32Z",
-  "teacher_config": "configs/teacher_n320_gt6.yaml",
-  "checkpoint": "models/teacher_n320_gt6/inference.ckpt",
+  "phase": "trackA_coarsen_extend_15k",
+  "status": "candidate",
+  "generated_at": "2026-08-06T08:11:24Z",
+  "checkpoint": "models/trackA_coarsen_full_extend_runs/.../inference-last.ckpt",
   "domain": "africa",
   "variables": [
     "t2m",
@@ -13,11 +12,7 @@
   ],
   "leads_hours": [
     24,
-    48,
-    72,
-    120,
-    168,
-    240
+    48
   ],
   "truth_source": "gcs",
   "inits_scored": [
@@ -28,730 +23,260 @@
     "20230129"
   ],
   "forecasts": [
-    "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-    "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-    "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-    "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-    "data\\processed\\trackA\\forecasts\\20230129_00Z.nc"
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230129_00Z.nc"
   ],
   "results": [
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
       "init_date": "20230101",
       "lead_hours": 24,
       "valid_time": "2023-01-02T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 3.5243211337957168,
-          "acc": 0.876660141754737
+          "rmse": 1.6672768856407034,
+          "acc": 0.9625601227720457
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.00036292956683658815,
+          "acc": 0.3041617550855918,
+          "pod_1mm": 0.21703980099502487
         },
         "u10": {
-          "rmse": 2.4390813766136166,
-          "acc": 0.732117331431724
+          "rmse": 2.0439149180096665,
+          "acc": 0.7533394735502206
         },
         "v10": {
-          "rmse": 2.640308250689135,
-          "acc": 0.661132614291493
+          "rmse": 2.132097779288233,
+          "acc": 0.6905150536754538
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
       "init_date": "20230101",
       "lead_hours": 48,
       "valid_time": "2023-01-03T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 7.021996417335353,
-          "acc": 0.6830165589024177
+          "rmse": 2.291036072323027,
+          "acc": 0.929284906296427
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0005231750415689015,
+          "acc": 0.21948167653462872,
+          "pod_1mm": 0.3701594533029613
         },
         "u10": {
-          "rmse": 4.730192300367789,
-          "acc": 0.3243586192782311
+          "rmse": 2.3812721231722676,
+          "acc": 0.49712987596073827
         },
         "v10": {
-          "rmse": 4.476133798073944,
-          "acc": 0.36772307050816305
+          "rmse": 3.1173474857145966,
+          "acc": 0.3384994151231299
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-      "init_date": "20230101",
-      "lead_hours": 72,
-      "valid_time": "2023-01-04T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 10.420173615460936,
-          "acc": 0.5366587067215084
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 6.734179440856851,
-          "acc": 0.18335583373702738
-        },
-        "v10": {
-          "rmse": 5.940002620450713,
-          "acc": 0.3413813926237727
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-      "init_date": "20230101",
-      "lead_hours": 120,
-      "valid_time": "2023-01-06T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 15.888201759116614,
-          "acc": 0.37187454975888373
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 10.116646868083556,
-          "acc": 0.20105221490625344
-        },
-        "v10": {
-          "rmse": 10.059519574083334,
-          "acc": 0.20850127761882375
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-      "init_date": "20230101",
-      "lead_hours": 168,
-      "valid_time": "2023-01-08T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 21.55115620131367,
-          "acc": 0.26084336302246214
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 13.835735086520046,
-          "acc": 0.15255052228938668
-        },
-        "v10": {
-          "rmse": 14.151715057391153,
-          "acc": 0.16636775324540723
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-      "init_date": "20230101",
-      "lead_hours": 240,
-      "valid_time": "2023-01-11T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 32.514713680149676,
-          "acc": 0.16519249570331873
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 21.682565694301214,
-          "acc": 0.04096946351373618
-        },
-        "v10": {
-          "rmse": 21.207832326555533,
-          "acc": 0.10068827063148385
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
       "init_date": "20230108",
       "lead_hours": 24,
       "valid_time": "2023-01-09T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 3.1842915495883206,
-          "acc": 0.9067275631967157
+          "rmse": 1.6745697697325188,
+          "acc": 0.9622823932225879
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0005951352484863771,
+          "acc": 0.25965127762861545,
+          "pod_1mm": 0.4376430205949657
         },
         "u10": {
-          "rmse": 2.8975198977168404,
-          "acc": 0.6260562853117742
+          "rmse": 2.405003834223293,
+          "acc": 0.6482202429668034
         },
         "v10": {
-          "rmse": 3.182609250006754,
-          "acc": 0.5782322507636185
+          "rmse": 2.567288165017403,
+          "acc": 0.6054114727868009
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
       "init_date": "20230108",
       "lead_hours": 48,
       "valid_time": "2023-01-10T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 6.201290464815124,
-          "acc": 0.7639275042234964
+          "rmse": 2.367801147558147,
+          "acc": 0.9260333387792481
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0007018280112756499,
+          "acc": 0.07523169259376554,
+          "pod_1mm": 0.25680726107848373
         },
         "u10": {
-          "rmse": 4.783645258600749,
-          "acc": 0.397235989504938
+          "rmse": 3.454391905864937,
+          "acc": 0.31175717105345924
         },
         "v10": {
-          "rmse": 5.153233912527794,
-          "acc": 0.3352626293630292
+          "rmse": 3.2288524957651754,
+          "acc": 0.33380622650524133
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-      "init_date": "20230108",
-      "lead_hours": 72,
-      "valid_time": "2023-01-11T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 9.46875385331364,
-          "acc": 0.6223388112288706
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 6.779554771149215,
-          "acc": 0.28144561550537667
-        },
-        "v10": {
-          "rmse": 6.928358461295879,
-          "acc": 0.303703517688404
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-      "init_date": "20230108",
-      "lead_hours": 120,
-      "valid_time": "2023-01-13T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 15.291082802254142,
-          "acc": 0.40905267495234987
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 11.421670967482632,
-          "acc": 0.22187234307534384
-        },
-        "v10": {
-          "rmse": 10.987508448412132,
-          "acc": 0.25878316564554177
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-      "init_date": "20230108",
-      "lead_hours": 168,
-      "valid_time": "2023-01-15T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 21.087100522697433,
-          "acc": 0.2555493242396471
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 16.89077156307897,
-          "acc": 0.16997768605050947
-        },
-        "v10": {
-          "rmse": 15.558755613107337,
-          "acc": 0.24447077656823288
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-      "init_date": "20230108",
-      "lead_hours": 240,
-      "valid_time": "2023-01-18T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 32.06906720663039,
-          "acc": 0.11624872771061366
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 24.453981883435063,
-          "acc": 0.15350866625411344
-        },
-        "v10": {
-          "rmse": 23.336830184004572,
-          "acc": 0.11963300523595682
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
       "init_date": "20230115",
       "lead_hours": 24,
       "valid_time": "2023-01-16T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 3.2117577807083877,
-          "acc": 0.9068464632988503
+          "rmse": 1.5608995452796866,
+          "acc": 0.968511316037527
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0004068503370023136,
+          "acc": 0.22926266299713838,
+          "pod_1mm": 0.1963470319634703
         },
         "u10": {
-          "rmse": 2.9932076883132392,
-          "acc": 0.6442783130380202
+          "rmse": 1.9972865695239843,
+          "acc": 0.7950409036748167
         },
         "v10": {
-          "rmse": 2.881821298224273,
-          "acc": 0.6839506371147962
+          "rmse": 2.0784892184878068,
+          "acc": 0.767330052872412
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
       "init_date": "20230115",
       "lead_hours": 48,
       "valid_time": "2023-01-17T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 6.321174228347712,
-          "acc": 0.7563620835702717
+          "rmse": 2.0877132527326143,
+          "acc": 0.9418091940561163
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0006001832753180132,
+          "acc": 0.20153487109205054,
+          "pod_1mm": 0.3538011695906433
         },
         "u10": {
-          "rmse": 4.422391387102678,
-          "acc": 0.4934138335799055
+          "rmse": 3.1874601514023455,
+          "acc": 0.5328391586353671
         },
         "v10": {
-          "rmse": 5.010100350841518,
-          "acc": 0.43958811989793267
+          "rmse": 2.7492918064564016,
+          "acc": 0.5582774590616063
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-      "init_date": "20230115",
-      "lead_hours": 72,
-      "valid_time": "2023-01-18T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 9.323475901051347,
-          "acc": 0.6334974473757862
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 5.849102433805982,
-          "acc": 0.3955002325286564
-        },
-        "v10": {
-          "rmse": 7.362899114018678,
-          "acc": 0.2774902041970415
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-      "init_date": "20230115",
-      "lead_hours": 120,
-      "valid_time": "2023-01-20T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 15.311346176453666,
-          "acc": 0.38935485050536855
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 9.764647271785948,
-          "acc": 0.3037192508797728
-        },
-        "v10": {
-          "rmse": 10.572075902684075,
-          "acc": 0.2901631224741124
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-      "init_date": "20230115",
-      "lead_hours": 168,
-      "valid_time": "2023-01-22T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 21.28521477370291,
-          "acc": 0.2722907307225333
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 15.044612859091417,
-          "acc": 0.2022145696547771
-        },
-        "v10": {
-          "rmse": 14.812564013320928,
-          "acc": 0.22745162997981885
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-      "init_date": "20230115",
-      "lead_hours": 240,
-      "valid_time": "2023-01-25T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 32.14260809058032,
-          "acc": 0.19878294741745484
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 24.39811203804159,
-          "acc": 0.14327626821407577
-        },
-        "v10": {
-          "rmse": 21.52332242739247,
-          "acc": 0.16122448222526925
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
       "init_date": "20230122",
       "lead_hours": 24,
       "valid_time": "2023-01-23T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 3.1903087198402327,
-          "acc": 0.8999697089290631
+          "rmse": 1.5930729651772606,
+          "acc": 0.9707583392532009
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0004928621676403264,
+          "acc": 0.4894093392559831,
+          "pod_1mm": 0.607397504456328
         },
         "u10": {
-          "rmse": 3.418630400333185,
-          "acc": 0.656764185601586
+          "rmse": 2.085187188080491,
+          "acc": 0.7598794354431982
         },
         "v10": {
-          "rmse": 3.1337291798645994,
-          "acc": 0.655222163728971
+          "rmse": 2.1567863925554267,
+          "acc": 0.7946482132344385
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
       "init_date": "20230122",
       "lead_hours": 48,
       "valid_time": "2023-01-24T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 5.894896494290384,
-          "acc": 0.74009252553704
+          "rmse": 2.2042081670142073,
+          "acc": 0.9445476142052519
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0006647735722828898,
+          "acc": 0.3297330656857856,
+          "pod_1mm": 0.6008700380641653
         },
         "u10": {
-          "rmse": 5.8083395976045065,
-          "acc": 0.45934732875251455
+          "rmse": 2.718359811813247,
+          "acc": 0.6025677040667294
         },
         "v10": {
-          "rmse": 4.902002318094604,
-          "acc": 0.49041545084528615
+          "rmse": 2.9008746284050066,
+          "acc": 0.565447296633606
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-      "init_date": "20230122",
-      "lead_hours": 72,
-      "valid_time": "2023-01-25T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 8.881777885231603,
-          "acc": 0.5552004901168309
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 8.084047849271686,
-          "acc": 0.3917632587984916
-        },
-        "v10": {
-          "rmse": 6.856270630782882,
-          "acc": 0.3746669411571806
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-      "init_date": "20230122",
-      "lead_hours": 120,
-      "valid_time": "2023-01-27T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 13.939212207970524,
-          "acc": 0.3621599867254756
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 12.325149213453843,
-          "acc": 0.30889101352792053
-        },
-        "v10": {
-          "rmse": 11.123558420414232,
-          "acc": 0.3087554784840894
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-      "init_date": "20230122",
-      "lead_hours": 168,
-      "valid_time": "2023-01-29T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 19.97908276314509,
-          "acc": 0.2377464817889716
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 18.077820896794062,
-          "acc": 0.1294437109679981
-        },
-        "v10": {
-          "rmse": 15.993300324865864,
-          "acc": 0.17724382577302258
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-      "init_date": "20230122",
-      "lead_hours": 240,
-      "valid_time": "2023-02-01T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 30.819366932530816,
-          "acc": 0.15619311512132
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 26.80840416518035,
-          "acc": 0.20877963973927424
-        },
-        "v10": {
-          "rmse": 23.453545531330693,
-          "acc": 0.1730265269329021
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
       "init_date": "20230129",
       "lead_hours": 24,
       "valid_time": "2023-01-30T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 3.5098266876049795,
-          "acc": 0.9018915993984977
+          "rmse": 1.6635331132534583,
+          "acc": 0.9684187534835945
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0010265177201810385,
+          "acc": 0.3742270703651311,
+          "pod_1mm": 0.42360319270239455
         },
         "u10": {
-          "rmse": 3.820395595333024,
-          "acc": 0.4451011636189048
+          "rmse": 2.3374393673072924,
+          "acc": 0.678302316377562
         },
         "v10": {
-          "rmse": 4.400140362434014,
-          "acc": 0.47635120243642565
+          "rmse": 2.503964994947267,
+          "acc": 0.7220152770255849
         }
       }
     },
     {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
       "init_date": "20230129",
       "lead_hours": 48,
       "valid_time": "2023-01-31T00:00:00.000000000",
       "variables": {
         "t2m": {
-          "rmse": 6.89079279410021,
-          "acc": 0.7465582897594948
+          "rmse": 2.2333910596915763,
+          "acc": 0.942074590385977
         },
         "tp": {
-          "rmse": null,
-          "acc": null
+          "rmse": 0.0007767151573004531,
+          "acc": 0.0424705763578937,
+          "pod_1mm": 0.1788939051918736
         },
         "u10": {
-          "rmse": 5.744156266902691,
-          "acc": 0.2823272674268093
+          "rmse": 3.1041350764763074,
+          "acc": 0.3937607318385642
         },
         "v10": {
-          "rmse": 6.509493724473422,
-          "acc": 0.26028423882673507
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
-      "init_date": "20230129",
-      "lead_hours": 72,
-      "valid_time": "2023-02-01T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 10.273715440167015,
-          "acc": 0.6227486842357833
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 7.747514969812459,
-          "acc": 0.22751483626853997
-        },
-        "v10": {
-          "rmse": 8.29218965568134,
-          "acc": 0.17852186787739088
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
-      "init_date": "20230129",
-      "lead_hours": 120,
-      "valid_time": "2023-02-03T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 16.327318850086346,
-          "acc": 0.43458325397562775
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 12.0599323578413,
-          "acc": 0.2186673563988705
-        },
-        "v10": {
-          "rmse": 11.138203030001836,
-          "acc": 0.2955173470897911
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
-      "init_date": "20230129",
-      "lead_hours": 168,
-      "valid_time": "2023-02-05T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 22.55598043703549,
-          "acc": 0.2844570145984687
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 17.43573537521687,
-          "acc": 0.11546854765967014
-        },
-        "v10": {
-          "rmse": 15.643874339235936,
-          "acc": 0.19584639900148224
-        }
-      }
-    },
-    {
-      "forecast": "data\\processed\\trackA\\forecasts\\20230129_00Z.nc",
-      "init_date": "20230129",
-      "lead_hours": 240,
-      "valid_time": "2023-02-08T00:00:00.000000000",
-      "variables": {
-        "t2m": {
-          "rmse": 33.11988829282263,
-          "acc": 0.15282222069315066
-        },
-        "tp": {
-          "rmse": null,
-          "acc": null
-        },
-        "u10": {
-          "rmse": 26.309845936616302,
-          "acc": 0.15513288528531413
-        },
-        "v10": {
-          "rmse": 22.330583591052697,
-          "acc": 0.2048652799513248
+          "rmse": 2.894882397295298,
+          "acc": 0.5590806793988646
         }
       }
     }

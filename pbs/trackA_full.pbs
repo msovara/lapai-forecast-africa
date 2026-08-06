@@ -1,0 +1,85 @@
+#!/bin/bash
+#PBS -N lapai_trackA_full
+#PBS -P RCHPC
+#PBS -q gpu_1
+# 32 GiB V100s only (CHPC wiki guide/gpu): pin exact host — node_type=32GB is not the
+# supported request and after the Aug 2026 reboot it failed with "Insufficient ... nodetype".
+# Unpinned jobs land on 16 GiB V100s (insufficient for this fp32 / channels=256 config).
+# Alternate host if gpu2005 is busy: host=gpu2006
+#PBS -l select=1:host=gpu2005:ncpus=9:ngpus=1
+# gpu_1 enforces resources_max.walltime=12:00:00 (and ncpus<=10); 24h is rejected
+# outright with "Job violates queue and/or server resource limits".
+#PBS -l walltime=12:00:00
+#PBS -o lapai_trackA_full.o
+#PBS -e lapai_trackA_full.e
+#PBS -j oe
+#PBS -k oe
+#
+# Full Track A coarsen fine-tune on era5_n96_2020_2021.zarr
+#
+# Before submit (laptop → Lengau):
+#   rsync -avP data/processed/lapai/era5_n96_2020_2021.zarr/ \
+#     msovara@lengau.chpc.ac.za:~/repos/lapai-forecast/data/processed/lapai/era5_n96_2020_2021.zarr/
+#   rsync -avP configs/trackA_coarsen_full.yaml training/ pbs/ scripts/ \
+#     msovara@lengau.chpc.ac.za:~/repos/lapai-forecast/
+#
+# Submit from LapAI repo root on Lengau:
+#   cd ~/repos/lapai-forecast && qsub pbs/trackA_full.pbs
+#
+# Dry-run hints only:
+#   qsub -v LAPAI_TRACKA_DRY=1 pbs/trackA_full.pbs
+#
+# Skip teacher inference gate (if already verified):
+#   qsub -v LAPAI_SKIP_GATE=1 pbs/trackA_full.pbs
+#
+# If gpu2005 is busy, switch host then resubmit:
+#   sed -i 's/host=gpu2005/host=gpu2006/' pbs/trackA_full.pbs && qsub pbs/trackA_full.pbs
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
+
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+export ANEMOI_BASE_SEED="${JOB_NUM}"
+
+source pbs/inc_conda_lengau.sh
+lapai_load_cuda_gpu
+
+export LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  echo "ERROR: lustre env python not found/executable: ${LAPAI_PYTHON}" >&2
+  exit 1
+fi
+export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+CFG="${LAPAI_TRACKA_CONFIG:-configs/trackA_coarsen_full.yaml}"
+ZARR="data/processed/lapai/era5_n96_2020_2021.zarr"
+
+echo "[lapai trackA full] host=$(hostname) job=${JOB_NUM} cfg=${CFG} LAPAI_PYTHON=${LAPAI_PYTHON}"
+
+if [[ ! -d "${ZARR}" ]]; then
+  echo "ERROR: missing training Zarr: ${ZARR}" >&2
+  echo "       rsync era5_n96_2020_2021.zarr from laptop before qsub." >&2
+  exit 1
+fi
+
+export LAPAI_TEACHER_CONFIG="${LAPAI_TEACHER_CONFIG:-configs/teacher_n320_gt6.yaml}"
+export LD_LIBRARY_PATH="${HOME}/.conda/envs/grib_env/lib:${LD_LIBRARY_PATH:-}"
+
+if [[ "${LAPAI_SKIP_GATE:-0}" != 1 ]]; then
+  echo "[lapai trackA full] inference gate (teacher smoke)..."
+  GATE_PYTHON="${LAPAI_GATE_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+  if [[ -x "${GATE_PYTHON}" ]]; then
+    LAPAI_PYTHON="${GATE_PYTHON}" bash scripts/lapai_inference_gate.sh
+  else
+    LAPAI_PYTHON="${LAPAI_PYTHON}" bash scripts/lapai_inference_gate.sh
+  fi
+fi
+
+if [[ "${LAPAI_TRACKA_DRY:-0}" == 1 ]]; then
+  exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config "${CFG}" --suggest-invocation
+fi
+
+exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config "${CFG}"

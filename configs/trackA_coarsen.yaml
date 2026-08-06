@@ -54,6 +54,8 @@ forecast:
   cds_cache_dir: ~/.cache/aifs-africa/era5
 
 notes: >-
+  SMOKE only (50 steps, 2018 Q1 Zarr). For the full 2020–2021 fine-tune use
+  configs/trackA_coarsen_full.yaml and pbs/trackA_full.pbs.
   After coarsened processor fine-tune, forecast the same Phase 0 inits, score with
   run_phase0_closure.py --score-only, then: python scripts/run_trackA_gate.py
   --candidate reports/TRACKA_COARSEN_SCORECARD.json
