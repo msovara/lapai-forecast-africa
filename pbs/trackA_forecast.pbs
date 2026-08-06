@@ -2,7 +2,8 @@
 #PBS -N lapai_trackA_fc
 #PBS -P RCHPC
 #PBS -q gpu_1
-#PBS -l select=1:ncpus=9:ngpus=1:node_type=32GB
+# 32 GiB V100s only (CHPC wiki): pin exact host. Alternate: host=gpu2006
+#PBS -l select=1:host=gpu2005:ncpus=9:ngpus=1
 #PBS -l walltime=06:00:00
 #PBS -o lapai_trackA_fc.o
 #PBS -e lapai_trackA_fc.e
@@ -66,4 +67,6 @@ if [[ -n "${LAPAI_TRACKA_FC_INIT:-}" ]]; then
     --cds-offline
 fi
 
-exec "${LAPAI_PYTHON}" scripts/run_trackA_closure.py --forecast-only
+exec "${LAPAI_PYTHON}" scripts/run_trackA_closure.py \
+  --config configs/trackA_coarsen_full.yaml \
+  --forecast-only

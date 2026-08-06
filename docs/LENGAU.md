@@ -10,7 +10,8 @@ This repo is wired for **Centre for High Performance Computing** [Lengau](https:
 
 ```bash
 cd ~/repos/lapai-forecast   # wherever you cloned github.com/msovara/lapai-forecast-africa
-qsub pbs/trackA.pbs
+qsub pbs/trackA.pbs              # smoke (configs/trackA_coarsen.yaml)
+qsub pbs/trackA_full.pbs         # full A1 on era5_n96_2020_2021.zarr (24h walltime)
 ```
 
 Submit **from inside** `lapai-forecast/`, not from a parent repo unless you deliberately set PBS `-d`.

@@ -57,8 +57,10 @@ if [[ "${LAPAI_SKIP_GATE:-0}" != 1 ]]; then
   fi
 fi
 
+CFG="${LAPAI_TRACKA_CONFIG:-configs/trackA_coarsen.yaml}"
+
 if [[ "${LAPAI_TRACKA_DRY:-0}" == 1 ]]; then
-  exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml --suggest-invocation
+  exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config "${CFG}" --suggest-invocation
 fi
 
-exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config configs/trackA_coarsen.yaml
+exec "${LAPAI_PYTHON}" training/train_trackA.py --step coarsen --config "${CFG}"
