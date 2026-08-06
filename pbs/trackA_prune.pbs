@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#PBS -N lapai_trackA_prune
+#PBS -P RCHPC
+#PBS -q gpu_1
+# 32 GiB V100s only — pin host (alt: gpu2006)
+#PBS -l select=1:host=gpu2005:ncpus=9:ngpus=1
+#PBS -l walltime=12:00:00
+#PBS -o lapai_trackA_prune.o
+#PBS -e lapai_trackA_prune.e
+#PBS -j oe
+#PBS -k oe
+#
+# Track A A2 — soft-mask attention heads + recovery fine-tune.
+# Requires models/teacher_gt_coarsened.ckpt (GraphTransformer O96 from A1b).
+#
+#   qsub pbs/trackA_prune.pbs
+#   qsub -v LAPAI_TRACKA_CONFIG=configs/trackA_prune.yaml pbs/trackA_prune.pbs
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?submit from lapai-forecast repo root}" || exit 1
+
+JOB_NUM=$(echo "${PBS_JOBID}" | cut -d'.' -f1)
+export ANEMOI_BASE_SEED="${JOB_NUM}"
+
+source pbs/inc_conda_lengau.sh
+lapai_load_cuda_gpu
+
+export LAPAI_PYTHON="${LAPAI_PYTHON:-/home/msovara/lustre/dev/lapai-anemoi/bin/python}"
+if [[ ! -x "${LAPAI_PYTHON}" ]]; then
+  echo "ERROR: lustre env python not found: ${LAPAI_PYTHON}" >&2
+  exit 1
+fi
+export PATH="$(dirname "${LAPAI_PYTHON}"):${PATH}"
+export HYDRA_FULL_ERROR=1
+export PYTHONUNBUFFERED=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export LD_LIBRARY_PATH="${HOME}/.conda/envs/grib_env/lib:${LD_LIBRARY_PATH:-}"
+
+CFG="${LAPAI_TRACKA_CONFIG:-configs/trackA_prune.yaml}"
+echo "[lapai A2 prune] host=$(hostname) job=${JOB_NUM} cfg=${CFG}"
+
+if [[ ! -e models/teacher_gt_coarsened.ckpt ]]; then
+  echo "ERROR: models/teacher_gt_coarsened.ckpt missing." >&2
+  echo "       Run A1b first: configs/trackA_gt_coarsen.yaml" >&2
+  exit 1
+fi
+
+exec "${LAPAI_PYTHON}" training/train_trackA.py --step prune --config "${CFG}"
