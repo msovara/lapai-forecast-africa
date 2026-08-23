@@ -38,6 +38,9 @@ export LD_LIBRARY_PATH="${HOME}/.conda/envs/grib_env/lib:${LD_LIBRARY_PATH:-}"
 
 CFG="${LAPAI_TRACKA_CONFIG:-configs/trackA_prune.yaml}"
 echo "[lapai A2 prune] host=$(hostname) job=${JOB_NUM} cfg=${CFG}"
+echo "[lapai A2 prune] python=${LAPAI_PYTHON} $(date -Is)"
+# Force line-buffered child logs even if a wrapper forgets PYTHONUNBUFFERED.
+export PYTHONUNBUFFERED=1
 
 if [[ ! -e models/teacher_gt_coarsened.ckpt ]]; then
   echo "ERROR: models/teacher_gt_coarsened.ckpt missing." >&2
@@ -45,4 +48,5 @@ if [[ ! -e models/teacher_gt_coarsened.ckpt ]]; then
   exit 1
 fi
 
-exec "${LAPAI_PYTHON}" training/train_trackA.py --step prune --config "${CFG}"
+echo "[lapai A2 prune] exec train_trackA.py --step prune"
+exec "${LAPAI_PYTHON}" -u training/train_trackA.py --step prune --config "${CFG}"

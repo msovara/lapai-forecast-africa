@@ -85,6 +85,27 @@ def _existing_warmstart_format(path: Path) -> int:
     return -1
 
 
+def _ensure_unpickle_stubs() -> None:
+    """Older C4E inference ckpts pickle Triton classes that newer anemoi-models renamed."""
+    try:
+        import anemoi.models.triton.gt as gt
+    except Exception:
+        return
+    if hasattr(gt, "GraphTransformerFunction"):
+        return
+
+    class GraphTransformerFunction(torch.autograd.Function):
+        @staticmethod
+        def forward(ctx, *args, **kwargs):  # pragma: no cover
+            raise RuntimeError("GraphTransformerFunction stub is not executable")
+
+        @staticmethod
+        def backward(ctx, *grad_outputs):  # pragma: no cover
+            raise RuntimeError("GraphTransformerFunction stub is not executable")
+
+    gt.GraphTransformerFunction = GraphTransformerFunction
+
+
 def convert_inference_to_warmstart(in_path: Path, out_path: Path, *, force: bool = False) -> Path:
     """Build a PyTorch Lightning-style checkpoint for anemoi-training transfer learning."""
     in_path = in_path.resolve()
@@ -101,6 +122,7 @@ def convert_inference_to_warmstart(in_path: Path, out_path: Path, *, force: bool
     ):
         return out_path
 
+    _ensure_unpickle_stubs()
     obj = torch.load(in_path, map_location="cpu", weights_only=False)
 
     if isinstance(obj, dict) and "state_dict" in obj:

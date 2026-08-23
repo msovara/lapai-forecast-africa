@@ -23,9 +23,9 @@ domain:
   default: africa
   regions:
     africa:
-      # Aligned with graphcast-africa: continental Africa + Madagascar / WIO to 70E.
+      # Original Track A / Phase 0 Africa box (A1 grid 321 x 301).
       lat: [-40.0, 40.0]
-      lon: [-20.0, 70.0]
+      lon: [-20.0, 55.0]
     global:
       lat: [-90.0, 90.0]
       lon: [-180.0, 180.0]

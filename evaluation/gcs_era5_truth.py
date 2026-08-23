@@ -5,7 +5,11 @@ from __future__ import annotations
 import numpy as np
 import xarray as xr
 
-GCS_OPTS = {"token": "google_default"}
+# Private team bucket needs ADC by default. Override with LAPAI_GCS_TOKEN=anon
+# only for public buckets.
+import os as _os
+
+GCS_OPTS = {"token": _os.environ.get("LAPAI_GCS_TOKEN", "google_default")}
 
 # scorecard name -> GCS folder stem (without year suffix)
 ERA5_GCS_STEMS = {
@@ -16,7 +20,7 @@ ERA5_GCS_STEMS = {
 }
 
 AFRICA_LAT = slice(-40, 40)
-AFRICA_LON = slice(-20, 70)
+AFRICA_LON = slice(-20, 55)
 
 
 def era5_gcs_path(var: str, year: int, bucket: str = "gs://code4earth/era5") -> str:

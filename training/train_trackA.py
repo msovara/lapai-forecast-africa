@@ -1,4 +1,4 @@
-﻿"""Track A driver — Anemoi coarsening + scorecard-gated acceptance."""
+"""Track A driver — Anemoi coarsening + scorecard-gated acceptance."""
 
 from __future__ import annotations
 
@@ -13,18 +13,34 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from evaluation.run_scorecard import _read_eval_config
-from evaluation.trackA_gate import load_trackA_coarsen_config, run_coarsen_gate, write_gate_report
-from scripts.convert_inference_to_warmstart_ckpt import convert_inference_to_warmstart, default_warmstart_path
+
+def _log(msg: str) -> None:
+    """Print and flush so PBS -k oe shows progress before heavy imports."""
+    print(msg, flush=True)
 
 
 def repo_root() -> Path:
     return _REPO_ROOT
 
 
+def _read_config(path: Path) -> dict[str, Any]:
+    """Load YAML config without importing the evaluation stack (keeps startup light)."""
+    if not path.is_file():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    try:
+        import yaml  # type: ignore
+
+        return yaml.safe_load(text) or {}
+    except Exception:  # noqa: BLE001
+        from evaluation.run_scorecard import _read_eval_config
+
+        return _read_eval_config(path)
+
+
 def suggested_invocation(step: str, config: Path) -> str:
     rr = repo_root()
-    cfg = _read_eval_config(config) if config.exists() else {}
+    cfg = _read_config(config) if config.exists() else {}
     gate = cfg.get("gate") or {}
     if step == "prune":
         return (
@@ -69,6 +85,12 @@ def _anemoi_train_cmd(extra: list[str]) -> list[str]:
 
 def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
     """Launch anemoi-training when configs/trackA_coarsen.yaml anemoi block is populated."""
+    _log("[Track A] loading warm-start conversion helpers (imports torch)…")
+    from scripts.convert_inference_to_warmstart_ckpt import (  # noqa: PLC0415
+        convert_inference_to_warmstart,
+        default_warmstart_path,
+    )
+
     anemoi = cfg.get("anemoi") or {}
     dataset = anemoi.get("dataset")
     if not dataset:
@@ -102,10 +124,12 @@ def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
         if not warm_start_path.is_absolute():
             warm_start_path = rr / warm_start_path
     else:
+        _log(f"[Track A] convert_inference_to_warmstart: {warm_start_path}")
         warm_start_path = convert_inference_to_warmstart(
             warm_start_path,
             default_warmstart_path(warm_start_path),
         )
+        _log(f"[Track A] warm_start ready: {warm_start_path}")
     output_root_path = Path(output_root)
     if not output_root_path.is_absolute():
         output_root_path = rr / output_root_path
@@ -136,14 +160,16 @@ def _run_coarsen_anemoi(cfg: dict[str, Any]) -> int:
     overrides.extend(str(x) for x in (anemoi.get("hydra_overrides") or []))
 
     cmd = _anemoi_train_cmd(overrides)
-    print("exec:", " ".join(cmd))
+    _log("exec: " + " ".join(cmd))
     return subprocess.call(cmd)
 
 
 def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
     """Soft-mask attention heads on a GraphTransformer ckpt, then recovery fine-tune."""
-    from utils.head_prune import prune_checkpoint, write_prune_report
+    _log("[A2 prune] importing utils.head_prune (loads torch)…")
+    from utils.head_prune import prune_checkpoint, write_prune_report  # noqa: PLC0415
 
+    _log("[A2 prune] head_prune import OK")
     anemoi = cfg.get("anemoi") or {}
     prune_cfg = cfg.get("prune") or {}
     rr = repo_root()
@@ -158,6 +184,7 @@ def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
             "\nFine-tune GraphTransformer on O96 first:",
             "configs/trackA_gt_coarsen.yaml → models/teacher_gt_coarsened.ckpt",
             "\n(A1 GNN teacher_coarsened.ckpt has no attention heads.)",
+            flush=True,
         )
         return 2
 
@@ -165,12 +192,14 @@ def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
     if not masked.is_absolute():
         masked = rr / masked
     fraction = float(prune_cfg.get("fraction_per_round", cfg.get("prune_fraction_per_round", 0.10)))
-    scope = str(prune_cfg.get("scope", "processor"))
-    if isinstance(scope, list):
-        scope = scope[0] if len(scope) == 1 else "processor"
+    scope_raw = prune_cfg.get("scope", "processor")
+    if isinstance(scope_raw, list):
+        scope = str(scope_raw[0]) if len(scope_raw) == 1 else "processor"
+    else:
+        scope = str(scope_raw)
     importance = str(prune_cfg.get("importance", "weight_l1"))
 
-    print(f"[A2 prune] masking heads on {warm} → {masked} (fraction={fraction}, scope={scope})")
+    _log(f"[A2 prune] masking heads on {warm} → {masked} (fraction={fraction}, scope={scope})")
     report = prune_checkpoint(
         warm,
         masked,
@@ -180,8 +209,8 @@ def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
     )
     report_path = rr / "reports" / f"TRACKA_A2_PRUNE_ROUND{int(prune_cfg.get('round', 1))}.json"
     write_prune_report(report, report_path)
-    print(f"[A2 prune] wrote {report_path}")
-    print(f"[A2 prune] dropped_heads sample:", list(report["dropped_heads"].items())[:3])
+    _log(f"[A2 prune] wrote {report_path}")
+    _log(f"[A2 prune] dropped_heads sample: {list(report['dropped_heads'].items())[:3]}")
 
     # Recovery fine-tune from masked weights.
     ft_cfg = dict(cfg)
@@ -189,10 +218,12 @@ def _run_prune_anemoi(cfg: dict[str, Any]) -> int:
     ft_anemoi["warm_start"] = str(masked)
     ft_anemoi["model"] = anemoi.get("model", "graphtransformer")
     ft_cfg["anemoi"] = ft_anemoi
+    _log("[A2 prune] starting recovery fine-tune…")
     return _run_coarsen_anemoi(ft_cfg)
 
 
 def main() -> None:
+    _log(f"[Track A] train_trackA.py start argv={sys.argv!r}")
     p = argparse.ArgumentParser(description="Track A: Anemoi coarsening + CRPS-gated pruning")
     p.add_argument("--step", choices=["coarsen", "prune"], required=True)
     p.add_argument("--config", type=Path, default=Path("configs/trackA_coarsen.yaml"))
@@ -216,6 +247,7 @@ def main() -> None:
         help="Run anemoi-training train ARGS when tokens follow",
     )
     args = p.parse_args()
+    _log(f"[Track A] parsed step={args.step} config={args.config}")
 
     if args.step == "coarsen" and not args.config.name.startswith("trackA_coarsen"):
         pass  # allow override
@@ -227,20 +259,29 @@ def main() -> None:
         return
 
     if args.check_gate is not None:
+        _log("[Track A] importing gate helpers…")
+        from evaluation.trackA_gate import (  # noqa: PLC0415
+            load_trackA_coarsen_config,
+            run_coarsen_gate,
+            write_gate_report,
+        )
+
         report = run_coarsen_gate(args.check_gate, config=load_trackA_coarsen_config(args.config))
         out = repo_root() / args.gate_out
         if args.step == "prune" and args.gate_out == Path("reports/TRACKA_A1_GATE.json"):
             out = repo_root() / "reports" / "TRACKA_A2_GATE.json"
         write_gate_report(report, out)
-        print(f"Track A gate passed={report['passed']} -> {out}")
+        print(f"Track A gate passed={report['passed']} -> {out}", flush=True)
         raise SystemExit(0 if report["passed"] else 1)
 
     if args.anemoi_train is not None and len(args.anemoi_train) > 0:
         cmd = _anemoi_train_cmd(list(args.anemoi_train))
-        print("exec:", " ".join(cmd))
+        _log("exec: " + " ".join(cmd))
         raise SystemExit(subprocess.call(cmd))
 
-    cfg = _read_eval_config(args.config) if args.config.exists() else {}
+    _log(f"[Track A] reading config {args.config}")
+    cfg = _read_config(args.config) if args.config.exists() else {}
+    _log("[Track A] config loaded")
 
     if args.step == "coarsen":
         raise SystemExit(_run_coarsen_anemoi(cfg))

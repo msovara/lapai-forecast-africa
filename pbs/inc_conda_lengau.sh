@@ -76,4 +76,14 @@ lapai_load_cuda_gpu() {
   module load chpc/cuda/12.0/12.0 2>/dev/null || module load chpc/cuda/11.8/11.8 2>/dev/null || {
     echo "WARNING: CUDA module not loaded — expect torch.cuda=false here." >&2
   }
+  # GraphTransformer uses Triton kernels that JIT-compile with $CC. Lengau's
+  # /bin/gcc is 4.8.5 and lacks <stdatomic.h>; load a modern GCC and point CC/CXX.
+  module load gcc/9.2.0 2>/dev/null || module load gcc/7.3.0 2>/dev/null || {
+    echo "WARNING: modern gcc module not loaded — Triton GT JIT may fail (stdatomic.h)." >&2
+  }
+  if command -v gcc >/dev/null 2>&1; then
+    export CC="$(command -v gcc)"
+    export CXX="$(command -v g++)"
+    echo "[lapai] Triton build CC=${CC} ($(${CC} --version | head -1))"
+  fi
 }

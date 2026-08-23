@@ -1,0 +1,284 @@
+{
+  "phase": "trackA_a2_prune_round1",
+  "status": "candidate",
+  "generated_at": "2026-08-20T04:31:36Z",
+  "checkpoint": "models/teacher_pruned.ckpt",
+  "domain": "africa",
+  "variables": [
+    "t2m",
+    "u10",
+    "v10",
+    "tp"
+  ],
+  "leads_hours": [
+    24,
+    48
+  ],
+  "truth_source": "gcs",
+  "inits_scored": [
+    "20230101",
+    "20230108",
+    "20230115",
+    "20230122",
+    "20230129"
+  ],
+  "forecasts": [
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230101_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230108_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230115_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230122_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230129_00Z.nc"
+  ],
+  "results": [
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.8993376735525391,
+          "acc": 0.9612010743992928
+        },
+        "u10": {
+          "rmse": 2.175618158090845,
+          "acc": 0.7211008186083748
+        },
+        "v10": {
+          "rmse": 2.3185985211793936,
+          "acc": 0.6434171896122195
+        },
+        "tp": {
+          "rmse": 0.0005884490756541932,
+          "acc": 0.30124644602817835,
+          "pod_1mm": 0.5546218487394958
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 48,
+      "valid_time": "2023-01-03T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.8013679208816744,
+          "acc": 0.9187053749260816
+        },
+        "u10": {
+          "rmse": 2.838536912841515,
+          "acc": 0.3311705853238519
+        },
+        "v10": {
+          "rmse": 3.147025683095013,
+          "acc": 0.3719891247601149
+        },
+        "tp": {
+          "rmse": 0.0005660222841333834,
+          "acc": 0.17831216143733594,
+          "pod_1mm": 0.3582741671217914
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "valid_time": "2023-01-09T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.8781155863407715,
+          "acc": 0.9583173295156988
+        },
+        "u10": {
+          "rmse": 2.4806877522513626,
+          "acc": 0.6580401861982315
+        },
+        "v10": {
+          "rmse": 2.4894480181749308,
+          "acc": 0.6129803882864482
+        },
+        "tp": {
+          "rmse": 0.000697950475529168,
+          "acc": 0.304658476963948,
+          "pod_1mm": 0.7255747126436781
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 48,
+      "valid_time": "2023-01-10T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.8945178605704927,
+          "acc": 0.9094069660171467
+        },
+        "u10": {
+          "rmse": 3.3964650254188595,
+          "acc": 0.3576487668735997
+        },
+        "v10": {
+          "rmse": 3.398824064636654,
+          "acc": 0.29282763868296485
+        },
+        "tp": {
+          "rmse": 0.0006367967046387068,
+          "acc": 0.15047110285632218,
+          "pod_1mm": 0.39905498281786944
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "valid_time": "2023-01-16T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.009826513800094,
+          "acc": 0.9642415525002772
+        },
+        "u10": {
+          "rmse": 2.4587223715698094,
+          "acc": 0.7167323736516075
+        },
+        "v10": {
+          "rmse": 2.20778233534203,
+          "acc": 0.7308937696303847
+        },
+        "tp": {
+          "rmse": 0.0006760699802032597,
+          "acc": 0.3260768017183365,
+          "pod_1mm": 0.6627218934911243
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 48,
+      "valid_time": "2023-01-17T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.901224147839838,
+          "acc": 0.9222259433410994
+        },
+        "u10": {
+          "rmse": 3.7125418481118735,
+          "acc": 0.38181355271240724
+        },
+        "v10": {
+          "rmse": 3.0510713278822412,
+          "acc": 0.46230461199190864
+        },
+        "tp": {
+          "rmse": 0.000708161945426302,
+          "acc": 0.2315030930926105,
+          "pod_1mm": 0.5776223776223777
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "valid_time": "2023-01-23T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.0886634630821366,
+          "acc": 0.9620026152941679
+        },
+        "u10": {
+          "rmse": 2.3620140990758474,
+          "acc": 0.7100396204194397
+        },
+        "v10": {
+          "rmse": 2.326496804150478,
+          "acc": 0.759358137797087
+        },
+        "tp": {
+          "rmse": 0.0007820815766807375,
+          "acc": 0.42480232820527625,
+          "pod_1mm": 0.7622138708575333
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 48,
+      "valid_time": "2023-01-24T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 3.2848073640380178,
+          "acc": 0.9079212922487074
+        },
+        "u10": {
+          "rmse": 3.2350458614661366,
+          "acc": 0.42230558275074526
+        },
+        "v10": {
+          "rmse": 3.280952796396418,
+          "acc": 0.5194573697401574
+        },
+        "tp": {
+          "rmse": 0.000792715357128283,
+          "acc": 0.30824649042568003,
+          "pod_1mm": 0.73914949583516
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "valid_time": "2023-01-30T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.170660759249451,
+          "acc": 0.9555016269832539
+        },
+        "u10": {
+          "rmse": 2.7818120314064636,
+          "acc": 0.5398357658512423
+        },
+        "v10": {
+          "rmse": 2.9299580388505557,
+          "acc": 0.6085789541185824
+        },
+        "tp": {
+          "rmse": 0.0007907205129740291,
+          "acc": 0.18794531689502816,
+          "pod_1mm": 0.5430588235294118
+        }
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 48,
+      "valid_time": "2023-01-31T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 3.1996650605739623,
+          "acc": 0.9075437465634005
+        },
+        "u10": {
+          "rmse": 3.770877905705547,
+          "acc": 0.28625740543430267
+        },
+        "v10": {
+          "rmse": 3.569640982485649,
+          "acc": 0.37902518391341855
+        },
+        "tp": {
+          "rmse": 0.0008399373853022323,
+          "acc": 0.07974968855967071,
+          "pod_1mm": 0.4482598607888631
+        }
+      }
+    }
+  ]
+}

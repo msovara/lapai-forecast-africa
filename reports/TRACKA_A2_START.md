@@ -66,3 +66,4 @@ $LAPAI_PYTHON scripts/run_trackA_gate.py \
 
 - GT O96 transfer from full `n320_gt6` (1024-ch) into 256-ch may under-transfer; if skill is poor, raise capacity or match teacher dims (may need multi-GPU / activation ckpt).
 - First A1b job may OOM — dual-queue 32 GiB hosts; reduce `num_layers` / `num_heads` if needed.
+- **Triton JIT needs modern GCC.** Job 7358489 failed when Triton used `/bin/gcc` 4.8.5 (`stdatomic.h` missing). `lapai_load_cuda_gpu` now loads `gcc/9.2.0` and sets `CC`/`CXX`.

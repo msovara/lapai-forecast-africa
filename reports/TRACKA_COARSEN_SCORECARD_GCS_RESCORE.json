@@ -1,0 +1,356 @@
+{
+  "phase": "trackA_coarsen_extend_15k_gcs_rescore",
+  "status": "baseline_rescored",
+  "generated_at": "2026-08-20T12:43:42Z",
+  "checkpoint": "models/trackA_coarsen_full_extend_runs/.../inference-last.ckpt",
+  "domain": "africa",
+  "domain_box": {
+    "lat": [
+      -40.0,
+      40.0
+    ],
+    "lon": [
+      -20.0,
+      55.0
+    ]
+  },
+  "eval_grid": "321x301",
+  "variables": [
+    "t2m",
+    "u10",
+    "v10",
+    "tp"
+  ],
+  "leads_hours": [
+    24,
+    48
+  ],
+  "truth_source": "gcs",
+  "truth_bucket": "gs://code4earth/era5",
+  "inits_scored": [
+    "20230101",
+    "20230108",
+    "20230115",
+    "20230122",
+    "20230129"
+  ],
+  "forecasts": [
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
+    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc"
+  ],
+  "results": [
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.6672768856407034,
+          "acc": 0.9625601227720455
+        },
+        "u10": {
+          "rmse": 2.043914918009667,
+          "acc": 0.7533394735502207
+        },
+        "v10": {
+          "rmse": 2.132097779288233,
+          "acc": 0.6905150536754542
+        },
+        "tp": {
+          "rmse": 0.00036292956683658815,
+          "acc": 0.3041617550855918,
+          "pod_1mm": 0.21703980099502487
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 48,
+      "valid_time": "2023-01-03T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.291036072323027,
+          "acc": 0.929284906296427
+        },
+        "u10": {
+          "rmse": 2.3812721231722676,
+          "acc": 0.49712987596073815
+        },
+        "v10": {
+          "rmse": 3.1173474857145966,
+          "acc": 0.3384994151231299
+        },
+        "tp": {
+          "rmse": 0.0005231750415689014,
+          "acc": 0.21948167653462866,
+          "pod_1mm": 0.3701594533029613
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "valid_time": "2023-01-09T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.6745697697325188,
+          "acc": 0.962282393222588
+        },
+        "u10": {
+          "rmse": 2.4050038342232924,
+          "acc": 0.6482202429668035
+        },
+        "v10": {
+          "rmse": 2.5672881650174033,
+          "acc": 0.6054114727868009
+        },
+        "tp": {
+          "rmse": 0.0005951352484863771,
+          "acc": 0.2596512776286155,
+          "pod_1mm": 0.4376430205949657
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 48,
+      "valid_time": "2023-01-10T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.367801147558147,
+          "acc": 0.9260333387792483
+        },
+        "u10": {
+          "rmse": 3.454391905864937,
+          "acc": 0.31175717105345924
+        },
+        "v10": {
+          "rmse": 3.228852495765176,
+          "acc": 0.3338062265052414
+        },
+        "tp": {
+          "rmse": 0.0007018280112756498,
+          "acc": 0.07523169259376557,
+          "pod_1mm": 0.25680726107848373
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "valid_time": "2023-01-16T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.5608995452796866,
+          "acc": 0.968511316037527
+        },
+        "u10": {
+          "rmse": 1.997286569523984,
+          "acc": 0.7950409036748166
+        },
+        "v10": {
+          "rmse": 2.0784892184878068,
+          "acc": 0.7673300528724117
+        },
+        "tp": {
+          "rmse": 0.0004068503370023136,
+          "acc": 0.22926266299713832,
+          "pod_1mm": 0.1963470319634703
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 48,
+      "valid_time": "2023-01-17T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.0877132527326143,
+          "acc": 0.9418091940561166
+        },
+        "u10": {
+          "rmse": 3.187460151402346,
+          "acc": 0.5328391586353671
+        },
+        "v10": {
+          "rmse": 2.7492918064564016,
+          "acc": 0.5582774590616063
+        },
+        "tp": {
+          "rmse": 0.0006001832753180132,
+          "acc": 0.20153487109205054,
+          "pod_1mm": 0.3538011695906433
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "valid_time": "2023-01-23T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.5930729651772606,
+          "acc": 0.9707583392532009
+        },
+        "u10": {
+          "rmse": 2.085187188080491,
+          "acc": 0.7598794354431984
+        },
+        "v10": {
+          "rmse": 2.156786392555427,
+          "acc": 0.7946482132344388
+        },
+        "tp": {
+          "rmse": 0.0004928621676403264,
+          "acc": 0.4894093392559831,
+          "pod_1mm": 0.607397504456328
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 48,
+      "valid_time": "2023-01-24T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.2042081670142073,
+          "acc": 0.9445476142052518
+        },
+        "u10": {
+          "rmse": 2.718359811813247,
+          "acc": 0.6025677040667293
+        },
+        "v10": {
+          "rmse": 2.9008746284050066,
+          "acc": 0.565447296633606
+        },
+        "tp": {
+          "rmse": 0.0006647735722828899,
+          "acc": 0.3297330656857856,
+          "pod_1mm": 0.6008700380641653
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "valid_time": "2023-01-30T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.6635331132534583,
+          "acc": 0.9684187534835946
+        },
+        "u10": {
+          "rmse": 2.3374393673072924,
+          "acc": 0.6783023163775621
+        },
+        "v10": {
+          "rmse": 2.503964994947267,
+          "acc": 0.7220152770255849
+        },
+        "tp": {
+          "rmse": 0.0010265177201810385,
+          "acc": 0.37422707036513103,
+          "pod_1mm": 0.42360319270239455
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    },
+    {
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 48,
+      "valid_time": "2023-01-31T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.2333910596915763,
+          "acc": 0.9420745903859771
+        },
+        "u10": {
+          "rmse": 3.1041350764763074,
+          "acc": 0.3937607318385641
+        },
+        "v10": {
+          "rmse": 2.894882397295298,
+          "acc": 0.5590806793988646
+        },
+        "tp": {
+          "rmse": 0.000776715157300453,
+          "acc": 0.04247057635789369,
+          "pod_1mm": 0.1788939051918736
+        }
+      },
+      "pred_grid": {
+        "nlat": 321,
+        "nlon": 301,
+        "lon_min": -20.0,
+        "lon_max": 55.0
+      }
+    }
+  ]
+}

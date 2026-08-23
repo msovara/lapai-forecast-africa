@@ -12,7 +12,7 @@ import xarray as xr
 
 from evaluation.gcs_era5_truth import open_era5_at_valid_time
 from evaluation.phase0_scorecard import _score_point
-from evaluation.run_scorecard import _read_eval_config
+from evaluation.run_scorecard import _read_eval_config, _resolve_domain
 from teachers.graphcast.gcs_forecasts import (
     GCS_BUCKET_PREFIX,
     open_graphcast_forecast,
@@ -84,6 +84,13 @@ def build_graphcast_scorecard(
     variables = list(cfg.get("variables") or ["t2m", "u10", "v10"])
     forecast_bucket = cfg.get("forecast_bucket") or GCS_BUCKET_PREFIX
     truth_bucket = (cfg.get("truth") or {}).get("gcs_bucket") or "gs://code4earth/era5"
+    eval_cfg = _read_eval_config(_REPO_ROOT / "configs" / "eval.yaml")
+    resolved = _resolve_domain(eval_cfg, "africa")
+    domain_box = (
+        {"lat": list(resolved[1]), "lon": list(resolved[2])}
+        if resolved
+        else {"lat": [-40.0, 40.0], "lon": [-20.0, 55.0]}
+    )
 
     card: dict[str, Any] = {
         "pathway": "graphcast_africa",
@@ -91,7 +98,7 @@ def build_graphcast_scorecard(
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "forecast_bucket": forecast_bucket,
         "domain": "africa",
-        "domain_box": {"lat": [-40.0, 40.0], "lon": [-20.0, 70.0]},
+        "domain_box": domain_box,
         "variables": variables,
         "leads_hours": leads,
         "truth_source": "gcs",

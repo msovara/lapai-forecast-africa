@@ -1,10 +1,10 @@
 # Canonical LapAI evaluation domains (single source of truth for docs + code).
-# Aligned with africlimate-research/graphcast-africa (lat -40..40, lon -20..70).
+# Track A / Phase 0 original Africa box (lat -40..40, lon -20..55; 321 x 301 at 0.25 deg).
 
 africa:
   lat: [-40.0, 40.0]
-  lon: [-20.0, 70.0]
-  description: "Full African continent + margins (Madagascar / WIO fringe to 70E)"
+  lon: [-20.0, 55.0]
+  description: "Original Track A Africa box (west Africa to Horn; A1 grid 321 x 301)"
 
 global:
   lat: [-90.0, 90.0]
