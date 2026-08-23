@@ -3,7 +3,10 @@
 set -euo pipefail
 cd /home/msovara/repos/lapai-forecast || exit 1
 CR=$(printf '\r')
-sed -i "s/${CR}\$//" pbs/trackA_full.pbs configs/trackA_gt_coarsen.yaml 2>/dev/null || true
+# Windows uploads leave CRLF; sourcing a CRLF .sh under set -e → exit 127 ($'\r').
+for f in pbs/trackA_full.pbs pbs/inc_conda_lengau.sh configs/trackA_gt_coarsen.yaml; do
+  sed -i "s/${CR}\$//" "$f" 2>/dev/null || true
+done
 
 export LAPAI_TRACKA_CONFIG=configs/trackA_gt_coarsen.yaml
 export LAPAI_SKIP_GATE=1

@@ -39,10 +39,62 @@ def _unwrap_state_dict(obj: Any) -> dict[str, torch.Tensor]:
         # raw state dict
         if any(isinstance(v, torch.Tensor) for v in obj.values()):
             return {k: v for k, v in obj.items() if isinstance(v, torch.Tensor)}
+    # anemoi inference-last.ckpt loads as AnemoiModelInterface (nn.Module)
+    if hasattr(obj, "state_dict") and callable(obj.state_dict):
+        sd = obj.state_dict()
+        if isinstance(sd, dict) and any(isinstance(v, torch.Tensor) for v in sd.values()):
+            return {k: v for k, v in sd.items() if isinstance(v, torch.Tensor)}
     raise TypeError(f"unrecognised checkpoint object type={type(obj)}")
 
 
+def _save_pruned_ckpt(blob: Any, state: dict[str, torch.Tensor], out_ckpt: Path) -> None:
+    """Write masked weights, preserving Anemoi inference / Lightning layouts."""
+    out_ckpt = Path(out_ckpt)
+    out_ckpt.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(blob, dict) and "state_dict" in blob:
+        blob["state_dict"] = state
+        torch.save(blob, out_ckpt)
+        return
+    if isinstance(blob, dict) and "model_state_dict" in blob:
+        blob["model_state_dict"] = state
+        torch.save(blob, out_ckpt)
+        return
+    if hasattr(blob, "load_state_dict") and callable(blob.load_state_dict):
+        # AnemoiModelInterface: do not re-pickle the full module (legacy Triton
+        # symbols / stubs). Write Lightning-style weights for load_weights_only.
+        torch.save({"state_dict": state}, out_ckpt)
+        return
+    torch.save({"state_dict": state}, out_ckpt)
+
+
+class _GraphTransformerFunctionStub(torch.autograd.Function):
+    """Module-level stub so legacy anemoi inference pickles can unpickle."""
+
+    @staticmethod
+    def forward(ctx: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG004
+        raise RuntimeError("GraphTransformerFunction stub — use state_dict only")
+
+    @staticmethod
+    def backward(ctx: Any, *grad_outputs: Any) -> Any:  # noqa: ARG004
+        raise RuntimeError("GraphTransformerFunction stub — use state_dict only")
+
+
+def _stub_legacy_anemoi_pickle_symbols() -> None:
+    """Allow loading inference ckpts pickled under older anemoi-models.
+
+    Some Lengau checkpoints reference ``anemoi.models.triton.gt.GraphTransformerFunction``,
+    which newer anemoi-models dropped. We only need weights for soft-mask prune.
+    """
+    try:
+        import anemoi.models.triton.gt as gt  # noqa: PLC0415
+    except Exception:
+        return
+    if not hasattr(gt, "GraphTransformerFunction"):
+        gt.GraphTransformerFunction = _GraphTransformerFunctionStub  # type: ignore[attr-defined]
+
+
 def load_ckpt_blob(path: Path) -> tuple[Any, dict[str, torch.Tensor]]:
+    _stub_legacy_anemoi_pickle_symbols()
     blob = torch.load(path, map_location="cpu", weights_only=False)
     return blob, _unwrap_state_dict(blob)
 
@@ -228,13 +280,7 @@ def prune_checkpoint(
     drop = select_heads_to_drop(scores, fraction=fraction, num_heads=nh)
     apply_soft_head_mask(state, drop, num_heads=nh)
 
-    out_ckpt = Path(out_ckpt)
-    out_ckpt.parent.mkdir(parents=True, exist_ok=True)
-    if isinstance(blob, dict) and "state_dict" in blob:
-        blob["state_dict"] = state
-        torch.save(blob, out_ckpt)
-    else:
-        torch.save(state, out_ckpt)
+    _save_pruned_ckpt(blob, state, Path(out_ckpt))
 
     report = {
         "input_ckpt": str(in_ckpt),

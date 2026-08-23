@@ -67,6 +67,29 @@ def test_phase0_scorecard_local_identical(tmp_path):
     assert t2m["rmse"] == pytest.approx(0.0, abs=1e-5)
 
 
+def test_subset_eval_domain_crops_a2_lon70_to_a1():
+    pytest.importorskip("xarray")
+    import xarray as xr
+
+    from evaluation.phase0_scorecard import _eval_africa_box, _subset_eval_domain
+
+    lat = np.arange(-40.0, 40.25, 0.25)
+    lon = np.arange(-20.0, 70.25, 0.25)
+    da = xr.DataArray(
+        np.zeros((lat.size, lon.size), dtype=np.float32),
+        dims=("latitude", "longitude"),
+        coords={"latitude": lat, "longitude": lon},
+    )
+    assert da.sizes["longitude"] == 361
+    box = _eval_africa_box()
+    assert box is not None
+    cropped = _subset_eval_domain(da, box[0], box[1])
+    assert cropped.sizes["latitude"] == 321
+    assert cropped.sizes["longitude"] == 301
+    assert float(cropped.longitude.min()) == pytest.approx(-20.0)
+    assert float(cropped.longitude.max()) == pytest.approx(55.0)
+
+
 def test_eval_skill_alias_2t():
     pytest.importorskip("xarray")
     import xarray as xr

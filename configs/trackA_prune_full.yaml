@@ -1,17 +1,10 @@
-# Track A Step A2 — attention-head pruning (PLAN §4.2)
-#
-# PREREQUISITE: warm_start must be a GraphTransformer checkpoint (num_heads>0).
-# The A1 GNN coarsened teacher (model=gnn) has NO attention heads — do not point
-# warm_start at models/teacher_coarsened.ckpt from the GNN A1 run.
-#
-# Recommended order:
-#   1) Fine-tune GraphTransformer on O96 Zarr  → configs/trackA_gt_coarsen.yaml
-#   2) Round-1 soft-mask prune (10% / 2 of 16 heads) + recovery fine-tune (this file)
-#   3) Forecast → score (include tp) → A2 gate ≤3% RMSE proxy vs A1 scorecard
+# Track A Step A2 FULL — attention-head pruning (PLAN §4.2)
+# Same prune hyperparameters as configs/trackA_prune.yaml.
+# Isolated output paths so smoke A2 in models/trackA_prune_runs is not overwritten.
 #
 # Driver:
-#   $LAPAI_PYTHON training/train_trackA.py --step prune --config configs/trackA_prune.yaml
-#   qsub -v LAPAI_TRACKA_CONFIG=configs/trackA_prune.yaml pbs/trackA_prune.pbs
+#   /local/Mthetho/run_a2_prune_full.sh
+#   $LAPAI_PYTHON training/train_trackA.py --step prune --config configs/trackA_prune_full.yaml
 
 input_grid: N320
 target_grid: N96
@@ -40,9 +33,9 @@ anemoi:
   dataset: data/processed/lapai/era5_n96_2020_2021.zarr
   # Must be GraphTransformer O96 ckpt from trackA_gt_coarsen (A1b), not GNN A1.
   warm_start: models/teacher_gt_coarsened.ckpt
-  output_root: models/trackA_prune_runs
-  output_ckpt: models/teacher_pruned.ckpt
-  masked_ckpt: models/teacher_pruned_masked.ckpt
+  output_root: models/trackA_prune_runs_full
+  output_ckpt: models/teacher_pruned_full.ckpt
+  masked_ckpt: models/teacher_pruned_masked_full.ckpt
   processor_resolution: 6
   # Recovery fine-tune after mask (PLAN: ~2 epochs @ 5e-5; steps ≈ short).
   max_steps: 2000
@@ -68,10 +61,10 @@ forecast:
   inits: [20230101, 20230108, 20230115, 20230122, 20230129]
   init_time: "0000"
   lead_time_hours: 240
-  forecast_dir: data/processed/trackA_prune/forecasts
-  scorecard_out: reports/TRACKA_PRUNE_SCORECARD.json
+  forecast_dir: data/processed/trackA_prune_full/forecasts
+  scorecard_out: reports/TRACKA_PRUNE_FULL_SCORECARD.json
   teacher_config: configs/teacher_n320_gt6.yaml
-  checkpoint: models/teacher_pruned.ckpt
+  checkpoint: models/teacher_pruned_full.ckpt
   ic_source: cds
   cds_cache_dir: ~/.cache/aifs-africa/era5
 
@@ -81,5 +74,5 @@ prune_fraction_per_round: 0.10
 max_rounds: 3
 
 notes: >-
-  A2 round 1: soft-mask lowest-importance heads then recovery fine-tune.
-  See reports/TRACKA_A2_START.md.
+  A2 FULL round 1: soft-mask lowest-importance heads then recovery fine-tune
+  from the 2000-step A1b GraphTransformer ckpt. Smoke A2 paths are left intact.

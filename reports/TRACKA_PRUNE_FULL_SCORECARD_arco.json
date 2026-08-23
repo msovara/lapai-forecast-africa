@@ -1,0 +1,285 @@
+{
+  "phase": "trackA_a2_prune_round1_full",
+  "status": "candidate",
+  "generated_at": "2026-08-20T04:21:13Z",
+  "checkpoint": "models/teacher_pruned_full.ckpt",
+  "domain": "africa",
+  "variables": [
+    "t2m",
+    "u10",
+    "v10",
+    "tp"
+  ],
+  "leads_hours": [
+    24,
+    48
+  ],
+  "truth_source": "arco_era5_anon",
+  "truth_uri": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+  "inits_scored": [
+    "20230101",
+    "20230108",
+    "20230115",
+    "20230122",
+    "20230129"
+  ],
+  "forecasts": [
+    "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230101_00Z.nc",
+    "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230108_00Z.nc",
+    "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230115_00Z.nc",
+    "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230122_00Z.nc",
+    "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230129_00Z.nc"
+  ],
+  "results": [
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.807873892821071,
+          "acc": 0.9650287504967248
+        },
+        "u10": {
+          "rmse": 2.137630401564164,
+          "acc": 0.7373701953375552
+        },
+        "v10": {
+          "rmse": 2.241432279737445,
+          "acc": 0.650807398646452
+        },
+        "tp": {
+          "rmse": 0.0005508125231663366,
+          "acc": 0.3079977417110948,
+          "pod_1mm": 0.5165595650024716
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230101_00Z.nc",
+      "init_date": "20230101",
+      "lead_hours": 48,
+      "valid_time": "2023-01-03T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.6097170200435746,
+          "acc": 0.9262870842246634
+        },
+        "u10": {
+          "rmse": 3.1225998414336695,
+          "acc": 0.35776254303713895
+        },
+        "v10": {
+          "rmse": 3.1860780315008386,
+          "acc": 0.30731983775849475
+        },
+        "tp": {
+          "rmse": 0.0005316039757444266,
+          "acc": 0.1748245647529287,
+          "pod_1mm": 0.2506826870562534
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "valid_time": "2023-01-09T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.9377566467581533,
+          "acc": 0.9545485026931884
+        },
+        "u10": {
+          "rmse": 2.553989140016989,
+          "acc": 0.6697178808411564
+        },
+        "v10": {
+          "rmse": 2.2822298733511466,
+          "acc": 0.6589326373829992
+        },
+        "tp": {
+          "rmse": 0.0007304025320609061,
+          "acc": 0.2881644929160783,
+          "pod_1mm": 0.6810344827586207
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230108_00Z.nc",
+      "init_date": "20230108",
+      "lead_hours": 48,
+      "valid_time": "2023-01-10T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.937113497109068,
+          "acc": 0.8984547946125692
+        },
+        "u10": {
+          "rmse": 3.3134714076238154,
+          "acc": 0.5113699221988073
+        },
+        "v10": {
+          "rmse": 2.991311066022853,
+          "acc": 0.38820682019890523
+        },
+        "tp": {
+          "rmse": 0.0006073470829384479,
+          "acc": 0.15940298743281542,
+          "pod_1mm": 0.3078902229845626
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "valid_time": "2023-01-16T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 1.9066460251384478,
+          "acc": 0.9681123702363416
+        },
+        "u10": {
+          "rmse": 2.3378236787451026,
+          "acc": 0.7507069624829819
+        },
+        "v10": {
+          "rmse": 2.172066754505753,
+          "acc": 0.7374975906283452
+        },
+        "tp": {
+          "rmse": 0.0006683446159354238,
+          "acc": 0.32471129165773627,
+          "pod_1mm": 0.6276320650166236
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230115_00Z.nc",
+      "init_date": "20230115",
+      "lead_hours": 48,
+      "valid_time": "2023-01-17T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.759017135241334,
+          "acc": 0.924958193144658
+        },
+        "u10": {
+          "rmse": 3.284378874451422,
+          "acc": 0.5726726888680004
+        },
+        "v10": {
+          "rmse": 3.0237069284654448,
+          "acc": 0.4352591375918129
+        },
+        "tp": {
+          "rmse": 0.0006596830846690922,
+          "acc": 0.21145176915197086,
+          "pod_1mm": 0.5230769230769231
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "valid_time": "2023-01-23T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.0888033225020366,
+          "acc": 0.9619974434245849
+        },
+        "u10": {
+          "rmse": 2.3797914568164944,
+          "acc": 0.731420552659695
+        },
+        "v10": {
+          "rmse": 2.3661667697671014,
+          "acc": 0.7560103821704878
+        },
+        "tp": {
+          "rmse": 0.0007268963245714186,
+          "acc": 0.43185118629777336,
+          "pod_1mm": 0.7493169398907104
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230122_00Z.nc",
+      "init_date": "20230122",
+      "lead_hours": 48,
+      "valid_time": "2023-01-24T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 3.250875541909955,
+          "acc": 0.9078854890387779
+        },
+        "u10": {
+          "rmse": 3.229450101710841,
+          "acc": 0.5207598796952632
+        },
+        "v10": {
+          "rmse": 3.3739450555708212,
+          "acc": 0.43466284589774745
+        },
+        "tp": {
+          "rmse": 0.0007158956698588335,
+          "acc": 0.3223675110375785,
+          "pod_1mm": 0.7233669443226655
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "valid_time": "2023-01-30T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 2.046324902114058,
+          "acc": 0.959188193017518
+        },
+        "u10": {
+          "rmse": 2.8367485010199083,
+          "acc": 0.5441262527106326
+        },
+        "v10": {
+          "rmse": 2.777590319949819,
+          "acc": 0.6361287630841153
+        },
+        "tp": {
+          "rmse": 0.0007501075410568764,
+          "acc": 0.19366716231596232,
+          "pod_1mm": 0.5195294117647059
+        }
+      }
+    },
+    {
+      "forecast": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_full/forecasts/20230129_00Z.nc",
+      "init_date": "20230129",
+      "lead_hours": 48,
+      "valid_time": "2023-01-31T00:00:00.000000000",
+      "variables": {
+        "t2m": {
+          "rmse": 3.1176775702732065,
+          "acc": 0.9041670360643741
+        },
+        "u10": {
+          "rmse": 3.7893697021809483,
+          "acc": 0.35542385501541385
+        },
+        "v10": {
+          "rmse": 3.6553526046681144,
+          "acc": 0.2801645397651062
+        },
+        "tp": {
+          "rmse": 0.0007717700284540389,
+          "acc": 0.08982302389128055,
+          "pod_1mm": 0.3368909512761021
+        }
+      }
+    }
+  ]
+}

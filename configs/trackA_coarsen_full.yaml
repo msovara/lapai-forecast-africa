@@ -59,4 +59,4 @@ forecast:
 notes: >-
   Full A1 train on era5_n96_2020_2021.zarr. After checkpoint lands, run
   scripts/run_trackA_closure.py (forecast + score) then gate vs Phase 0.
-  Rematerialise forecasts on the 70E Africa box when regenerating eval NetCDFs.
+  Rematerialise forecasts on the original Africa box (lon -20 to 55) when regenerating eval NetCDFs.

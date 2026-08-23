@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 import torch
@@ -14,6 +16,8 @@ from evaluation.run_scorecard import (
     _split_csv,
     _to_tensors,
 )
+
+_REPO = Path(__file__).resolve().parents[1]
 
 _AFRICA_CFG = {
     "domain": {
@@ -55,6 +59,14 @@ def test_resolve_domain_default_and_global():
     assert _resolve_domain(_AFRICA_CFG, "global") is None
     # no domain config -> no crop
     assert _resolve_domain({}, None) is None
+
+
+def test_eval_yaml_africa_is_original_trackA_box():
+    cfg = _read_eval_config(_REPO / "configs" / "eval.yaml")
+    name, lat_r, lon_r = _resolve_domain(cfg, None)
+    assert name == "africa"
+    assert lat_r == (-40.0, 40.0)
+    assert lon_r == (-20.0, 55.0)
 
 
 def test_crop_domain_handles_0_360_longitude():

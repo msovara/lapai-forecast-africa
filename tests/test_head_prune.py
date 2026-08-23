@@ -57,3 +57,22 @@ def test_gnn_like_state_rejected():
     except RuntimeError:
         raised = True
     assert raised
+
+
+def test_unwrap_module_like_anemoi_interface():
+    from utils.head_prune import _unwrap_state_dict
+
+    class _FakeInterface:
+        def __init__(self, state):
+            self._state = state
+
+        def state_dict(self):
+            return self._state
+
+        def load_state_dict(self, state, strict=True):
+            self._state = state
+
+    state = _fake_gt_state()
+    obj = _FakeInterface(state)
+    unwrapped = _unwrap_state_dict(obj)
+    assert "model.processor.proc.0.lin_query.weight" in unwrapped

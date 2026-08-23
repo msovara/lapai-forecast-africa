@@ -7,9 +7,9 @@ from typing import Tuple
 import numpy as np
 import torch
 
-# Aligned with graphcast-africa / config/domains.yaml (lon east to 70E).
+# Original Track A / Phase 0 Africa box (config/domains.yaml, lon east to 55E).
 AFRICA_LAT: Tuple[float, float] = (-40.0, 40.0)
-AFRICA_LON: Tuple[float, float] = (-20.0, 70.0)
+AFRICA_LON: Tuple[float, float] = (-20.0, 55.0)
 
 
 def lat_lon_to_indices(

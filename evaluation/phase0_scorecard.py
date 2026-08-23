@@ -50,10 +50,28 @@ def forecast_step_and_valid_time(fc: xr.Dataset, lead_hours: int) -> tuple[int, 
     return step, np.datetime64(fc.time.isel(time=step).values)
 
 
+def _eval_africa_box() -> tuple[tuple[float, float], tuple[float, float]] | None:
+    """Lat/lon box from configs/eval.yaml africa region (source of truth)."""
+    cfg = _read_eval_config(_REPO_ROOT / "configs" / "eval.yaml")
+    resolved = _resolve_domain(cfg, "africa")
+    if resolved is None:
+        return None
+    return resolved[1], resolved[2]
+
+
 def _score_point(
     pred: xr.DataArray,
     truth: xr.DataArray,
 ) -> dict[str, float]:
+    # Crop wider forecast files (e.g. A2 -20:70) onto the eval.yaml box (A1 -20:55)
+    # so A1 vs A2 scoring is on the same 321 x 301 grid. Existing nc files are not rewritten.
+    box = _eval_africa_box()
+    if box is not None:
+        lat_range, lon_range = box
+        if "longitude" in pred.dims:
+            pred = _subset_eval_domain(pred, lat_range, lon_range)
+        if "longitude" in truth.dims:
+            truth = _subset_eval_domain(truth, lat_range, lon_range)
     truth_a = align_truth_to_pred(truth, pred)
     p = np.asarray(pred.values, dtype=np.float64).squeeze()
     t = np.asarray(truth_a.values, dtype=np.float64).squeeze()
