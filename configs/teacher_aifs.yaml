@@ -1,5 +1,8 @@
 # ECMWF AIFS Single v1.0 teacher. Model card: https://huggingface.co/ecmwf/aifs-single-1.0
 # Weights: CC BY 4.0 (attribute ECMWF). See PLAN.md section 10.
+#
+# Track B distillation teacher in practice: K1 pruned GraphTransformer
+#   models/teacher_pruned.ckpt (num_layers=8). See layer_map_k1 below.
 
 huggingface_repo_id: ecmwf/aifs-single-1.0
 # HF artefact name on main as of pinned revision (single v1.0 MSE release).
@@ -9,9 +12,20 @@ revision: f0bb02c077e65a516dadc018c31bc5ddf65ff829
 
 local_checkpoint_relative: models/teacher/aifs-single-mse-1.0.ckpt
 
+# PLAN placeholders for full AIFS (often ≥16 processor layers) — keep for reference.
 layer_map:
   feature_L10: 10
   feature_L14: 14
+
+# Live K1 GraphTransformer (Track A accepted): processor.proc ModuleList length 8.
+# Depth-proportional map of PLAN L10/L14 → indices used by build_teacher_feature_cache.py.
+layer_map_k1:
+  feature_L10: 5
+  feature_L14: 7
+  num_layers: 8
+  note: >-
+    L10/L14 were AIFS placeholders. On K1, hook processor.proc[5] and [7]
+    (~10/16 and ~14/16 of an 8-layer stack).
 
 license_note: >-
   Subject to Hugging Face / ECMWF terms; HF notebooks Apache-2.0.

@@ -115,4 +115,4 @@ def zarr_append(root_group: Any, name: str, arr: np.ndarray, start_idx: int) -> 
     ds = root_group[name]
     new_len = start_idx + arr.shape[0]
     ds.resize((new_len,) + ds.shape[1:])
-    ds[start_idx:new_idx] = arr
+    ds[start_idx:new_len] = arr

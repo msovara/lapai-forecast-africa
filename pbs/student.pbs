@@ -8,6 +8,9 @@
 # TRACK_B defaults to lapai-credit (PyTorch+CUDA stack). Create via:
 #   conda env create -f environment-credit-lengau.yml
 #
+# Teacher handoff (Track A K1): models/teacher_pruned.ckpt — see reports/TRACKA_REPORT.md
+# Checklist: reports/TRACKB_START.md
+#
 # Ops index: docs/LENGAU.md - complete Phase 0 teacher inference first (RUNBOOK_BASELINE_LENGAU.md).
 
 set -euo pipefail
@@ -17,4 +20,13 @@ source pbs/inc_conda_lengau.sh
 lapai_load_cuda_gpu
 lapai_activate_track_b
 
-exec python training/train_student.py --epochs 100 --device cuda --out models/student.pt
+test -e models/teacher_pruned.ckpt || {
+  echo "ERROR: models/teacher_pruned.ckpt missing (expected K1 symlink). See reports/TRACKA_REPORT.md"
+  exit 1
+}
+
+exec python training/train_student.py \
+  --config configs/student_global.yaml \
+  --epochs "${LAPAI_STUDENT_EPOCHS:-100}" \
+  --device cuda \
+  --out models/student_global.ckpt

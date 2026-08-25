@@ -1,20 +1,17 @@
-# LapAI student pathway (Track A)
+# LapAI student pathway
 
-**Role:** Compressed O96 / laptop-deployable student distilled from the AIFS teacher.
+**Role:** Compressed O96 / laptop-deployable student distilled from the Track A teacher.
 
-**Artefacts**
-- Smoke config: `configs/trackA_coarsen.yaml` (50-step / 2018 Q1 Zarr)
-- **Full config:** `configs/trackA_coarsen_full.yaml` (2000-step / 2020–2021 Zarr)
-- PBS: `pbs/trackA.pbs` (smoke), `pbs/trackA_full.pbs` (full, 24h)
-- Forecasts: `data/processed/trackA/forecasts/`
-- Gate: `reports/TRACKA_A1_GATE.json`
+## Track A (closed for round-1 prune — accept K1)
 
-**Full A1 sequence (Lengau)**
-1. Rsync `data/processed/lapai/era5_n96_2020_2021.zarr/` + repo to Lengau  
-2. `cd ~/repos/lapai-forecast && qsub pbs/trackA_full.pbs`  
-3. After ckpt: `python scripts/run_trackA_closure.py` (forecast + score)  
-4. Gate vs Phase 0: `python scripts/run_trackA_gate.py --candidate reports/TRACKA_COARSEN_SCORECARD.json`
+- Report: `reports/TRACKA_REPORT.md` — **accept K1**, tp trade-off documented, **no A2 round 2**
+- Teacher for distillation: `models/teacher_pruned.ckpt` (K1 from A1b+)
+- Historical A1 notes: `reports/TEAM_NOTE_A1_PASSED.md`, `reports/TRACKA_A2_START.md`
 
-**Teachers for comparison (same Africa scorecard)**
-1. AIFS Phase 0 — `teachers/aifs`
-2. GraphCast Africa — `teachers/graphcast` (GCS; lon to 70°E)
+## Track B (current)
+
+- Start checklist: `reports/TRACKB_START.md`
+- Configs: `configs/student_global.yaml`, `configs/student_distill.yaml` (`teacher_ckpt` → K1)
+- Driver: `python training/train_student.py --config configs/student_global.yaml`
+- Cassava smoke: `bash scripts/run_trackB_smoke_cassava.sh` (GPU 1)
+- PBS (Lengau): `pbs/student.pbs`
