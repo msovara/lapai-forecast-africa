@@ -7,8 +7,8 @@ YAML files here drive training, pruning, evaluation, and the pinned teacher iden
 | `teacher_aifs.yaml` | Hugging Face repo ID, checkpoint file **`aifs-single-mse-1.0.ckpt`**, pinned `revision`, local relative path, distillation hook placeholders (`layer_map`). |
 | `trackA_coarsen.yaml` | Track A coarse-grid parameters (e.g. N320 → processor mesh hints for Anemoi / offline tools). |
 | `trackA_prune.yaml` | CRPS gate and iterative head-prune knobs. |
-| `student_global.yaml` | LapAIStudent CNN geometry and loss phase schedule pointers. |
-| `student_distill.yaml` | Distillation loss λ weights etc. — align with PLAN.md. |
+| `student_global.yaml` | LapAIStudent CNN geometry, loss phase schedule, **`teacher_ckpt: models/teacher_pruned.ckpt`** (K1). |
+| `student_distill.yaml` | Distillation loss λ weights + teacher path echo — align with PLAN.md / `TRACKB_START.md`. |
 | `lora_africa.yaml` | LoRA ranks and Africa crop defaults. |
 | `eval.yaml` | Lead hours and verification variable list for scorecards. |
 | `inference_aifs_minimal.yaml` | Starter **`anemoi-inference run`** YAML (Quickstart-aligned). Use [`scripts/run_aifs_inference.py`](../scripts/run_aifs_inference.py) to inject absolute `checkpoint:` paths from **`teacher_aifs.yaml`**. |
