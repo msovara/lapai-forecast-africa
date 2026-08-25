@@ -74,7 +74,15 @@
     "MVP cache gate: one-step 6h lead only (not PLAN {24,72,120,240}h skill table).",
     "Channels are tp/msl/2t only (no u10/v10/z500/t850).",
     "Cache T\u2248256 from 2020\u20132021 ERA5; same store used for train \u2192 not held-out.",
-    "Full Jan-2023 Track-A-style init forecast + ERA5 GCS truth scoring still TODO."
+    "SOFT-FAIL ACCEPTED (2026-08-25): tp 21.2% fail kept for MVP; no further tp-reweight round; proceed to held-out Jan-2023 (reports/TRACKB_HELD_OUT_JAN2023.json)."
   ],
+  "mvp_decision": {
+    "status": "soft_fail_accepted",
+    "pass_count": 2,
+    "total_checks": 3,
+    "failed_variable": "tp",
+    "tp_degradation_pct": 21.224512503517197,
+    "rationale": "msl/2t beat K1 on-cache; tp stuck ~21% across v1-v3; defer reweight; move to off-cache Jan-2023 skill vs K1."
+  },
   "timestamp_utc": "2026-08-25T18:39:59.552087+00:00"
 }
