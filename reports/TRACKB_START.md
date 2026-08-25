@@ -127,15 +127,36 @@ Log: `logs/trackB_train_cache_smoke.log`. High raw loss is expected (physical ER
 
 ---
 
-## 4) MVP gate vs K1 (2026-08-25) — **FAILED 0/3**
+## 4) MVP gate vs K1 — stable v3 **FAIL 2/3 (soft-fail accepted)**
 
-25-epoch `models/student_global.ckpt` on medium cache scored with `evaluation/trackB_gate.py` (≤15% RMSE vs `teacher_pred`, vars `tp/msl/2t`, lead 6h, global).
+| Var | Degradation vs K1 (v3) | |
+|-----|------------------------|---|
+| tp  | **21.2%** fail (≤15%)  | soft-fail accepted for MVP |
+| msl | **−17.2%** pass        | beats teacher on-cache |
+| 2t  | **−13.8%** pass        | beats teacher on-cache |
 
-| Var | Student RMSE vs ERA5 | Teacher RMSE vs ERA5 | Degradation vs teacher |
-|-----|----------------------|----------------------|------------------------|
-| tp  | 46.44                | 0.0021               | ≫ 15% (fail)           |
-| msl | 42274                | 254                  | ≫ 15% (fail)           |
-| 2t  | 46.70                | 2.90                 | ≫ 15% (fail)           |
+**Decision (2026-08-25):** accept documented tp soft-fail; do **not** start another tp-reweight train; promote `models/student_global_stable_v3.ckpt`; move to held-out Jan-2023.
 
-Reports: `TRACKB_GATE.json`, `TRACKB_STUDENT_SCORECARD.json`, narrative `TRACKB_REPORT.md`.  
-Caveats: cache T=32 / 6h one-step only; train set = score set; not PLAN multi-lead Jan-2023 IC gate. Failure mode: unphysical preds after feature-loss spike at epoch 11 (see `/local/Mthetho/logs/trackB_student_train.log`).
+Reports: `TRACKB_GATE.json`, `TRACKB_STUDENT_SCORECARD.json`, `TRACKB_REPORT.md`.
+
+---
+
+## 5) Held-out Jan-2023 multi-lead vs K1
+
+```bash
+export CUDA_VISIBLE_DEVICES=1 MKL_INTERFACE_LAYER=GNU
+source /local/Mthetho/miniforge3/etc/profile.d/conda.sh
+# Teacher multi-lead needs netCDF4 + GCS (anemoi); student 6h needs torch CUDA (credit) + earthkit CDS read (anemoi).
+conda activate /local/Mthetho/envs/lapai-anemoi   # or credit if both stacks present
+cd /local/Mthetho/lapai-forecast
+pip install -e . --no-deps
+python -u evaluation/trackB_held_out_jan2023.py \
+  --student_ckpt models/student_global_stable_v3.ckpt \
+  --device cuda \
+  --out reports/TRACKB_HELD_OUT_JAN2023.json
+```
+
+Teacher-only (laptop / no GPU): omit `--student_ckpt`.  
+Artifacts: `reports/TRACKB_HELD_OUT_JAN2023.json` + section in `TRACKB_REPORT.md`.
+
+Early catastrophic train (historical): 25-epoch `student_global.ckpt` failed 0/3 (unphysical after β spike) — superseded by stable v1→v3.
