@@ -1,4 +1,25 @@
+# Track B distillation loss weights (PLAN §5.2) — stable v3 (L_A-only + channel weights)
+# Teacher features come from Track A K1: models/teacher_pruned.ckpt
+#
+# L = alpha * L_A (lat-weighted MAE vs ERA5, channel-normalized, optional channel_weights)
+#   + beta  * L_B (feature distill vs teacher L10/L14, instance-normed)
+#   + gamma * L_C (spectral / log-power surrogate on normalized fields)
+#
+# v3: β=γ=0; channel_weights live in student_global.yaml (tp/msl/2t).
+
 alpha: 1.0
-beta: 0.5
-gamma: 0.3
+beta: 0.0
+gamma: 0.0
+beta_ramp_epochs: 1
+gamma_ramp_epochs: 1
 spectral_k_warmup: 40
+grad_clip: 1.0
+# Optional override; student_global.yaml is authoritative when both set.
+# channel_weights: [3.0, 0.4, 3.0]
+
+
+# Same handoff path as student_global.yaml (explicit for scripts that only load distill yaml)
+teacher_ckpt: models/teacher_pruned.ckpt
+teacher_note: >-
+  K1 (1/16 heads) from A1b+; Cassava symlink models/teacher_pruned.ckpt →
+  trackA_prune_k1_from_a1bplus_runs/checkpoint/f52c98d7-4530-49d4-a230-309fa005e92a/inference-last.ckpt
