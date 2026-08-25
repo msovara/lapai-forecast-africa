@@ -5,16 +5,38 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Any, Callable, Iterator, Optional
 
+import numpy as np
 import torch
+import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
 
-from lapai_inference.dataset import LapAIZarrDataset, collate_lapai_batch
+from lapai_inference.dataset import LapAIZarrDataset, collate_lapai_batch, open_cache_readonly
 from lapai_inference.model import LapAIStudentCNN, LapAIStudentConfig
 from lapai_inference.cache_schema import cosine_latitude_weights, lat_lon_mesh
-from utils.losses_distillation import FeatureDistillationHead, combined_distillation_loss
+from utils.losses_distillation import (
+    FeatureDistillationHead,
+    apply_soft_physical_constraints,
+    combined_distillation_loss,
+)
+
+
+# Fallback Cout=3 (tp, msl, 2t) if cache stats unavailable (synth smoke).
+_FALLBACK_MEAN = torch.tensor([5e-4, 1.01e5, 278.0], dtype=torch.float32)
+_FALLBACK_STD = torch.tensor([2e-3, 1.3e3, 20.0], dtype=torch.float32)
+
+
+def _read_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        import yaml  # type: ignore
+    except ImportError:
+        return {}
+    text = path.read_text(encoding="utf-8")
+    return yaml.safe_load(text) or {}
 
 
 def synth_batch(cfg: LapAIStudentConfig, batch: int, device: torch.device) -> dict:
@@ -30,7 +52,28 @@ def synth_batch(cfg: LapAIStudentConfig, batch: int, device: torch.device) -> di
 
 def make_cos_lat_weights(cfg: LapAIStudentConfig, device: torch.device) -> torch.Tensor:
     lat, _ = lat_lon_mesh(cfg.lat, cfg.lon)
-    return cosine_latitude_weights(lat).squeeze().float().to(device)
+    w = cosine_latitude_weights(lat)
+    return torch.as_tensor(w, dtype=torch.float32, device=device).squeeze()
+
+
+def compute_target_stats_from_cache(
+    cache: Path, device: torch.device
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Per-channel mean/std of era5_target over the full cache (compute once)."""
+    g = open_cache_readonly(cache)
+    era5 = np.asarray(g["era5_target"][:], dtype=np.float64)  # (T,C,H,W)
+    # Reduce over T,H,W → (C,)
+    mean = era5.mean(axis=(0, 2, 3))
+    std = era5.std(axis=(0, 2, 3))
+    std = np.maximum(std, 1e-6)
+    print(
+        "[Track B] target stats from cache "
+        + " ".join(f"c{i}:mean={mean[i]:.4g}/std={std[i]:.4g}" for i in range(len(mean)))
+    )
+    return (
+        torch.as_tensor(mean, dtype=torch.float32, device=device),
+        torch.as_tensor(std, dtype=torch.float32, device=device),
+    )
 
 
 def batch_generator_loader(
@@ -53,6 +96,21 @@ def batch_generator_synth(
         yield synth_batch(cfg, batch_size, device)
 
 
+def staged_weight(
+    epoch: int,
+    start_epoch: int,
+    target: float,
+    ramp_epochs: int,
+) -> float:
+    """0 before start; linear ramp to target over ramp_epochs (inclusive of start)."""
+    if epoch < start_epoch or target <= 0:
+        return 0.0
+    if ramp_epochs <= 1:
+        return float(target)
+    t = min(1.0, (epoch - start_epoch + 1) / float(ramp_epochs))
+    return float(target) * t
+
+
 def train_epoch(
     net: LapAIStudentCNN,
     opt: optim.Optimizer,
@@ -60,20 +118,33 @@ def train_epoch(
     batches: Iterator[dict],
     w_lat: torch.Tensor,
     *,
-    beta_active: bool,
-    gamma_active: bool,
+    beta_w: float,
+    gamma_w: float,
     spectral_k_max: int | None,
     steps: int,
-) -> float:
+    alpha: float = 1.0,
+    target_mean: Optional[torch.Tensor] = None,
+    target_std: Optional[torch.Tensor] = None,
+    grad_clip: float = 1.0,
+    physical_constraints: bool = True,
+    channel_weights: Optional[torch.Tensor] = None,
+) -> tuple[float, dict[str, float]]:
     net.train()
     running = 0.0
+    part_sums = {"L_A": 0.0, "L_B": 0.0, "L_C": 0.0}
     gen = batches
+    params = list(net.parameters()) + list(heads[0].parameters()) + list(heads[1].parameters())
     for _ in range(steps):
         b = next(gen)
         opt.zero_grad(set_to_none=True)
         out = net(b["x"])
-        loss, _parts = combined_distillation_loss(
-            out["pred"],
+        pred = out["pred"]
+        if physical_constraints:
+            pred = apply_soft_physical_constraints(pred)
+        use_b = beta_w > 0.0
+        use_c = gamma_w > 0.0
+        loss, parts = combined_distillation_loss(
+            pred,
             b["era5"],
             b["teacher_pred"],
             out["feat_stage2"],
@@ -82,46 +153,115 @@ def train_epoch(
             b["feat14"],
             w_lat,
             heads,
-            alpha=1.0,
-            beta=0.5,
-            gamma=0.3,
-            use_feature_loss=beta_active,
-            use_spectral_loss=gamma_active,
+            alpha=alpha,
+            beta=beta_w,
+            gamma=gamma_w,
+            use_feature_loss=use_b,
+            use_spectral_loss=use_c,
             spectral_k_max=spectral_k_max,
+            target_mean=target_mean,
+            target_std=target_std,
+            channel_weights=channel_weights,
         )
+        if not torch.isfinite(loss):
+            raise RuntimeError(
+                f"non-finite loss L_A={float(parts['L_A'])} "
+                f"L_B={float(parts['L_B'])} L_C={float(parts['L_C'])}"
+            )
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(net.parameters(), 1.0)
+        if grad_clip and grad_clip > 0:
+            torch.nn.utils.clip_grad_norm_(params, grad_clip)
         opt.step()
         running += float(loss.detach())
-    return running / steps
+        for k in part_sums:
+            part_sums[k] += float(parts[k])
+    avg_parts = {k: v / steps for k, v in part_sums.items()}
+    return running / steps, avg_parts
 
 
-def cfg_from_dataset(ds: LapAIZarrDataset) -> LapAIStudentConfig:
+def cfg_from_dataset(ds: LapAIZarrDataset, yml: dict[str, Any] | None = None) -> LapAIStudentConfig:
     """Default demo alignment: Cin = 65 = 13 * 5 multilevel stack."""
-    return LapAIStudentConfig(
-        lat=ds.lat,
-        lon=ds.lon,
-        in_channels_raw=ds.cin,
-        out_channels=ds.cout,
-    )
+    yml = yml or {}
+    kwargs: dict[str, Any] = {
+        "lat": ds.lat,
+        "lon": ds.lon,
+        "in_channels_raw": ds.cin,
+        "out_channels": ds.cout,
+    }
+    if "base_channels" in yml:
+        kwargs["base_channels"] = int(yml["base_channels"])
+    if "stages" in yml:
+        kwargs["stages"] = tuple(yml["stages"])
+    return LapAIStudentConfig(**kwargs)
 
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Track B student training")
-    p.add_argument("--epochs", type=int, default=25)
+    p.add_argument(
+        "--config",
+        type=Path,
+        default=Path("configs/student_global.yaml"),
+        help="Student geometry + teacher_ckpt handoff (K1)",
+    )
+    p.add_argument("--epochs", type=int, default=None)
     p.add_argument("--device", default="cpu")
-    p.add_argument("--out", type=Path, default=Path("models/student_demo.pt"))
+    p.add_argument("--out", type=Path, default=None)
     p.add_argument("--cache", type=Path, default=None, help="Path to Zarr store with lapai_cache/")
     p.add_argument("--batch_size", type=int, default=4)
     p.add_argument("--workers", type=int, default=0)
     p.add_argument("--steps_per_epoch", type=int, default=32)
+    p.add_argument(
+        "--teacher-ckpt",
+        type=Path,
+        default=None,
+        help="Override teacher_ckpt from yaml (Track A K1: models/teacher_pruned.ckpt)",
+    )
+    p.add_argument(
+        "--resume",
+        type=Path,
+        default=None,
+        help="Resume student (+ heads) weights from a prior ckpt (e.g. stable_v2)",
+    )
     args = p.parse_args()
+
+    yml = _read_yaml(args.config) if args.config else {}
+    distill_path = Path(yml.get("distill_config", "configs/student_distill.yaml"))
+    distill = _read_yaml(distill_path)
+
+    teacher_ckpt = Path(
+        args.teacher_ckpt
+        or yml.get("teacher_ckpt")
+        or distill.get("teacher_ckpt")
+        or "models/teacher_pruned.ckpt"
+    )
+    print(f"[Track B] config={args.config} teacher_ckpt={teacher_ckpt} (exists={teacher_ckpt.exists()})")
+
+    epochs = int(args.epochs if args.epochs is not None else yml.get("epochs", 25))
+    out = args.out or Path(yml.get("output_ckpt", "models/student_global.ckpt"))
+    cache = args.cache or (Path(yml["cache"]) if yml.get("cache") else None)
+    resume = args.resume or (Path(yml["resume"]) if yml.get("resume") else None)
+
+    epoch_feat = int(yml.get("epoch_start_feature_loss", 18))
+    epoch_spec = int(yml.get("epoch_start_spectral_loss", 22))
+    alpha = float(distill.get("alpha", 1.0))
+    beta_target = float(distill.get("beta", 0.05))
+    gamma_target = float(distill.get("gamma", 0.05))
+    beta_ramp = int(distill.get("beta_ramp_epochs", yml.get("beta_ramp_epochs", 5)))
+    gamma_ramp = int(distill.get("gamma_ramp_epochs", yml.get("gamma_ramp_epochs", 4)))
+    spectral_k_warmup = distill.get("spectral_k_warmup", 40)
+    spectral_k_warmup = int(spectral_k_warmup) if spectral_k_warmup is not None else None
+    grad_clip = float(yml.get("grad_clip", distill.get("grad_clip", 1.0)))
+    normalize_targets = bool(yml.get("normalize_targets", True))
+    physical_constraints = bool(yml.get("physical_constraints", True))
+    # Cout order: tp, msl, 2t — up-weight tp/2t when msl already near gate.
+    cw_raw = yml.get("channel_weights", distill.get("channel_weights"))
+    channel_weights_list = [float(x) for x in cw_raw] if cw_raw is not None else None
 
     device = torch.device(args.device)
 
-    if args.cache is not None:
-        ds = LapAIZarrDataset(args.cache)
-        cfg = cfg_from_dataset(ds)
+    if cache is not None:
+        ds = LapAIZarrDataset(cache)
+        cfg = cfg_from_dataset(ds, yml)
         loader = DataLoader(
             ds,
             batch_size=args.batch_size,
@@ -137,42 +277,128 @@ def main() -> None:
             FeatureDistillationHead(cfg.base_channels, ds.d_feat10, proj_dim=128),
             FeatureDistillationHead(cfg.base_channels, ds.d_feat14, proj_dim=128),
         )
+        if normalize_targets:
+            target_mean, target_std = compute_target_stats_from_cache(cache, device)
+        else:
+            target_mean = target_std = None
     else:
-        cfg = LapAIStudentConfig()
+        model_kwargs: dict[str, Any] = {}
+        if "lat" in yml:
+            model_kwargs["lat"] = int(yml["lat"])
+        if "lon" in yml:
+            model_kwargs["lon"] = int(yml["lon"])
+        if "base_channels" in yml:
+            model_kwargs["base_channels"] = int(yml["base_channels"])
+        if "stages" in yml:
+            model_kwargs["stages"] = tuple(yml["stages"])
+        cfg = LapAIStudentConfig(**model_kwargs)
+        batch_factory = lambda: batch_generator_synth(
+            cfg, device, args.batch_size, args.steps_per_epoch
+        )
         heads = (
             FeatureDistillationHead(cfg.base_channels, 128, proj_dim=128),
             FeatureDistillationHead(cfg.base_channels, 128, proj_dim=128),
         )
+        if normalize_targets:
+            target_mean = _FALLBACK_MEAN.to(device)
+            target_std = _FALLBACK_STD.to(device)
+            if cfg.out_channels != 3:
+                target_mean = torch.zeros(cfg.out_channels, device=device)
+                target_std = torch.ones(cfg.out_channels, device=device)
+        else:
+            target_mean = target_std = None
 
     net = LapAIStudentCNN(cfg).to(device)
     for h in heads:
         h.to(device)
 
-    opt = optim.AdamW(list(net.parameters()) + list(heads[0].parameters()) + list(heads[1].parameters()), lr=3e-4)
+    if resume is not None:
+        if not resume.exists():
+            raise SystemExit(f"--resume not found: {resume}")
+        blob_in = torch.load(resume, map_location="cpu", weights_only=False)
+        net.load_state_dict(blob_in["model"])
+        hs = blob_in.get("heads") or []
+        for i, h in enumerate(heads):
+            if i < len(hs):
+                h.load_state_dict(hs[i])
+        print(f"[Track B] resumed model+heads from {resume}")
+    elif (
+        target_mean is not None
+        and net.head.bias is not None
+        and target_mean.numel() == cfg.out_channels
+    ):
+        # Bias head toward physical channel means so early grads aren't stuck under dead clamps.
+        with torch.no_grad():
+            net.head.bias.copy_(target_mean.to(device=net.head.bias.device, dtype=net.head.bias.dtype))
+            nn.init.zeros_(net.head.weight)
+
+    channel_weights = None
+    if channel_weights_list is not None:
+        if len(channel_weights_list) != cfg.out_channels:
+            raise SystemExit(
+                f"channel_weights len={len(channel_weights_list)} != out_channels={cfg.out_channels}"
+            )
+        channel_weights = torch.tensor(channel_weights_list, dtype=torch.float32, device=device)
+        print(f"[Track B] channel_weights (tp,msl,2t)={channel_weights_list}")
+
+    opt = optim.AdamW(
+        list(net.parameters()) + list(heads[0].parameters()) + list(heads[1].parameters()),
+        lr=3e-4,
+    )
 
     w_lat = make_cos_lat_weights(cfg, device)
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    for epoch in range(1, args.epochs + 1):
-        beta_active = epoch >= 11
-        gamma_active = epoch >= 16
-        kspec = 40 if epoch <= 20 else None
+    out.parent.mkdir(parents=True, exist_ok=True)
+    print(
+        f"[Track B] schedule feat@{epoch_feat} (β→{beta_target}, ramp={beta_ramp}) "
+        f"spec@{epoch_spec} (γ→{gamma_target}, ramp={gamma_ramp}) "
+        f"grad_clip={grad_clip} norm={normalize_targets} phys={physical_constraints} "
+        f"resume={resume}"
+    )
+    for epoch in range(1, epochs + 1):
+        beta_w = staged_weight(epoch, epoch_feat, beta_target, beta_ramp)
+        gamma_w = staged_weight(epoch, epoch_spec, gamma_target, gamma_ramp)
+        kspec = spectral_k_warmup if epoch <= 20 else None
         batches = batch_factory()
-        loss_m = train_epoch(
+        loss_m, parts = train_epoch(
             net,
             opt,
             heads,
             batches,
             w_lat,
-            beta_active=beta_active,
-            gamma_active=gamma_active,
+            beta_w=beta_w,
+            gamma_w=gamma_w,
             spectral_k_max=kspec,
             steps=args.steps_per_epoch,
+            alpha=alpha,
+            target_mean=target_mean,
+            target_std=target_std,
+            grad_clip=grad_clip,
+            physical_constraints=physical_constraints,
+            channel_weights=channel_weights,
         )
-        print(f"epoch {epoch} loss={loss_m:.6f} beta={beta_active} gamma={gamma_active} cache={args.cache}")
+        print(
+            f"epoch {epoch} loss={loss_m:.6f} "
+            f"L_A={parts['L_A']:.6f} L_B={parts['L_B']:.6f} L_C={parts['L_C']:.6f} "
+            f"beta_w={beta_w:.4f} gamma_w={gamma_w:.4f} "
+            f"cache={cache} teacher={teacher_ckpt}"
+        )
 
-    torch.save({"model": net.state_dict(), "heads": [h.state_dict() for h in heads], "cfg": asdict(cfg)}, args.out)
-    print("saved", args.out.resolve(), "params", net.count_parameters())
+    blob: dict[str, Any] = {
+        "model": net.state_dict(),
+        "heads": [h.state_dict() for h in heads],
+        "cfg": asdict(cfg),
+        "teacher_ckpt": str(teacher_ckpt),
+        "normalize_targets": normalize_targets,
+        "physical_constraints": physical_constraints,
+        "channel_weights": channel_weights_list,
+        "resume_from": str(resume) if resume is not None else None,
+    }
+    if target_mean is not None and target_std is not None:
+        blob["target_mean"] = target_mean.detach().cpu()
+        blob["target_std"] = target_std.detach().cpu()
+    torch.save(blob, out)
+    print("saved", out.resolve(), "params", net.count_parameters())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,2885 @@
+{
+  "protocol": "trackB_cache_mvp",
+  "timestamp_utc": "2026-08-25T15:28:26.367527+00:00",
+  "ckpt": {
+    "teacher_ckpt": "models/teacher_pruned.ckpt",
+    "cfg": {
+      "lat": 181,
+      "lon": 360,
+      "in_channels_raw": 65,
+      "pressure_levels_in": 13,
+      "pressure_levels_out": 3,
+      "multilevel_groups": 5,
+      "geo_features": 8,
+      "base_channels": 256,
+      "stages": [
+        2,
+        3,
+        3
+      ],
+      "zonal_kernel": 11,
+      "merid_kernel": 11,
+      "out_channels": 3
+    },
+    "ckpt": "models/student_global_stable_v2.ckpt",
+    "physical_constraints": true,
+    "normalize_targets": true
+  },
+  "cache": "data/processed/lapai/teacher_k1_cache_t128.zarr",
+  "n_samples": 128,
+  "cin": 65,
+  "cout": 3,
+  "grid": [
+    181,
+    360
+  ],
+  "domain": "global",
+  "variables": [
+    "tp",
+    "msl",
+    "2t"
+  ],
+  "lead_hours_default": 6,
+  "cache_attrs": {
+    "lapai_schema_version": "lapai_cache/v1",
+    "layer_map_json": "{\"feature_L10\": 5, \"feature_L14\": 7, \"num_layers\": 8, \"mapping\": \"depth_proportional_placeholders_L10_L14\"}"
+  },
+  "aggregate": {
+    "tp": {
+      "student_rmse_vs_era5": 0.0025377986021339893,
+      "teacher_rmse_vs_era5": 0.002095956588163972,
+      "student_rmse_vs_teacher": 0.0019987013656646013,
+      "degradation_pct_vs_teacher": 21.0806853760776
+    },
+    "msl": {
+      "student_rmse_vs_era5": 232.73703002929688,
+      "teacher_rmse_vs_era5": 249.25877380371094,
+      "student_rmse_vs_teacher": 350.02716064453125,
+      "degradation_pct_vs_teacher": -6.628349936209181
+    },
+    "2t": {
+      "student_rmse_vs_era5": 3.7782557010650635,
+      "teacher_rmse_vs_era5": 2.9022574424743652,
+      "student_rmse_vs_teacher": 4.173330783843994,
+      "degradation_pct_vs_teacher": 30.183340932148738
+    }
+  },
+  "per_sample": [
+    {
+      "sample_index": 0,
+      "lead_hours": 6,
+      "init_id": 0,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002458909759297967,
+          "teacher_rmse_vs_era5": 0.0020690143574029207,
+          "degradation_pct_vs_teacher": 18.844499580198796
+        },
+        "msl": {
+          "student_rmse_vs_era5": 232.67782592773438,
+          "teacher_rmse_vs_era5": 232.12733459472656,
+          "degradation_pct_vs_teacher": 0.23715058546160486
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.128207683563232,
+          "teacher_rmse_vs_era5": 2.7303009033203125,
+          "degradation_pct_vs_teacher": 51.199733280054545
+        }
+      }
+    },
+    {
+      "sample_index": 1,
+      "lead_hours": 6,
+      "init_id": 8,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024697878398001194,
+          "teacher_rmse_vs_era5": 0.0020605374593287706,
+          "degradation_pct_vs_teacher": 19.86134144849101
+        },
+        "msl": {
+          "student_rmse_vs_era5": 243.73870849609375,
+          "teacher_rmse_vs_era5": 247.82424926757812,
+          "degradation_pct_vs_teacher": -1.6485637638604038
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.141351699829102,
+          "teacher_rmse_vs_era5": 2.7384867668151855,
+          "degradation_pct_vs_teacher": 51.22774190526488
+        }
+      }
+    },
+    {
+      "sample_index": 2,
+      "lead_hours": 6,
+      "init_id": 16,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023428848944604397,
+          "teacher_rmse_vs_era5": 0.0019920484628528357,
+          "degradation_pct_vs_teacher": 17.611842189078427
+        },
+        "msl": {
+          "student_rmse_vs_era5": 250.01290893554688,
+          "teacher_rmse_vs_era5": 259.5359802246094,
+          "degradation_pct_vs_teacher": -3.6692682381922457
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.160488605499268,
+          "teacher_rmse_vs_era5": 2.7742764949798584,
+          "degradation_pct_vs_teacher": 49.96661699105349
+        }
+      }
+    },
+    {
+      "sample_index": 3,
+      "lead_hours": 6,
+      "init_id": 24,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023241897579282522,
+          "teacher_rmse_vs_era5": 0.0019829978700727224,
+          "degradation_pct_vs_teacher": 17.205862548052927
+        },
+        "msl": {
+          "student_rmse_vs_era5": 244.19952392578125,
+          "teacher_rmse_vs_era5": 253.22702026367188,
+          "degradation_pct_vs_teacher": -3.5649814654418677
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.231357574462891,
+          "teacher_rmse_vs_era5": 2.794915199279785,
+          "degradation_pct_vs_teacher": 51.394846453776445
+        }
+      }
+    },
+    {
+      "sample_index": 4,
+      "lead_hours": 6,
+      "init_id": 32,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002525696763768792,
+          "teacher_rmse_vs_era5": 0.002111071487888694,
+          "degradation_pct_vs_teacher": 19.640513277680128
+        },
+        "msl": {
+          "student_rmse_vs_era5": 243.0309600830078,
+          "teacher_rmse_vs_era5": 269.0184326171875,
+          "degradation_pct_vs_teacher": -9.660108521693676
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.247318267822266,
+          "teacher_rmse_vs_era5": 2.749696969985962,
+          "degradation_pct_vs_teacher": 54.46495792748935
+        }
+      }
+    },
+    {
+      "sample_index": 5,
+      "lead_hours": 6,
+      "init_id": 40,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024033421650528908,
+          "teacher_rmse_vs_era5": 0.0019967486150562763,
+          "degradation_pct_vs_teacher": 20.36278111980336
+        },
+        "msl": {
+          "student_rmse_vs_era5": 240.3378448486328,
+          "teacher_rmse_vs_era5": 251.21759033203125,
+          "degradation_pct_vs_teacher": -4.3308056052200845
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9302127361297607,
+          "teacher_rmse_vs_era5": 2.738363027572632,
+          "degradation_pct_vs_teacher": 43.52416741521743
+        }
+      }
+    },
+    {
+      "sample_index": 6,
+      "lead_hours": 6,
+      "init_id": 48,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002397852949798107,
+          "teacher_rmse_vs_era5": 0.0019912749994546175,
+          "degradation_pct_vs_teacher": 20.417970920884645
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.9635772705078,
+          "teacher_rmse_vs_era5": 246.65231323242188,
+          "degradation_pct_vs_teacher": -7.982384476305826
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9215142726898193,
+          "teacher_rmse_vs_era5": 2.8360586166381836,
+          "degradation_pct_vs_teacher": 38.27338580675447
+        }
+      }
+    },
+    {
+      "sample_index": 7,
+      "lead_hours": 6,
+      "init_id": 56,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0022059662733227015,
+          "teacher_rmse_vs_era5": 0.0018308523576706648,
+          "degradation_pct_vs_teacher": 20.488485271924503
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.53634643554688,
+          "teacher_rmse_vs_era5": 245.44850158691406,
+          "degradation_pct_vs_teacher": -7.705141823679186
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.941392421722412,
+          "teacher_rmse_vs_era5": 2.8586647510528564,
+          "degradation_pct_vs_teacher": 37.87529371084116
+        }
+      }
+    },
+    {
+      "sample_index": 8,
+      "lead_hours": 6,
+      "init_id": 64,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002657210687175393,
+          "teacher_rmse_vs_era5": 0.0021047217305749655,
+          "degradation_pct_vs_teacher": 26.249976354332567
+        },
+        "msl": {
+          "student_rmse_vs_era5": 239.62969970703125,
+          "teacher_rmse_vs_era5": 255.70968627929688,
+          "degradation_pct_vs_teacher": -6.2883760119678795
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.012416362762451,
+          "teacher_rmse_vs_era5": 2.8449807167053223,
+          "degradation_pct_vs_teacher": 41.034922985667805
+        }
+      }
+    },
+    {
+      "sample_index": 9,
+      "lead_hours": 6,
+      "init_id": 72,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002556597115471959,
+          "teacher_rmse_vs_era5": 0.0019174853805452585,
+          "degradation_pct_vs_teacher": 33.33072269604277
+        },
+        "msl": {
+          "student_rmse_vs_era5": 263.39263916015625,
+          "teacher_rmse_vs_era5": 252.22610473632812,
+          "degradation_pct_vs_teacher": 4.427192195471355
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.993730306625366,
+          "teacher_rmse_vs_era5": 2.871436834335327,
+          "degradation_pct_vs_teacher": 39.084734822308036
+        }
+      }
+    },
+    {
+      "sample_index": 10,
+      "lead_hours": 6,
+      "init_id": 80,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002518628491088748,
+          "teacher_rmse_vs_era5": 0.0020557253155857325,
+          "degradation_pct_vs_teacher": 22.517754293020502
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.13340759277344,
+          "teacher_rmse_vs_era5": 251.322021484375,
+          "degradation_pct_vs_teacher": -7.237174754593628
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.112395286560059,
+          "teacher_rmse_vs_era5": 2.858813524246216,
+          "degradation_pct_vs_teacher": 43.84972128059227
+        }
+      }
+    },
+    {
+      "sample_index": 11,
+      "lead_hours": 6,
+      "init_id": 88,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00256033125333488,
+          "teacher_rmse_vs_era5": 0.0019182077376171947,
+          "degradation_pct_vs_teacher": 33.4751811873793
+        },
+        "msl": {
+          "student_rmse_vs_era5": 248.6859588623047,
+          "teacher_rmse_vs_era5": 249.09237670898438,
+          "degradation_pct_vs_teacher": -0.1631594880779941
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.2031660079956055,
+          "teacher_rmse_vs_era5": 2.818312406539917,
+          "degradation_pct_vs_teacher": 49.137689570614114
+        }
+      }
+    },
+    {
+      "sample_index": 12,
+      "lead_hours": 6,
+      "init_id": 96,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002552290912717581,
+          "teacher_rmse_vs_era5": 0.002071926137432456,
+          "degradation_pct_vs_teacher": 23.18445462927534
+        },
+        "msl": {
+          "student_rmse_vs_era5": 247.21372985839844,
+          "teacher_rmse_vs_era5": 231.52293395996094,
+          "degradation_pct_vs_teacher": 6.777210201193732
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.173149108886719,
+          "teacher_rmse_vs_era5": 2.9044322967529297,
+          "degradation_pct_vs_teacher": 43.68209283281202
+        }
+      }
+    },
+    {
+      "sample_index": 13,
+      "lead_hours": 6,
+      "init_id": 104,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002446176949888468,
+          "teacher_rmse_vs_era5": 0.0019885380752384663,
+          "degradation_pct_vs_teacher": 23.013835156016377
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.53506469726562,
+          "teacher_rmse_vs_era5": 247.273681640625,
+          "degradation_pct_vs_teacher": -8.386908305712788
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.205603122711182,
+          "teacher_rmse_vs_era5": 3.052354097366333,
+          "degradation_pct_vs_teacher": 37.78228175885321
+        }
+      }
+    },
+    {
+      "sample_index": 14,
+      "lead_hours": 6,
+      "init_id": 112,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025244809221476316,
+          "teacher_rmse_vs_era5": 0.00215846486389637,
+          "degradation_pct_vs_teacher": 16.957239581400685
+        },
+        "msl": {
+          "student_rmse_vs_era5": 229.1298828125,
+          "teacher_rmse_vs_era5": 248.9995574951172,
+          "degradation_pct_vs_teacher": -7.979803210295595
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.148496627807617,
+          "teacher_rmse_vs_era5": 3.0318000316619873,
+          "degradation_pct_vs_teacher": 36.832791888766934
+        }
+      }
+    },
+    {
+      "sample_index": 15,
+      "lead_hours": 6,
+      "init_id": 120,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002535876352339983,
+          "teacher_rmse_vs_era5": 0.002086463151499629,
+          "degradation_pct_vs_teacher": 21.53947461364663
+        },
+        "msl": {
+          "student_rmse_vs_era5": 214.8048095703125,
+          "teacher_rmse_vs_era5": 259.1894226074219,
+          "degradation_pct_vs_teacher": -17.12439211083702
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.126084804534912,
+          "teacher_rmse_vs_era5": 3.033931016921997,
+          "degradation_pct_vs_teacher": 35.99797693228153
+        }
+      }
+    },
+    {
+      "sample_index": 16,
+      "lead_hours": 6,
+      "init_id": 128,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024214517325162888,
+          "teacher_rmse_vs_era5": 0.0019442704506218433,
+          "degradation_pct_vs_teacher": 24.54294780552915
+        },
+        "msl": {
+          "student_rmse_vs_era5": 236.14414978027344,
+          "teacher_rmse_vs_era5": 262.729248046875,
+          "degradation_pct_vs_teacher": -10.118819455479263
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.201017379760742,
+          "teacher_rmse_vs_era5": 2.9421393871307373,
+          "degradation_pct_vs_teacher": 42.787843367873215
+        }
+      }
+    },
+    {
+      "sample_index": 17,
+      "lead_hours": 6,
+      "init_id": 136,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025129755958914757,
+          "teacher_rmse_vs_era5": 0.001935850828886032,
+          "degradation_pct_vs_teacher": 29.812460670719386
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.45204162597656,
+          "teacher_rmse_vs_era5": 254.03656005859375,
+          "degradation_pct_vs_teacher": -8.102974795387464
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9474854469299316,
+          "teacher_rmse_vs_era5": 2.859536647796631,
+          "degradation_pct_vs_teacher": 38.04633173600352
+        }
+      }
+    },
+    {
+      "sample_index": 18,
+      "lead_hours": 6,
+      "init_id": 144,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026399195194244385,
+          "teacher_rmse_vs_era5": 0.002123711397871375,
+          "degradation_pct_vs_teacher": 24.306886617007653
+        },
+        "msl": {
+          "student_rmse_vs_era5": 246.56680297851562,
+          "teacher_rmse_vs_era5": 270.7829284667969,
+          "degradation_pct_vs_teacher": -8.943003026592427
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9972712993621826,
+          "teacher_rmse_vs_era5": 2.9320733547210693,
+          "degradation_pct_vs_teacher": 36.329171059993705
+        }
+      }
+    },
+    {
+      "sample_index": 19,
+      "lead_hours": 6,
+      "init_id": 152,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00261764507740736,
+          "teacher_rmse_vs_era5": 0.002132157329469919,
+          "degradation_pct_vs_teacher": 22.76979007258058
+        },
+        "msl": {
+          "student_rmse_vs_era5": 265.8575439453125,
+          "teacher_rmse_vs_era5": 257.30963134765625,
+          "degradation_pct_vs_teacher": 3.322033673161263
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.991926908493042,
+          "teacher_rmse_vs_era5": 2.9095709323883057,
+          "degradation_pct_vs_teacher": 37.19984840569913
+        }
+      }
+    },
+    {
+      "sample_index": 20,
+      "lead_hours": 6,
+      "init_id": 160,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002889322116971016,
+          "teacher_rmse_vs_era5": 0.002351369708776474,
+          "degradation_pct_vs_teacher": 22.878257136112524
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.6630401611328,
+          "teacher_rmse_vs_era5": 252.47222900390625,
+          "degradation_pct_vs_teacher": -7.450003082312242
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8882298469543457,
+          "teacher_rmse_vs_era5": 2.8501830101013184,
+          "degradation_pct_vs_teacher": 36.4203573305325
+        }
+      }
+    },
+    {
+      "sample_index": 21,
+      "lead_hours": 6,
+      "init_id": 168,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002650681883096695,
+          "teacher_rmse_vs_era5": 0.0021590455435216427,
+          "degradation_pct_vs_teacher": 22.771003652527813
+        },
+        "msl": {
+          "student_rmse_vs_era5": 263.0399169921875,
+          "teacher_rmse_vs_era5": 275.7723388671875,
+          "degradation_pct_vs_teacher": -4.617004710226561
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8990535736083984,
+          "teacher_rmse_vs_era5": 2.943086624145508,
+          "degradation_pct_vs_teacher": 32.4817809173539
+        }
+      }
+    },
+    {
+      "sample_index": 22,
+      "lead_hours": 6,
+      "init_id": 176,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024098167195916176,
+          "teacher_rmse_vs_era5": 0.0020203632302582264,
+          "degradation_pct_vs_teacher": 19.276409484229944
+        },
+        "msl": {
+          "student_rmse_vs_era5": 278.635498046875,
+          "teacher_rmse_vs_era5": 261.16986083984375,
+          "degradation_pct_vs_teacher": 6.687462768815288
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.053832530975342,
+          "teacher_rmse_vs_era5": 3.1113038063049316,
+          "degradation_pct_vs_teacher": 30.293689827409775
+        }
+      }
+    },
+    {
+      "sample_index": 23,
+      "lead_hours": 6,
+      "init_id": 184,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002617350546643138,
+          "teacher_rmse_vs_era5": 0.002076769480481744,
+          "degradation_pct_vs_teacher": 26.02990227090571
+        },
+        "msl": {
+          "student_rmse_vs_era5": 236.91552734375,
+          "teacher_rmse_vs_era5": 259.2943115234375,
+          "degradation_pct_vs_teacher": -8.630649877432692
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.962129592895508,
+          "teacher_rmse_vs_era5": 2.998403787612915,
+          "degradation_pct_vs_teacher": 32.1412949538005
+        }
+      }
+    },
+    {
+      "sample_index": 24,
+      "lead_hours": 6,
+      "init_id": 192,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025599924847483635,
+          "teacher_rmse_vs_era5": 0.001983875874429941,
+          "degradation_pct_vs_teacher": 29.039952435732257
+        },
+        "msl": {
+          "student_rmse_vs_era5": 237.42738342285156,
+          "teacher_rmse_vs_era5": 266.1741638183594,
+          "degradation_pct_vs_teacher": -10.79998899334384
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.780165910720825,
+          "teacher_rmse_vs_era5": 2.9335858821868896,
+          "degradation_pct_vs_teacher": 28.858198209722723
+        }
+      }
+    },
+    {
+      "sample_index": 25,
+      "lead_hours": 6,
+      "init_id": 200,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0022105646785348654,
+          "teacher_rmse_vs_era5": 0.0019053989090025425,
+          "degradation_pct_vs_teacher": 16.01584676523585
+        },
+        "msl": {
+          "student_rmse_vs_era5": 250.9212646484375,
+          "teacher_rmse_vs_era5": 266.39556884765625,
+          "degradation_pct_vs_teacher": -5.8087693673568745
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9602293968200684,
+          "teacher_rmse_vs_era5": 2.9526538848876953,
+          "degradation_pct_vs_teacher": 34.124403035836906
+        }
+      }
+    },
+    {
+      "sample_index": 26,
+      "lead_hours": 6,
+      "init_id": 208,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026111810002475977,
+          "teacher_rmse_vs_era5": 0.002209991915151477,
+          "degradation_pct_vs_teacher": 18.153418677489714
+        },
+        "msl": {
+          "student_rmse_vs_era5": 225.12791442871094,
+          "teacher_rmse_vs_era5": 255.90008544921875,
+          "degradation_pct_vs_teacher": -12.025072585063398
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.806884765625,
+          "teacher_rmse_vs_era5": 2.9122214317321777,
+          "degradation_pct_vs_teacher": 30.720992715196115
+        }
+      }
+    },
+    {
+      "sample_index": 27,
+      "lead_hours": 6,
+      "init_id": 216,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002601320156827569,
+          "teacher_rmse_vs_era5": 0.002199613954871893,
+          "degradation_pct_vs_teacher": 18.262577443007345
+        },
+        "msl": {
+          "student_rmse_vs_era5": 223.06039428710938,
+          "teacher_rmse_vs_era5": 258.64971923828125,
+          "degradation_pct_vs_teacher": -13.75966115717496
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7402241230010986,
+          "teacher_rmse_vs_era5": 2.8067827224731445,
+          "degradation_pct_vs_teacher": 33.25663198131238
+        }
+      }
+    },
+    {
+      "sample_index": 28,
+      "lead_hours": 6,
+      "init_id": 224,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002547812880948186,
+          "teacher_rmse_vs_era5": 0.0021912420634180307,
+          "degradation_pct_vs_teacher": 16.27254348038366
+        },
+        "msl": {
+          "student_rmse_vs_era5": 232.08477783203125,
+          "teacher_rmse_vs_era5": 237.0991668701172,
+          "degradation_pct_vs_teacher": -2.114891040858367
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.058625221252441,
+          "teacher_rmse_vs_era5": 3.0121240615844727,
+          "degradation_pct_vs_teacher": 34.742963379718034
+        }
+      }
+    },
+    {
+      "sample_index": 29,
+      "lead_hours": 6,
+      "init_id": 232,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002666543237864971,
+          "teacher_rmse_vs_era5": 0.002138138748705387,
+          "degradation_pct_vs_teacher": 24.713292786987072
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.52183532714844,
+          "teacher_rmse_vs_era5": 254.50526428222656,
+          "degradation_pct_vs_teacher": -10.60230680539307
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.055369853973389,
+          "teacher_rmse_vs_era5": 3.0585103034973145,
+          "degradation_pct_vs_teacher": 32.592976696406595
+        }
+      }
+    },
+    {
+      "sample_index": 30,
+      "lead_hours": 6,
+      "init_id": 240,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026583378203213215,
+          "teacher_rmse_vs_era5": 0.002103501930832863,
+          "degradation_pct_vs_teacher": 26.376771105162536
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.70896911621094,
+          "teacher_rmse_vs_era5": 253.430908203125,
+          "degradation_pct_vs_teacher": -7.781978617662104
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.961648941040039,
+          "teacher_rmse_vs_era5": 3.0112006664276123,
+          "degradation_pct_vs_teacher": 31.563764089492143
+        }
+      }
+    },
+    {
+      "sample_index": 31,
+      "lead_hours": 6,
+      "init_id": 248,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002520174952223897,
+          "teacher_rmse_vs_era5": 0.0020142390858381987,
+          "degradation_pct_vs_teacher": 25.117964890208647
+        },
+        "msl": {
+          "student_rmse_vs_era5": 229.29568481445312,
+          "teacher_rmse_vs_era5": 250.0463104248047,
+          "degradation_pct_vs_teacher": -8.29871297644754
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.867600440979004,
+          "teacher_rmse_vs_era5": 2.9485390186309814,
+          "degradation_pct_vs_teacher": 31.170061394498568
+        }
+      }
+    },
+    {
+      "sample_index": 32,
+      "lead_hours": 6,
+      "init_id": 256,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002742739161476493,
+          "teacher_rmse_vs_era5": 0.0023434197064489126,
+          "degradation_pct_vs_teacher": 17.040031451842943
+        },
+        "msl": {
+          "student_rmse_vs_era5": 239.33065795898438,
+          "teacher_rmse_vs_era5": 270.3376159667969,
+          "degradation_pct_vs_teacher": -11.469716449530576
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9825682640075684,
+          "teacher_rmse_vs_era5": 3.005448341369629,
+          "degradation_pct_vs_teacher": 32.51161928781151
+        }
+      }
+    },
+    {
+      "sample_index": 33,
+      "lead_hours": 6,
+      "init_id": 264,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002627279842272401,
+          "teacher_rmse_vs_era5": 0.0021729287691414356,
+          "degradation_pct_vs_teacher": 20.909616531539033
+        },
+        "msl": {
+          "student_rmse_vs_era5": 254.50343322753906,
+          "teacher_rmse_vs_era5": 273.0345153808594,
+          "degradation_pct_vs_teacher": -6.787084089889173
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.045999526977539,
+          "teacher_rmse_vs_era5": 2.992466926574707,
+          "degradation_pct_vs_teacher": 35.206156868331576
+        }
+      }
+    },
+    {
+      "sample_index": 34,
+      "lead_hours": 6,
+      "init_id": 272,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026582172140479088,
+          "teacher_rmse_vs_era5": 0.0020867048297077417,
+          "degradation_pct_vs_teacher": 27.388271508443843
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.52902221679688,
+          "teacher_rmse_vs_era5": 261.74737548828125,
+          "degradation_pct_vs_teacher": -13.073045415508425
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.931417226791382,
+          "teacher_rmse_vs_era5": 2.9351766109466553,
+          "degradation_pct_vs_teacher": 33.94141981539633
+        }
+      }
+    },
+    {
+      "sample_index": 35,
+      "lead_hours": 6,
+      "init_id": 280,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024498547427356243,
+          "teacher_rmse_vs_era5": 0.0020239742007106543,
+          "degradation_pct_vs_teacher": 21.041796969320835
+        },
+        "msl": {
+          "student_rmse_vs_era5": 231.92593383789062,
+          "teacher_rmse_vs_era5": 268.8013916015625,
+          "degradation_pct_vs_teacher": -13.718477253395857
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.96197247505188,
+          "teacher_rmse_vs_era5": 2.934626340866089,
+          "degradation_pct_vs_teacher": 35.007732326242014
+        }
+      }
+    },
+    {
+      "sample_index": 36,
+      "lead_hours": 6,
+      "init_id": 288,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025728277396410704,
+          "teacher_rmse_vs_era5": 0.0020995563827455044,
+          "degradation_pct_vs_teacher": 22.541493088015493
+        },
+        "msl": {
+          "student_rmse_vs_era5": 262.6075439453125,
+          "teacher_rmse_vs_era5": 258.4965515136719,
+          "degradation_pct_vs_teacher": 1.5903471081405103
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.33474588394165,
+          "teacher_rmse_vs_era5": 2.925801992416382,
+          "degradation_pct_vs_teacher": 48.15581830818429
+        }
+      }
+    },
+    {
+      "sample_index": 37,
+      "lead_hours": 6,
+      "init_id": 296,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002682894002646208,
+          "teacher_rmse_vs_era5": 0.002145996317267418,
+          "degradation_pct_vs_teacher": 25.018574405684117
+        },
+        "msl": {
+          "student_rmse_vs_era5": 256.641357421875,
+          "teacher_rmse_vs_era5": 272.0655517578125,
+          "degradation_pct_vs_teacher": -5.669293387671446
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.186261177062988,
+          "teacher_rmse_vs_era5": 3.02839994430542,
+          "degradation_pct_vs_teacher": 38.233431978982885
+        }
+      }
+    },
+    {
+      "sample_index": 38,
+      "lead_hours": 6,
+      "init_id": 304,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023636987898498774,
+          "teacher_rmse_vs_era5": 0.001987281022593379,
+          "degradation_pct_vs_teacher": 18.94134563642526
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.61712646484375,
+          "teacher_rmse_vs_era5": 274.65850830078125,
+          "degradation_pct_vs_teacher": -17.127225414193983
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8366756439208984,
+          "teacher_rmse_vs_era5": 2.922395944595337,
+          "degradation_pct_vs_teacher": 31.285278129968166
+        }
+      }
+    },
+    {
+      "sample_index": 39,
+      "lead_hours": 6,
+      "init_id": 312,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002268219832330942,
+          "teacher_rmse_vs_era5": 0.0019373921677470207,
+          "degradation_pct_vs_teacher": 17.07592660337006
+        },
+        "msl": {
+          "student_rmse_vs_era5": 248.92840576171875,
+          "teacher_rmse_vs_era5": 262.56072998046875,
+          "degradation_pct_vs_teacher": -5.192065172794147
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8248026371002197,
+          "teacher_rmse_vs_era5": 2.8971164226531982,
+          "degradation_pct_vs_teacher": 32.021019493494855
+        }
+      }
+    },
+    {
+      "sample_index": 40,
+      "lead_hours": 6,
+      "init_id": 320,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002509038895368576,
+          "teacher_rmse_vs_era5": 0.002172970212996006,
+          "degradation_pct_vs_teacher": 15.465866966911237
+        },
+        "msl": {
+          "student_rmse_vs_era5": 241.45008850097656,
+          "teacher_rmse_vs_era5": 285.1773681640625,
+          "degradation_pct_vs_teacher": -15.333362512108478
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.968658208847046,
+          "teacher_rmse_vs_era5": 2.850682020187378,
+          "degradation_pct_vs_teacher": 39.21784964940363
+        }
+      }
+    },
+    {
+      "sample_index": 41,
+      "lead_hours": 6,
+      "init_id": 328,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002110875677317381,
+          "teacher_rmse_vs_era5": 0.0018377656815573573,
+          "degradation_pct_vs_teacher": 14.86098029257925
+        },
+        "msl": {
+          "student_rmse_vs_era5": 249.2428741455078,
+          "teacher_rmse_vs_era5": 262.22235107421875,
+          "degradation_pct_vs_teacher": -4.949798091405739
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9206621646881104,
+          "teacher_rmse_vs_era5": 2.899886131286621,
+          "degradation_pct_vs_teacher": 35.20055571797888
+        }
+      }
+    },
+    {
+      "sample_index": 42,
+      "lead_hours": 6,
+      "init_id": 336,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002453441033139825,
+          "teacher_rmse_vs_era5": 0.002019121078774333,
+          "degradation_pct_vs_teacher": 21.510347196669212
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.7667236328125,
+          "teacher_rmse_vs_era5": 262.0128479003906,
+          "degradation_pct_vs_teacher": -13.452059526858637
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7058870792388916,
+          "teacher_rmse_vs_era5": 2.770230293273926,
+          "degradation_pct_vs_teacher": 33.77541528719563
+        }
+      }
+    },
+    {
+      "sample_index": 43,
+      "lead_hours": 6,
+      "init_id": 344,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026703202165663242,
+          "teacher_rmse_vs_era5": 0.0021618239115923643,
+          "degradation_pct_vs_teacher": 23.52163385034491
+        },
+        "msl": {
+          "student_rmse_vs_era5": 244.68569946289062,
+          "teacher_rmse_vs_era5": 261.794189453125,
+          "degradation_pct_vs_teacher": -6.535091564092067
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9608891010284424,
+          "teacher_rmse_vs_era5": 2.8712122440338135,
+          "degradation_pct_vs_teacher": 37.95180447766982
+        }
+      }
+    },
+    {
+      "sample_index": 44,
+      "lead_hours": 6,
+      "init_id": 352,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002228397410362959,
+          "teacher_rmse_vs_era5": 0.0017986700404435396,
+          "degradation_pct_vs_teacher": 23.89139532303832
+        },
+        "msl": {
+          "student_rmse_vs_era5": 248.8712615966797,
+          "teacher_rmse_vs_era5": 263.38775634765625,
+          "degradation_pct_vs_teacher": -5.5114538930259345
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8213584423065186,
+          "teacher_rmse_vs_era5": 2.822031021118164,
+          "degradation_pct_vs_teacher": 35.41163841609347
+        }
+      }
+    },
+    {
+      "sample_index": 45,
+      "lead_hours": 6,
+      "init_id": 360,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024426335003226995,
+          "teacher_rmse_vs_era5": 0.0019659900572150946,
+          "degradation_pct_vs_teacher": 24.244448305236595
+        },
+        "msl": {
+          "student_rmse_vs_era5": 254.16091918945312,
+          "teacher_rmse_vs_era5": 247.17495727539062,
+          "degradation_pct_vs_teacher": 2.8263226950936913
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8936288356781006,
+          "teacher_rmse_vs_era5": 2.869340658187866,
+          "degradation_pct_vs_teacher": 35.69768457319125
+        }
+      }
+    },
+    {
+      "sample_index": 46,
+      "lead_hours": 6,
+      "init_id": 368,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025962223298847675,
+          "teacher_rmse_vs_era5": 0.0021590122487396,
+          "degradation_pct_vs_teacher": 20.25046784243138
+        },
+        "msl": {
+          "student_rmse_vs_era5": 295.7449951171875,
+          "teacher_rmse_vs_era5": 262.4414978027344,
+          "degradation_pct_vs_teacher": 12.689874731429054
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.89461088180542,
+          "teacher_rmse_vs_era5": 3.019143581390381,
+          "degradation_pct_vs_teacher": 62.119182140762774
+        }
+      }
+    },
+    {
+      "sample_index": 47,
+      "lead_hours": 6,
+      "init_id": 376,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025188217405229807,
+          "teacher_rmse_vs_era5": 0.0019824851769953966,
+          "degradation_pct_vs_teacher": 27.053748988955466
+        },
+        "msl": {
+          "student_rmse_vs_era5": 257.4894104003906,
+          "teacher_rmse_vs_era5": 256.6345520019531,
+          "degradation_pct_vs_teacher": 0.3331033922630161
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.408595561981201,
+          "teacher_rmse_vs_era5": 2.9925549030303955,
+          "degradation_pct_vs_teacher": 47.3187862824792
+        }
+      }
+    },
+    {
+      "sample_index": 48,
+      "lead_hours": 6,
+      "init_id": 384,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023689758963882923,
+          "teacher_rmse_vs_era5": 0.001933361985720694,
+          "degradation_pct_vs_teacher": 22.53142007988823
+        },
+        "msl": {
+          "student_rmse_vs_era5": 248.04815673828125,
+          "teacher_rmse_vs_era5": 257.02532958984375,
+          "degradation_pct_vs_teacher": -3.492719128456369
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9785945415496826,
+          "teacher_rmse_vs_era5": 3.014430046081543,
+          "degradation_pct_vs_teacher": 31.984968326647916
+        }
+      }
+    },
+    {
+      "sample_index": 49,
+      "lead_hours": 6,
+      "init_id": 392,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023496304638683796,
+          "teacher_rmse_vs_era5": 0.0020112977363169193,
+          "degradation_pct_vs_teacher": 16.82161330181845
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.590087890625,
+          "teacher_rmse_vs_era5": 258.121826171875,
+          "degradation_pct_vs_teacher": -11.828421770470468
+        },
+        "2t": {
+          "student_rmse_vs_era5": 4.056219100952148,
+          "teacher_rmse_vs_era5": 3.025937080383301,
+          "degradation_pct_vs_teacher": 34.04836231552905
+        }
+      }
+    },
+    {
+      "sample_index": 50,
+      "lead_hours": 6,
+      "init_id": 400,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025553149171173573,
+          "teacher_rmse_vs_era5": 0.00226379930973053,
+          "degradation_pct_vs_teacher": 12.877272562713516
+        },
+        "msl": {
+          "student_rmse_vs_era5": 238.5502166748047,
+          "teacher_rmse_vs_era5": 262.0507507324219,
+          "degradation_pct_vs_teacher": -8.967932353536133
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8582847118377686,
+          "teacher_rmse_vs_era5": 2.87050461769104,
+          "degradation_pct_vs_teacher": 34.41137450394605
+        }
+      }
+    },
+    {
+      "sample_index": 51,
+      "lead_hours": 6,
+      "init_id": 408,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00249453610740602,
+          "teacher_rmse_vs_era5": 0.0021914681419730186,
+          "degradation_pct_vs_teacher": 13.82944883516052
+        },
+        "msl": {
+          "student_rmse_vs_era5": 246.72805786132812,
+          "teacher_rmse_vs_era5": 266.5440368652344,
+          "degradation_pct_vs_teacher": -7.434410927724217
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8802096843719482,
+          "teacher_rmse_vs_era5": 3.026228427886963,
+          "degradation_pct_vs_teacher": 28.219325699787646
+        }
+      }
+    },
+    {
+      "sample_index": 52,
+      "lead_hours": 6,
+      "init_id": 416,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024975521955639124,
+          "teacher_rmse_vs_era5": 0.0022073262371122837,
+          "degradation_pct_vs_teacher": 13.148303751932673
+        },
+        "msl": {
+          "student_rmse_vs_era5": 268.5055847167969,
+          "teacher_rmse_vs_era5": 264.2207946777344,
+          "degradation_pct_vs_teacher": 1.621670256608147
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7914512157440186,
+          "teacher_rmse_vs_era5": 2.86850905418396,
+          "degradation_pct_vs_teacher": 32.174978155075735
+        }
+      }
+    },
+    {
+      "sample_index": 53,
+      "lead_hours": 6,
+      "init_id": 424,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025438317097723484,
+          "teacher_rmse_vs_era5": 0.002253404352813959,
+          "degradation_pct_vs_teacher": 12.888381820853212
+        },
+        "msl": {
+          "student_rmse_vs_era5": 219.94985961914062,
+          "teacher_rmse_vs_era5": 238.3810272216797,
+          "degradation_pct_vs_teacher": -7.731809790969317
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6696035861968994,
+          "teacher_rmse_vs_era5": 2.964308977127075,
+          "degradation_pct_vs_teacher": 23.792884429793006
+        }
+      }
+    },
+    {
+      "sample_index": 54,
+      "lead_hours": 6,
+      "init_id": 432,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023694580886512995,
+          "teacher_rmse_vs_era5": 0.002106575295329094,
+          "degradation_pct_vs_teacher": 12.479154858841037
+        },
+        "msl": {
+          "student_rmse_vs_era5": 230.281982421875,
+          "teacher_rmse_vs_era5": 259.9617919921875,
+          "degradation_pct_vs_teacher": -11.416989144006383
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.777540683746338,
+          "teacher_rmse_vs_era5": 2.856950521469116,
+          "degradation_pct_vs_teacher": 32.22282483925661
+        }
+      }
+    },
+    {
+      "sample_index": 55,
+      "lead_hours": 6,
+      "init_id": 440,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002472106833010912,
+          "teacher_rmse_vs_era5": 0.002156782429665327,
+          "degradation_pct_vs_teacher": 14.620130385359014
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.94078063964844,
+          "teacher_rmse_vs_era5": 248.12142944335938,
+          "degradation_pct_vs_teacher": -8.133376004234947
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8077378273010254,
+          "teacher_rmse_vs_era5": 2.7809674739837646,
+          "degradation_pct_vs_teacher": 36.92133629475362
+        }
+      }
+    },
+    {
+      "sample_index": 56,
+      "lead_hours": 6,
+      "init_id": 448,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002507244236767292,
+          "teacher_rmse_vs_era5": 0.0020810216665267944,
+          "degradation_pct_vs_teacher": 20.481409544950054
+        },
+        "msl": {
+          "student_rmse_vs_era5": 219.5876007080078,
+          "teacher_rmse_vs_era5": 249.56378173828125,
+          "degradation_pct_vs_teacher": -12.01143083402607
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7193543910980225,
+          "teacher_rmse_vs_era5": 2.944589138031006,
+          "degradation_pct_vs_teacher": 26.311489201005756
+        }
+      }
+    },
+    {
+      "sample_index": 57,
+      "lead_hours": 6,
+      "init_id": 456,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002355122473090887,
+          "teacher_rmse_vs_era5": 0.0020879867952317,
+          "degradation_pct_vs_teacher": 12.793935214017653
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.3212432861328,
+          "teacher_rmse_vs_era5": 250.6415557861328,
+          "degradation_pct_vs_teacher": -6.9103913936678
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7664082050323486,
+          "teacher_rmse_vs_era5": 2.8909904956817627,
+          "degradation_pct_vs_teacher": 30.280891986956952
+        }
+      }
+    },
+    {
+      "sample_index": 58,
+      "lead_hours": 6,
+      "init_id": 464,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002382546430453658,
+          "teacher_rmse_vs_era5": 0.002120435470715165,
+          "degradation_pct_vs_teacher": 12.361185396039902
+        },
+        "msl": {
+          "student_rmse_vs_era5": 218.8462371826172,
+          "teacher_rmse_vs_era5": 261.8814392089844,
+          "degradation_pct_vs_teacher": -16.43308596300504
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.644008159637451,
+          "teacher_rmse_vs_era5": 2.8679256439208984,
+          "degradation_pct_vs_teacher": 27.06076140298839
+        }
+      }
+    },
+    {
+      "sample_index": 59,
+      "lead_hours": 6,
+      "init_id": 472,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024942164309322834,
+          "teacher_rmse_vs_era5": 0.002168276347219944,
+          "degradation_pct_vs_teacher": 15.032220599105992
+        },
+        "msl": {
+          "student_rmse_vs_era5": 228.82460021972656,
+          "teacher_rmse_vs_era5": 255.1929168701172,
+          "degradation_pct_vs_teacher": -10.332699266810382
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7036235332489014,
+          "teacher_rmse_vs_era5": 2.909158706665039,
+          "degradation_pct_vs_teacher": 27.309091964068536
+        }
+      }
+    },
+    {
+      "sample_index": 60,
+      "lead_hours": 6,
+      "init_id": 480,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00256103603169322,
+          "teacher_rmse_vs_era5": 0.002155482303351164,
+          "degradation_pct_vs_teacher": 18.814987611428553
+        },
+        "msl": {
+          "student_rmse_vs_era5": 231.8043975830078,
+          "teacher_rmse_vs_era5": 246.18304443359375,
+          "degradation_pct_vs_teacher": -5.840632478840143
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.745170831680298,
+          "teacher_rmse_vs_era5": 2.89444899559021,
+          "degradation_pct_vs_teacher": 29.391495147649557
+        }
+      }
+    },
+    {
+      "sample_index": 61,
+      "lead_hours": 6,
+      "init_id": 488,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002467714250087738,
+          "teacher_rmse_vs_era5": 0.002102839294821024,
+          "degradation_pct_vs_teacher": 17.351537807256413
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.05557250976562,
+          "teacher_rmse_vs_era5": 249.892578125,
+          "degradation_pct_vs_teacher": -9.138729043729727
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.717031478881836,
+          "teacher_rmse_vs_era5": 2.957448720932007,
+          "degradation_pct_vs_teacher": 25.68371693391374
+        }
+      }
+    },
+    {
+      "sample_index": 62,
+      "lead_hours": 6,
+      "init_id": 496,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024079487193375826,
+          "teacher_rmse_vs_era5": 0.0020552556961774826,
+          "degradation_pct_vs_teacher": 17.16054230216049
+        },
+        "msl": {
+          "student_rmse_vs_era5": 224.40147399902344,
+          "teacher_rmse_vs_era5": 235.11297607421875,
+          "degradation_pct_vs_teacher": -4.555895745972772
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.558208703994751,
+          "teacher_rmse_vs_era5": 2.9849677085876465,
+          "degradation_pct_vs_teacher": 19.20426119712821
+        }
+      }
+    },
+    {
+      "sample_index": 63,
+      "lead_hours": 6,
+      "init_id": 504,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002475684741511941,
+          "teacher_rmse_vs_era5": 0.002106212778016925,
+          "degradation_pct_vs_teacher": 17.542005601299564
+        },
+        "msl": {
+          "student_rmse_vs_era5": 221.73377990722656,
+          "teacher_rmse_vs_era5": 242.95834350585938,
+          "degradation_pct_vs_teacher": -8.735885869307857
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.733499765396118,
+          "teacher_rmse_vs_era5": 3.0555098056793213,
+          "degradation_pct_vs_teacher": 22.18909454836659
+        }
+      }
+    },
+    {
+      "sample_index": 64,
+      "lead_hours": 6,
+      "init_id": 512,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027390364557504654,
+          "teacher_rmse_vs_era5": 0.002299074549227953,
+          "degradation_pct_vs_teacher": 19.136478487409427
+        },
+        "msl": {
+          "student_rmse_vs_era5": 243.69534301757812,
+          "teacher_rmse_vs_era5": 256.62298583984375,
+          "degradation_pct_vs_teacher": -5.037601281100228
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8166215419769287,
+          "teacher_rmse_vs_era5": 2.9697060585021973,
+          "degradation_pct_vs_teacher": 28.518495325489628
+        }
+      }
+    },
+    {
+      "sample_index": 65,
+      "lead_hours": 6,
+      "init_id": 520,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023979595862329006,
+          "teacher_rmse_vs_era5": 0.0020262848120182753,
+          "degradation_pct_vs_teacher": 18.342671869726928
+        },
+        "msl": {
+          "student_rmse_vs_era5": 255.69924926757812,
+          "teacher_rmse_vs_era5": 246.43679809570312,
+          "degradation_pct_vs_teacher": 3.758550364007712
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.826678514480591,
+          "teacher_rmse_vs_era5": 2.9105818271636963,
+          "degradation_pct_vs_teacher": 31.47469274930547
+        }
+      }
+    },
+    {
+      "sample_index": 66,
+      "lead_hours": 6,
+      "init_id": 528,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002625708933919668,
+          "teacher_rmse_vs_era5": 0.0021767481230199337,
+          "degradation_pct_vs_teacher": 20.62529909417651
+        },
+        "msl": {
+          "student_rmse_vs_era5": 240.85671997070312,
+          "teacher_rmse_vs_era5": 252.01487731933594,
+          "degradation_pct_vs_teacher": -4.427578826822181
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5237436294555664,
+          "teacher_rmse_vs_era5": 2.9233901500701904,
+          "degradation_pct_vs_teacher": 20.536207915011328
+        }
+      }
+    },
+    {
+      "sample_index": 67,
+      "lead_hours": 6,
+      "init_id": 536,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026542004197835922,
+          "teacher_rmse_vs_era5": 0.0021486259065568447,
+          "degradation_pct_vs_teacher": 23.530132057140023
+        },
+        "msl": {
+          "student_rmse_vs_era5": 237.63973999023438,
+          "teacher_rmse_vs_era5": 240.7149200439453,
+          "degradation_pct_vs_teacher": -1.2775195044617622
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.585150718688965,
+          "teacher_rmse_vs_era5": 2.9559402465820312,
+          "degradation_pct_vs_teacher": 21.286305527809397
+        }
+      }
+    },
+    {
+      "sample_index": 68,
+      "lead_hours": 6,
+      "init_id": 544,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026753791607916355,
+          "teacher_rmse_vs_era5": 0.002166630933061242,
+          "degradation_pct_vs_teacher": 23.481074693768026
+        },
+        "msl": {
+          "student_rmse_vs_era5": 238.36312866210938,
+          "teacher_rmse_vs_era5": 226.34727478027344,
+          "degradation_pct_vs_teacher": 5.308592247686801
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.553696393966675,
+          "teacher_rmse_vs_era5": 2.985138416290283,
+          "degradation_pct_vs_teacher": 19.046285243380936
+        }
+      }
+    },
+    {
+      "sample_index": 69,
+      "lead_hours": 6,
+      "init_id": 552,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002447319682687521,
+          "teacher_rmse_vs_era5": 0.002110979985445738,
+          "degradation_pct_vs_teacher": 15.932870020592086
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.6810302734375,
+          "teacher_rmse_vs_era5": 245.9527130126953,
+          "degradation_pct_vs_teacher": -7.835523545643128
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.648498296737671,
+          "teacher_rmse_vs_era5": 2.987297773361206,
+          "degradation_pct_vs_teacher": 22.133733344985707
+        }
+      }
+    },
+    {
+      "sample_index": 70,
+      "lead_hours": 6,
+      "init_id": 560,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027214279398322105,
+          "teacher_rmse_vs_era5": 0.002217563334852457,
+          "degradation_pct_vs_teacher": 22.72154292329502
+        },
+        "msl": {
+          "student_rmse_vs_era5": 234.78114318847656,
+          "teacher_rmse_vs_era5": 248.03033447265625,
+          "degradation_pct_vs_teacher": -5.341762455124345
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4069650173187256,
+          "teacher_rmse_vs_era5": 2.927953004837036,
+          "degradation_pct_vs_teacher": 16.359962461499627
+        }
+      }
+    },
+    {
+      "sample_index": 71,
+      "lead_hours": 6,
+      "init_id": 568,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002770277438685298,
+          "teacher_rmse_vs_era5": 0.002370208967477083,
+          "degradation_pct_vs_teacher": 16.87903795394289
+        },
+        "msl": {
+          "student_rmse_vs_era5": 223.81520080566406,
+          "teacher_rmse_vs_era5": 244.51116943359375,
+          "degradation_pct_vs_teacher": -8.464222176791175
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4582409858703613,
+          "teacher_rmse_vs_era5": 2.8371291160583496,
+          "degradation_pct_vs_teacher": 21.89226659782507
+        }
+      }
+    },
+    {
+      "sample_index": 72,
+      "lead_hours": 6,
+      "init_id": 576,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0029325862415134907,
+          "teacher_rmse_vs_era5": 0.0025626576971262693,
+          "degradation_pct_vs_teacher": 14.435347522302894
+        },
+        "msl": {
+          "student_rmse_vs_era5": 225.07777404785156,
+          "teacher_rmse_vs_era5": 251.06178283691406,
+          "degradation_pct_vs_teacher": -10.349647204545393
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.662625312805176,
+          "teacher_rmse_vs_era5": 2.866302490234375,
+          "degradation_pct_vs_teacher": 27.782232520255953
+        }
+      }
+    },
+    {
+      "sample_index": 73,
+      "lead_hours": 6,
+      "init_id": 584,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002403083024546504,
+          "teacher_rmse_vs_era5": 0.002163655823096633,
+          "degradation_pct_vs_teacher": 11.06586356730258
+        },
+        "msl": {
+          "student_rmse_vs_era5": 230.33839416503906,
+          "teacher_rmse_vs_era5": 255.30694580078125,
+          "degradation_pct_vs_teacher": -9.779816823011707
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7188985347747803,
+          "teacher_rmse_vs_era5": 2.8641467094421387,
+          "degradation_pct_vs_teacher": 29.84315791208632
+        }
+      }
+    },
+    {
+      "sample_index": 74,
+      "lead_hours": 6,
+      "init_id": 592,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002401948906481266,
+          "teacher_rmse_vs_era5": 0.00205400912091136,
+          "degradation_pct_vs_teacher": 16.939544329556142
+        },
+        "msl": {
+          "student_rmse_vs_era5": 239.953369140625,
+          "teacher_rmse_vs_era5": 244.9779510498047,
+          "degradation_pct_vs_teacher": -2.0510343431512235
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6013240814208984,
+          "teacher_rmse_vs_era5": 2.9675486087799072,
+          "degradation_pct_vs_teacher": 21.35686912645265
+        }
+      }
+    },
+    {
+      "sample_index": 75,
+      "lead_hours": 6,
+      "init_id": 600,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024842689745128155,
+          "teacher_rmse_vs_era5": 0.0020745398942381144,
+          "degradation_pct_vs_teacher": 19.750359171818978
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.44924926757812,
+          "teacher_rmse_vs_era5": 244.23008728027344,
+          "degradation_pct_vs_teacher": -4.414213716561237
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.489847421646118,
+          "teacher_rmse_vs_era5": 2.938626766204834,
+          "degradation_pct_vs_teacher": 18.757763380518462
+        }
+      }
+    },
+    {
+      "sample_index": 76,
+      "lead_hours": 6,
+      "init_id": 608,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0021302259992808104,
+          "teacher_rmse_vs_era5": 0.0017083637649193406,
+          "degradation_pct_vs_teacher": 24.693934806173306
+        },
+        "msl": {
+          "student_rmse_vs_era5": 212.0313720703125,
+          "teacher_rmse_vs_era5": 235.83058166503906,
+          "degradation_pct_vs_teacher": -10.091655385275548
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6202571392059326,
+          "teacher_rmse_vs_era5": 2.8925256729125977,
+          "degradation_pct_vs_teacher": 25.159032229454805
+        }
+      }
+    },
+    {
+      "sample_index": 77,
+      "lead_hours": 6,
+      "init_id": 616,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002699631964787841,
+          "teacher_rmse_vs_era5": 0.002233932027593255,
+          "degradation_pct_vs_teacher": 20.846647590093035
+        },
+        "msl": {
+          "student_rmse_vs_era5": 221.52731323242188,
+          "teacher_rmse_vs_era5": 249.29971313476562,
+          "degradation_pct_vs_teacher": -11.140165206419887
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4480478763580322,
+          "teacher_rmse_vs_era5": 2.838097333908081,
+          "degradation_pct_vs_teacher": 21.49153008822445
+        }
+      }
+    },
+    {
+      "sample_index": 78,
+      "lead_hours": 6,
+      "init_id": 624,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027426634915173054,
+          "teacher_rmse_vs_era5": 0.0021744316909462214,
+          "degradation_pct_vs_teacher": 26.132428208117837
+        },
+        "msl": {
+          "student_rmse_vs_era5": 238.8411865234375,
+          "teacher_rmse_vs_era5": 234.16287231445312,
+          "degradation_pct_vs_teacher": 1.9978889747739133
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.863510847091675,
+          "teacher_rmse_vs_era5": 2.8579726219177246,
+          "degradation_pct_vs_teacher": 35.18361993612189
+        }
+      }
+    },
+    {
+      "sample_index": 79,
+      "lead_hours": 6,
+      "init_id": 632,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002393822418525815,
+          "teacher_rmse_vs_era5": 0.0019269915064796805,
+          "degradation_pct_vs_teacher": 24.225893600276596
+        },
+        "msl": {
+          "student_rmse_vs_era5": 204.9074249267578,
+          "teacher_rmse_vs_era5": 226.67678833007812,
+          "degradation_pct_vs_teacher": -9.603702065700963
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5733959674835205,
+          "teacher_rmse_vs_era5": 2.8179843425750732,
+          "degradation_pct_vs_teacher": 26.80680703208423
+        }
+      }
+    },
+    {
+      "sample_index": 80,
+      "lead_hours": 6,
+      "init_id": 640,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025351669173687696,
+          "teacher_rmse_vs_era5": 0.002139205811545253,
+          "degradation_pct_vs_teacher": 18.509724669151623
+        },
+        "msl": {
+          "student_rmse_vs_era5": 200.68312072753906,
+          "teacher_rmse_vs_era5": 234.04441833496094,
+          "degradation_pct_vs_teacher": -14.254259018335432
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.521965503692627,
+          "teacher_rmse_vs_era5": 2.82387375831604,
+          "degradation_pct_vs_teacher": 24.721067764476828
+        }
+      }
+    },
+    {
+      "sample_index": 81,
+      "lead_hours": 6,
+      "init_id": 648,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024755201302468777,
+          "teacher_rmse_vs_era5": 0.0021265556570142508,
+          "degradation_pct_vs_teacher": 16.40984434531959
+        },
+        "msl": {
+          "student_rmse_vs_era5": 214.7602081298828,
+          "teacher_rmse_vs_era5": 235.1112823486328,
+          "degradation_pct_vs_teacher": -8.655932635581724
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.391735553741455,
+          "teacher_rmse_vs_era5": 2.7730765342712402,
+          "degradation_pct_vs_teacher": 22.3094823321491
+        }
+      }
+    },
+    {
+      "sample_index": 82,
+      "lead_hours": 6,
+      "init_id": 656,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027122460305690765,
+          "teacher_rmse_vs_era5": 0.002243426162749529,
+          "degradation_pct_vs_teacher": 20.89749489437018
+        },
+        "msl": {
+          "student_rmse_vs_era5": 205.47317504882812,
+          "teacher_rmse_vs_era5": 238.23849487304688,
+          "degradation_pct_vs_teacher": -13.753159346342754
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5675532817840576,
+          "teacher_rmse_vs_era5": 2.863022565841675,
+          "degradation_pct_vs_teacher": 24.6079344378225
+        }
+      }
+    },
+    {
+      "sample_index": 83,
+      "lead_hours": 6,
+      "init_id": 664,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025540238711982965,
+          "teacher_rmse_vs_era5": 0.0021283654496073723,
+          "degradation_pct_vs_teacher": 19.999310817108363
+        },
+        "msl": {
+          "student_rmse_vs_era5": 218.1874542236328,
+          "teacher_rmse_vs_era5": 249.72804260253906,
+          "degradation_pct_vs_teacher": -12.629974611664043
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7057931423187256,
+          "teacher_rmse_vs_era5": 2.945066213607788,
+          "degradation_pct_vs_teacher": 25.830554341901394
+        }
+      }
+    },
+    {
+      "sample_index": 84,
+      "lead_hours": 6,
+      "init_id": 672,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002652575494721532,
+          "teacher_rmse_vs_era5": 0.0021633021533489227,
+          "degradation_pct_vs_teacher": 22.616967334645526
+        },
+        "msl": {
+          "student_rmse_vs_era5": 225.9878692626953,
+          "teacher_rmse_vs_era5": 258.0155944824219,
+          "degradation_pct_vs_teacher": -12.413096690521375
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.43597149848938,
+          "teacher_rmse_vs_era5": 2.8973851203918457,
+          "degradation_pct_vs_teacher": 18.58870518478728
+        }
+      }
+    },
+    {
+      "sample_index": 85,
+      "lead_hours": 6,
+      "init_id": 680,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024909412022680044,
+          "teacher_rmse_vs_era5": 0.00205024890601635,
+          "degradation_pct_vs_teacher": 21.494575363921218
+        },
+        "msl": {
+          "student_rmse_vs_era5": 230.3371124267578,
+          "teacher_rmse_vs_era5": 242.92274475097656,
+          "degradation_pct_vs_teacher": -5.1809196940864695
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.535771608352661,
+          "teacher_rmse_vs_era5": 2.912064790725708,
+          "degradation_pct_vs_teacher": 21.418026810849934
+        }
+      }
+    },
+    {
+      "sample_index": 86,
+      "lead_hours": 6,
+      "init_id": 688,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002826138399541378,
+          "teacher_rmse_vs_era5": 0.002321298699826002,
+          "degradation_pct_vs_teacher": 21.748157604758802
+        },
+        "msl": {
+          "student_rmse_vs_era5": 213.4997100830078,
+          "teacher_rmse_vs_era5": 229.38995361328125,
+          "degradation_pct_vs_teacher": -6.927175004822627
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.584362506866455,
+          "teacher_rmse_vs_era5": 2.9961800575256348,
+          "degradation_pct_vs_teacher": 19.631078174472762
+        }
+      }
+    },
+    {
+      "sample_index": 87,
+      "lead_hours": 6,
+      "init_id": 696,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002464203629642725,
+          "teacher_rmse_vs_era5": 0.0020493397023528814,
+          "degradation_pct_vs_teacher": 20.243785196447973
+        },
+        "msl": {
+          "student_rmse_vs_era5": 216.89608764648438,
+          "teacher_rmse_vs_era5": 232.49249267578125,
+          "degradation_pct_vs_teacher": -6.708347805039278
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4330873489379883,
+          "teacher_rmse_vs_era5": 3.0191195011138916,
+          "degradation_pct_vs_teacher": 13.711542311305166
+        }
+      }
+    },
+    {
+      "sample_index": 88,
+      "lead_hours": 6,
+      "init_id": 704,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025004048366099596,
+          "teacher_rmse_vs_era5": 0.002050072653219104,
+          "degradation_pct_vs_teacher": 21.966645069077266
+        },
+        "msl": {
+          "student_rmse_vs_era5": 196.68238830566406,
+          "teacher_rmse_vs_era5": 224.7499237060547,
+          "degradation_pct_vs_teacher": -12.488340346268378
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4461920261383057,
+          "teacher_rmse_vs_era5": 2.9803712368011475,
+          "degradation_pct_vs_teacher": 15.629623034381677
+        }
+      }
+    },
+    {
+      "sample_index": 89,
+      "lead_hours": 6,
+      "init_id": 712,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002865106798708439,
+          "teacher_rmse_vs_era5": 0.0023172819055616856,
+          "degradation_pct_vs_teacher": 23.640839374437963
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.52651977539062,
+          "teacher_rmse_vs_era5": 239.4556427001953,
+          "degradation_pct_vs_teacher": -4.981767307835072
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5179100036621094,
+          "teacher_rmse_vs_era5": 2.968531608581543,
+          "degradation_pct_vs_teacher": 18.506738937608166
+        }
+      }
+    },
+    {
+      "sample_index": 90,
+      "lead_hours": 6,
+      "init_id": 720,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002434016205370426,
+          "teacher_rmse_vs_era5": 0.0020104157738387585,
+          "degradation_pct_vs_teacher": 21.07028988948043
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.47552490234375,
+          "teacher_rmse_vs_era5": 224.62155151367188,
+          "degradation_pct_vs_teacher": 0.8253764503799319
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6330630779266357,
+          "teacher_rmse_vs_era5": 2.9362990856170654,
+          "degradation_pct_vs_teacher": 23.729326338810097
+        }
+      }
+    },
+    {
+      "sample_index": 91,
+      "lead_hours": 6,
+      "init_id": 728,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026436906773597,
+          "teacher_rmse_vs_era5": 0.0022665185388177633,
+          "degradation_pct_vs_teacher": 16.641034788917867
+        },
+        "msl": {
+          "student_rmse_vs_era5": 224.69313049316406,
+          "teacher_rmse_vs_era5": 221.64138793945312,
+          "degradation_pct_vs_teacher": 1.3768829829492844
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6154279708862305,
+          "teacher_rmse_vs_era5": 2.904414415359497,
+          "degradation_pct_vs_teacher": 24.480444380342565
+        }
+      }
+    },
+    {
+      "sample_index": 92,
+      "lead_hours": 6,
+      "init_id": 736,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024809541646391153,
+          "teacher_rmse_vs_era5": 0.002063753781840205,
+          "degradation_pct_vs_teacher": 20.215608396215824
+        },
+        "msl": {
+          "student_rmse_vs_era5": 216.5873565673828,
+          "teacher_rmse_vs_era5": 238.303466796875,
+          "degradation_pct_vs_teacher": -9.11279660400516
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.821439743041992,
+          "teacher_rmse_vs_era5": 2.901975154876709,
+          "degradation_pct_vs_teacher": 31.68409580006714
+        }
+      }
+    },
+    {
+      "sample_index": 93,
+      "lead_hours": 6,
+      "init_id": 744,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002314327284693718,
+          "teacher_rmse_vs_era5": 0.0018662033835425973,
+          "degradation_pct_vs_teacher": 24.01259718543919
+        },
+        "msl": {
+          "student_rmse_vs_era5": 221.31854248046875,
+          "teacher_rmse_vs_era5": 232.19534301757812,
+          "degradation_pct_vs_teacher": -4.6843319059529795
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6960580348968506,
+          "teacher_rmse_vs_era5": 2.870105504989624,
+          "degradation_pct_vs_teacher": 28.77777588563639
+        }
+      }
+    },
+    {
+      "sample_index": 94,
+      "lead_hours": 6,
+      "init_id": 752,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002551404992118478,
+          "teacher_rmse_vs_era5": 0.002028031973168254,
+          "degradation_pct_vs_teacher": 25.806941205793443
+        },
+        "msl": {
+          "student_rmse_vs_era5": 211.15573120117188,
+          "teacher_rmse_vs_era5": 224.55581665039062,
+          "degradation_pct_vs_teacher": -5.967374013776383
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.9294309616088867,
+          "teacher_rmse_vs_era5": 2.893951177597046,
+          "degradation_pct_vs_teacher": 35.780831135915626
+        }
+      }
+    },
+    {
+      "sample_index": 95,
+      "lead_hours": 6,
+      "init_id": 760,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002600658917799592,
+          "teacher_rmse_vs_era5": 0.0020977247040718794,
+          "degradation_pct_vs_teacher": 23.975224811505075
+        },
+        "msl": {
+          "student_rmse_vs_era5": 222.68836975097656,
+          "teacher_rmse_vs_era5": 230.63331604003906,
+          "degradation_pct_vs_teacher": -3.444838944119946
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.624551296234131,
+          "teacher_rmse_vs_era5": 2.7747809886932373,
+          "degradation_pct_vs_teacher": 30.624770423451928
+        }
+      }
+    },
+    {
+      "sample_index": 96,
+      "lead_hours": 6,
+      "init_id": 768,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002628351328894496,
+          "teacher_rmse_vs_era5": 0.002092991955578327,
+          "degradation_pct_vs_teacher": 25.578663687134927
+        },
+        "msl": {
+          "student_rmse_vs_era5": 233.656982421875,
+          "teacher_rmse_vs_era5": 237.8755645751953,
+          "degradation_pct_vs_teacher": -1.7734407318607828
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.413642644882202,
+          "teacher_rmse_vs_era5": 2.712693691253662,
+          "degradation_pct_vs_teacher": 25.839590953027905
+        }
+      }
+    },
+    {
+      "sample_index": 97,
+      "lead_hours": 6,
+      "init_id": 776,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002220436232164502,
+          "teacher_rmse_vs_era5": 0.0017994685331359506,
+          "degradation_pct_vs_teacher": 23.394001688650107
+        },
+        "msl": {
+          "student_rmse_vs_era5": 220.8061981201172,
+          "teacher_rmse_vs_era5": 236.5010223388672,
+          "degradation_pct_vs_teacher": -6.636260623119798
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.628143548965454,
+          "teacher_rmse_vs_era5": 2.8042349815368652,
+          "degradation_pct_vs_teacher": 29.380867611067476
+        }
+      }
+    },
+    {
+      "sample_index": 98,
+      "lead_hours": 6,
+      "init_id": 784,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025438619777560234,
+          "teacher_rmse_vs_era5": 0.0020755245350301266,
+          "degradation_pct_vs_teacher": 22.564775063914087
+        },
+        "msl": {
+          "student_rmse_vs_era5": 221.91567993164062,
+          "teacher_rmse_vs_era5": 222.64193725585938,
+          "degradation_pct_vs_teacher": -0.3261996967732712
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.525094509124756,
+          "teacher_rmse_vs_era5": 2.816162109375,
+          "degradation_pct_vs_teacher": 25.173707060034676
+        }
+      }
+    },
+    {
+      "sample_index": 99,
+      "lead_hours": 6,
+      "init_id": 792,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024676877073943615,
+          "teacher_rmse_vs_era5": 0.002044711261987686,
+          "degradation_pct_vs_teacher": 20.68636551624875
+        },
+        "msl": {
+          "student_rmse_vs_era5": 204.20840454101562,
+          "teacher_rmse_vs_era5": 231.72628784179688,
+          "degradation_pct_vs_teacher": -11.875166843206038
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.410352945327759,
+          "teacher_rmse_vs_era5": 2.8072853088378906,
+          "degradation_pct_vs_teacher": 21.482235332165622
+        }
+      }
+    },
+    {
+      "sample_index": 100,
+      "lead_hours": 6,
+      "init_id": 800,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025037771556526423,
+          "teacher_rmse_vs_era5": 0.002051683608442545,
+          "degradation_pct_vs_teacher": 22.035246826058447
+        },
+        "msl": {
+          "student_rmse_vs_era5": 196.33518981933594,
+          "teacher_rmse_vs_era5": 237.072509765625,
+          "degradation_pct_vs_teacher": -17.18348533390179
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.3592686653137207,
+          "teacher_rmse_vs_era5": 2.846590757369995,
+          "degradation_pct_vs_teacher": 18.01024283579828
+        }
+      }
+    },
+    {
+      "sample_index": 101,
+      "lead_hours": 6,
+      "init_id": 808,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002447286853566766,
+          "teacher_rmse_vs_era5": 0.0019681835547089577,
+          "degradation_pct_vs_teacher": 24.342409411537574
+        },
+        "msl": {
+          "student_rmse_vs_era5": 220.80313110351562,
+          "teacher_rmse_vs_era5": 240.64169311523438,
+          "degradation_pct_vs_teacher": -8.244025278786083
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.514763593673706,
+          "teacher_rmse_vs_era5": 2.8095173835754395,
+          "degradation_pct_vs_teacher": 25.10204116269814
+        }
+      }
+    },
+    {
+      "sample_index": 102,
+      "lead_hours": 6,
+      "init_id": 816,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023547334130853415,
+          "teacher_rmse_vs_era5": 0.001970528159290552,
+          "degradation_pct_vs_teacher": 19.497577437975536
+        },
+        "msl": {
+          "student_rmse_vs_era5": 227.0790252685547,
+          "teacher_rmse_vs_era5": 234.59640502929688,
+          "degradation_pct_vs_teacher": -3.2043883024564686
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.606917142868042,
+          "teacher_rmse_vs_era5": 2.8441059589385986,
+          "degradation_pct_vs_teacher": 26.820772325026855
+        }
+      }
+    },
+    {
+      "sample_index": 103,
+      "lead_hours": 6,
+      "init_id": 824,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023335267324000597,
+          "teacher_rmse_vs_era5": 0.0019667765591293573,
+          "degradation_pct_vs_teacher": 18.647271931746708
+        },
+        "msl": {
+          "student_rmse_vs_era5": 219.80882263183594,
+          "teacher_rmse_vs_era5": 255.8990936279297,
+          "degradation_pct_vs_teacher": -14.103321150706387
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.564478874206543,
+          "teacher_rmse_vs_era5": 2.8311238288879395,
+          "degradation_pct_vs_teacher": 25.90331930506424
+        }
+      }
+    },
+    {
+      "sample_index": 104,
+      "lead_hours": 6,
+      "init_id": 832,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002608412178233266,
+          "teacher_rmse_vs_era5": 0.002147085964679718,
+          "degradation_pct_vs_teacher": 21.486154776404778
+        },
+        "msl": {
+          "student_rmse_vs_era5": 211.62828063964844,
+          "teacher_rmse_vs_era5": 234.54830932617188,
+          "degradation_pct_vs_teacher": -9.771986313766162
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6768693923950195,
+          "teacher_rmse_vs_era5": 2.8154046535491943,
+          "degradation_pct_vs_teacher": 30.59825655114385
+        }
+      }
+    },
+    {
+      "sample_index": 105,
+      "lead_hours": 6,
+      "init_id": 840,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002679309342056513,
+          "teacher_rmse_vs_era5": 0.002133505418896675,
+          "degradation_pct_vs_teacher": 25.582495283377146
+        },
+        "msl": {
+          "student_rmse_vs_era5": 203.23336791992188,
+          "teacher_rmse_vs_era5": 238.1109161376953,
+          "degradation_pct_vs_teacher": -14.647605739169208
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.664085626602173,
+          "teacher_rmse_vs_era5": 2.8514747619628906,
+          "degradation_pct_vs_teacher": 28.497915376249
+        }
+      }
+    },
+    {
+      "sample_index": 106,
+      "lead_hours": 6,
+      "init_id": 848,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027053486555814743,
+          "teacher_rmse_vs_era5": 0.0021511579398065805,
+          "degradation_pct_vs_teacher": 25.76243731432957
+        },
+        "msl": {
+          "student_rmse_vs_era5": 226.9739990234375,
+          "teacher_rmse_vs_era5": 241.94842529296875,
+          "degradation_pct_vs_teacher": -6.18909846236822
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7937638759613037,
+          "teacher_rmse_vs_era5": 2.9582722187042236,
+          "degradation_pct_vs_teacher": 28.242554960781817
+        }
+      }
+    },
+    {
+      "sample_index": 107,
+      "lead_hours": 6,
+      "init_id": 856,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0026928228326141834,
+          "teacher_rmse_vs_era5": 0.0021872688084840775,
+          "degradation_pct_vs_teacher": 23.113483910580175
+        },
+        "msl": {
+          "student_rmse_vs_era5": 236.654052734375,
+          "teacher_rmse_vs_era5": 242.6866455078125,
+          "degradation_pct_vs_teacher": -2.4857539073954937
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.632436990737915,
+          "teacher_rmse_vs_era5": 2.884831190109253,
+          "degradation_pct_vs_teacher": 25.91506231601542
+        }
+      }
+    },
+    {
+      "sample_index": 108,
+      "lead_hours": 6,
+      "init_id": 864,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025439863093197346,
+          "teacher_rmse_vs_era5": 0.002093419898301363,
+          "degradation_pct_vs_teacher": 21.52298310453478
+        },
+        "msl": {
+          "student_rmse_vs_era5": 217.40737915039062,
+          "teacher_rmse_vs_era5": 231.39517211914062,
+          "degradation_pct_vs_teacher": -6.044980472430934
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4873549938201904,
+          "teacher_rmse_vs_era5": 2.8283169269561768,
+          "degradation_pct_vs_teacher": 23.301422149082416
+        }
+      }
+    },
+    {
+      "sample_index": 109,
+      "lead_hours": 6,
+      "init_id": 872,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002679322613403201,
+          "teacher_rmse_vs_era5": 0.0021822997368872166,
+          "degradation_pct_vs_teacher": 22.775188399414226
+        },
+        "msl": {
+          "student_rmse_vs_era5": 204.63406372070312,
+          "teacher_rmse_vs_era5": 222.9932403564453,
+          "degradation_pct_vs_teacher": -8.233064197998027
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.612959146499634,
+          "teacher_rmse_vs_era5": 2.838625431060791,
+          "degradation_pct_vs_teacher": 27.278474537920108
+        }
+      }
+    },
+    {
+      "sample_index": 110,
+      "lead_hours": 6,
+      "init_id": 880,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002700752578675747,
+          "teacher_rmse_vs_era5": 0.0021788603626191616,
+          "degradation_pct_vs_teacher": 23.95253156238199
+        },
+        "msl": {
+          "student_rmse_vs_era5": 229.7763214111328,
+          "teacher_rmse_vs_era5": 243.587158203125,
+          "degradation_pct_vs_teacher": -5.669772123403757
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5048930644989014,
+          "teacher_rmse_vs_era5": 2.8124754428863525,
+          "degradation_pct_vs_teacher": 24.61950817611204
+        }
+      }
+    },
+    {
+      "sample_index": 111,
+      "lead_hours": 6,
+      "init_id": 888,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002710730768740177,
+          "teacher_rmse_vs_era5": 0.0022423574700951576,
+          "degradation_pct_vs_teacher": 20.88753933712199
+        },
+        "msl": {
+          "student_rmse_vs_era5": 232.05422973632812,
+          "teacher_rmse_vs_era5": 238.50906372070312,
+          "degradation_pct_vs_teacher": -2.7063264949686294
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4063615798950195,
+          "teacher_rmse_vs_era5": 2.873929738998413,
+          "degradation_pct_vs_teacher": 18.526265053444316
+        }
+      }
+    },
+    {
+      "sample_index": 112,
+      "lead_hours": 6,
+      "init_id": 896,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002473540836945176,
+          "teacher_rmse_vs_era5": 0.0020615074317902327,
+          "degradation_pct_vs_teacher": 19.986995865308607
+        },
+        "msl": {
+          "student_rmse_vs_era5": 242.33108520507812,
+          "teacher_rmse_vs_era5": 240.0702667236328,
+          "degradation_pct_vs_teacher": 0.9417319821816796
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.5450527667999268,
+          "teacher_rmse_vs_era5": 2.8549554347991943,
+          "degradation_pct_vs_teacher": 24.171912583611693
+        }
+      }
+    },
+    {
+      "sample_index": 113,
+      "lead_hours": 6,
+      "init_id": 904,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025304013397544622,
+          "teacher_rmse_vs_era5": 0.0020257686264812946,
+          "degradation_pct_vs_teacher": 24.910678676552564
+        },
+        "msl": {
+          "student_rmse_vs_era5": 225.8777313232422,
+          "teacher_rmse_vs_era5": 233.16136169433594,
+          "degradation_pct_vs_teacher": -3.123858223405927
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.3747005462646484,
+          "teacher_rmse_vs_era5": 2.910991668701172,
+          "degradation_pct_vs_teacher": 15.92958449690014
+        }
+      }
+    },
+    {
+      "sample_index": 114,
+      "lead_hours": 6,
+      "init_id": 912,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002566827926784754,
+          "teacher_rmse_vs_era5": 0.0021143010817468166,
+          "degradation_pct_vs_teacher": 21.40314115830956
+        },
+        "msl": {
+          "student_rmse_vs_era5": 246.2644500732422,
+          "teacher_rmse_vs_era5": 240.0661163330078,
+          "degradation_pct_vs_teacher": 2.581927776778108
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.750152587890625,
+          "teacher_rmse_vs_era5": 2.920778512954712,
+          "degradation_pct_vs_teacher": 28.395651065540857
+        }
+      }
+    },
+    {
+      "sample_index": 115,
+      "lead_hours": 6,
+      "init_id": 920,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025082260835915804,
+          "teacher_rmse_vs_era5": 0.002109719440340996,
+          "degradation_pct_vs_teacher": 18.88908238842287
+        },
+        "msl": {
+          "student_rmse_vs_era5": 245.98486328125,
+          "teacher_rmse_vs_era5": 252.5161590576172,
+          "degradation_pct_vs_teacher": -2.5864862671528783
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.7488138675689697,
+          "teacher_rmse_vs_era5": 2.9143178462982178,
+          "degradation_pct_vs_teacher": 28.634351683044226
+        }
+      }
+    },
+    {
+      "sample_index": 116,
+      "lead_hours": 6,
+      "init_id": 928,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027840088587254286,
+          "teacher_rmse_vs_era5": 0.0022306577302515507,
+          "degradation_pct_vs_teacher": 24.806635324168564
+        },
+        "msl": {
+          "student_rmse_vs_era5": 230.80340576171875,
+          "teacher_rmse_vs_era5": 239.68939208984375,
+          "degradation_pct_vs_teacher": -3.707292279665939
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.8215556144714355,
+          "teacher_rmse_vs_era5": 2.991586446762085,
+          "degradation_pct_vs_teacher": 27.743445910034115
+        }
+      }
+    },
+    {
+      "sample_index": 117,
+      "lead_hours": 6,
+      "init_id": 936,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002530433004721999,
+          "teacher_rmse_vs_era5": 0.0019910847768187523,
+          "degradation_pct_vs_teacher": 27.08815989065962
+        },
+        "msl": {
+          "student_rmse_vs_era5": 224.5785675048828,
+          "teacher_rmse_vs_era5": 240.0919189453125,
+          "degradation_pct_vs_teacher": -6.4614217373818725
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.774867057800293,
+          "teacher_rmse_vs_era5": 2.8964462280273438,
+          "degradation_pct_vs_teacher": 30.327537976467365
+        }
+      }
+    },
+    {
+      "sample_index": 118,
+      "lead_hours": 6,
+      "init_id": 944,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0027828540187329054,
+          "teacher_rmse_vs_era5": 0.002280039479956031,
+          "degradation_pct_vs_teacher": 22.05288738186985
+        },
+        "msl": {
+          "student_rmse_vs_era5": 199.18838500976562,
+          "teacher_rmse_vs_era5": 225.70799255371094,
+          "degradation_pct_vs_teacher": -11.749520805132558
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.341461420059204,
+          "teacher_rmse_vs_era5": 2.8428003787994385,
+          "degradation_pct_vs_teacher": 17.54119089678602
+        }
+      }
+    },
+    {
+      "sample_index": 119,
+      "lead_hours": 6,
+      "init_id": 952,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025845638010650873,
+          "teacher_rmse_vs_era5": 0.0021064181346446276,
+          "degradation_pct_vs_teacher": 22.699465911174723
+        },
+        "msl": {
+          "student_rmse_vs_era5": 224.72145080566406,
+          "teacher_rmse_vs_era5": 254.5760955810547,
+          "degradation_pct_vs_teacher": -11.72719878009331
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.484189987182617,
+          "teacher_rmse_vs_era5": 2.889127016067505,
+          "degradation_pct_vs_teacher": 20.596635862866076
+        }
+      }
+    },
+    {
+      "sample_index": 120,
+      "lead_hours": 6,
+      "init_id": 960,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002759594237431884,
+          "teacher_rmse_vs_era5": 0.002211411949247122,
+          "degradation_pct_vs_teacher": 24.78879108758508
+        },
+        "msl": {
+          "student_rmse_vs_era5": 228.01576232910156,
+          "teacher_rmse_vs_era5": 247.79437255859375,
+          "degradation_pct_vs_teacher": -7.981864166352412
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.615056276321411,
+          "teacher_rmse_vs_era5": 2.874673843383789,
+          "degradation_pct_vs_teacher": 25.755354286248878
+        }
+      }
+    },
+    {
+      "sample_index": 121,
+      "lead_hours": 6,
+      "init_id": 968,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025998312048614025,
+          "teacher_rmse_vs_era5": 0.0021114866249263287,
+          "degradation_pct_vs_teacher": 23.127997789335396
+        },
+        "msl": {
+          "student_rmse_vs_era5": 240.32923889160156,
+          "teacher_rmse_vs_era5": 258.1781005859375,
+          "degradation_pct_vs_teacher": -6.913391048205788
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6173014640808105,
+          "teacher_rmse_vs_era5": 2.8299098014831543,
+          "degradation_pct_vs_teacher": 27.823913758134083
+        }
+      }
+    },
+    {
+      "sample_index": 122,
+      "lead_hours": 6,
+      "init_id": 976,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025066626258194447,
+          "teacher_rmse_vs_era5": 0.0020490456372499466,
+          "degradation_pct_vs_teacher": 22.33317698007314
+        },
+        "msl": {
+          "student_rmse_vs_era5": 247.45123291015625,
+          "teacher_rmse_vs_era5": 270.11114501953125,
+          "degradation_pct_vs_teacher": -8.389106679673104
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.3562171459198,
+          "teacher_rmse_vs_era5": 2.841031789779663,
+          "degradation_pct_vs_teacher": 18.133741339800075
+        }
+      }
+    },
+    {
+      "sample_index": 123,
+      "lead_hours": 6,
+      "init_id": 984,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002849631244316697,
+          "teacher_rmse_vs_era5": 0.0022022873163223267,
+          "degradation_pct_vs_teacher": 29.394163204617268
+        },
+        "msl": {
+          "student_rmse_vs_era5": 241.00177001953125,
+          "teacher_rmse_vs_era5": 258.75634765625,
+          "degradation_pct_vs_teacher": -6.86150419015234
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.2703263759613037,
+          "teacher_rmse_vs_era5": 2.9188027381896973,
+          "degradation_pct_vs_teacher": 12.04341880224591
+        }
+      }
+    },
+    {
+      "sample_index": 124,
+      "lead_hours": 6,
+      "init_id": 992,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0025856196880340576,
+          "teacher_rmse_vs_era5": 0.0020017398055642843,
+          "degradation_pct_vs_teacher": 29.168620259573615
+        },
+        "msl": {
+          "student_rmse_vs_era5": 209.50877380371094,
+          "teacher_rmse_vs_era5": 247.33746337890625,
+          "degradation_pct_vs_teacher": -15.294363036805311
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.199723482131958,
+          "teacher_rmse_vs_era5": 2.877854347229004,
+          "degradation_pct_vs_teacher": 11.184344169915056
+        }
+      }
+    },
+    {
+      "sample_index": 125,
+      "lead_hours": 6,
+      "init_id": 1000,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0024029032792896032,
+          "teacher_rmse_vs_era5": 0.0019414637936279178,
+          "degradation_pct_vs_teacher": 23.76760705897153
+        },
+        "msl": {
+          "student_rmse_vs_era5": 230.81678771972656,
+          "teacher_rmse_vs_era5": 265.33123779296875,
+          "degradation_pct_vs_teacher": -13.008061304931212
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.342041254043579,
+          "teacher_rmse_vs_era5": 2.9835593700408936,
+          "degradation_pct_vs_teacher": 12.0152421836262
+        }
+      }
+    },
+    {
+      "sample_index": 126,
+      "lead_hours": 6,
+      "init_id": 1008,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.0023993735667318106,
+          "teacher_rmse_vs_era5": 0.0019626105204224586,
+          "degradation_pct_vs_teacher": 22.254188580184376
+        },
+        "msl": {
+          "student_rmse_vs_era5": 231.95870971679688,
+          "teacher_rmse_vs_era5": 256.7575988769531,
+          "degradation_pct_vs_teacher": -9.658483047288781
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.4290096759796143,
+          "teacher_rmse_vs_era5": 2.9764578342437744,
+          "degradation_pct_vs_teacher": 15.204376038164815
+        }
+      }
+    },
+    {
+      "sample_index": 127,
+      "lead_hours": 6,
+      "init_id": 1016,
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.002435322618111968,
+          "teacher_rmse_vs_era5": 0.002059697173535824,
+          "degradation_pct_vs_teacher": 18.236925767651496
+        },
+        "msl": {
+          "student_rmse_vs_era5": 216.7803955078125,
+          "teacher_rmse_vs_era5": 256.0176696777344,
+          "degradation_pct_vs_teacher": -15.326002388550881
+        },
+        "2t": {
+          "student_rmse_vs_era5": 3.6978018283843994,
+          "teacher_rmse_vs_era5": 3.0209295749664307,
+          "degradation_pct_vs_teacher": 22.406091788005032
+        }
+      }
+    }
+  ]
+}

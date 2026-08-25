@@ -1,7 +1,45 @@
+# Track B — LapAI student (global CNN + staged distillation)
+#
+# Teacher (Track A accepted K1): models/teacher_pruned.ckpt
+#   Cassava: trackA_prune_k1_from_a1bplus_runs/.../f52c98d7-4530-49d4-a230-309fa005e92a/inference-last.ckpt
+# See reports/TRACKA_REPORT.md and reports/TRACKB_START.md.
+#
+# Driver:
+#   python training/train_student.py --config configs/student_global.yaml
+#   python training/train_student.py --config configs/student_global.yaml --cache <zarr> --device cuda
+
 lat: 181
 lon: 360
 base_channels: 256
 stages: [2, 3, 3]
-epochs_stage_a_only: 10
-epoch_start_feature_loss: 11
-epoch_start_spectral_loss: 16
+
+# v3: continue from v2 with channel-weighted L_A (up-weight tp/2t; down-weight msl)
+# Keep β/γ off. Prefer T=256 cache when present.
+epochs: 80
+epochs_stage_a_only: 80
+epoch_start_feature_loss: 999
+epoch_start_spectral_loss: 999
+beta_ramp_epochs: 1
+gamma_ramp_epochs: 1
+grad_clip: 1.0
+normalize_targets: true
+physical_constraints: true
+
+# Cout order: tp, msl, 2t
+channel_weights: [3.0, 0.4, 3.0]
+
+resume: models/student_global_stable_v2.ckpt
+
+# Explicit Track A → Track B handoff (K1 pruned teacher)
+teacher_ckpt: models/teacher_pruned.ckpt
+distill_config: configs/student_distill.yaml
+
+# Prefer expanded cache when present (T≥256); else T=128.
+# cache: data/processed/lapai/teacher_k1_cache_t256.zarr
+
+output_ckpt: models/student_global_stable_v3.ckpt
+
+notes: >-
+  Accept K1 teacher; do not start A2 round 2. Stable v3: resume v2, L_A-only,
+  channel_weights [3,0.4,3] on tp/msl/2t, ~80 epochs on T=256 cache to push
+  2t/tp toward ≤15% after v2 gate 21.1 / -6.6 / 30.2%.
