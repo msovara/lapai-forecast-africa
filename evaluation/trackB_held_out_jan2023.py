@@ -8,11 +8,13 @@ Protocol (honest MVP; see caveats in output JSON):
    at leads ``{6,24,72,120,240}`` h for vars available in those files
    (``t2m, tp, u10, v10``). This is the multi-lead reference table.
 
-2. **Student held-out analysis-forced** (optional ``--student_ckpt``): CDS ERA5 IC
+2. **Student held-out analysis-forced** (optional ``--student_ckpt``): ERA5 IC
    → 65-ch 1° state → student predicts ``tp/msl/2t``; score ``tp`` and ``2t``
    (as t2m) on the Africa eval box vs GCS and vs K1 at matching lead(s).
    Default student leads: ``6`` (IC at init 00Z). Optional ``6,24`` uses IC at
    init+(lead−6)h so each step remains a one-step +6h prediction (not free-run).
+   IC source (``--ic_source``): ``auto`` tries CDS GRIB cache then public ARCO
+   ERA5 (no live CDS); ``arco`` forces ARCO; ``cds`` forces CDS cache/API.
 
 Not PLAN-complete: no z500/t850 student heads; no free-running multi-day student
 rollout (Cout=3 cannot close the 65-ch state); msl has no GCS truth stem in this
@@ -23,11 +25,11 @@ Usage::
   # Teacher multi-lead only (CPU / laptop OK if GCS ADC works):
   python -u evaluation/trackB_held_out_jan2023.py
 
-  # + student analysis-forced on Cassava GPU1:
+  # + student analysis-forced on Cassava GPU1 (ARCO IC, no CDS):
   CUDA_VISIBLE_DEVICES=1 MKL_INTERFACE_LAYER=GNU \\
     python -u evaluation/trackB_held_out_jan2023.py \\
       --student_ckpt models/student_global_stable_v5.ckpt --device cuda \\
-      --student_leads 6,24 --allow_download
+      --student_leads 6,24 --ic_source arco --skip_teacher
 """
 
 from __future__ import annotations
@@ -61,6 +63,12 @@ from evaluation.phase0_scorecard import (  # noqa: E402
     forecast_step_and_valid_time,
 )
 from utils.cds_ic import AIFS_AFRICA_CACHE_DIR  # noqa: E402
+from utils.era5_ondisk_ic import (  # noqa: E402
+    ARCO_DEFAULT,
+    DEFAULT_STATE_CACHE,
+    build_student_state_from_ondisk,
+    prefetch_arco_student_states,
+)
 
 DEFAULT_INITS = ("20230101", "20230108", "20230115", "20230122", "20230129")
 # PLAN §5.4 leads plus 6h (student native / first forecast step).
@@ -197,6 +205,70 @@ def _n320_to_latlon1deg(
     return interp(query).reshape(lat_t.size, lon_t.size).astype(np.float32)
 
 
+def build_student_state(
+    init_yyyymmdd: str,
+    *,
+    ic_source: str,
+    cache_dir: Path,
+    n320_latlon_path: Path,
+    allow_download: bool = False,
+    init_hhmm: str = "0000",
+    arco_path: str = ARCO_DEFAULT,
+    state_cache_dir: Path | None = None,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Build 65-ch student IC from CDS cache and/or on-disk ARCO ERA5."""
+    src = (ic_source or "auto").lower()
+    state_cache = Path(state_cache_dir or (_REPO_ROOT / DEFAULT_STATE_CACHE))
+
+    if src == "arco":
+        return build_student_state_from_ondisk(
+            init_yyyymmdd,
+            init_hhmm,
+            arco_path=arco_path,
+            state_cache_dir=state_cache,
+        )
+
+    if src == "cds":
+        state, meta = build_student_state_from_cds(
+            init_yyyymmdd,
+            cache_dir=cache_dir,
+            n320_latlon_path=n320_latlon_path,
+            allow_download=allow_download,
+            init_hhmm=init_hhmm,
+        )
+        meta = dict(meta)
+        meta["ic_source"] = "cds_era5" if allow_download else "cds_era5_cache"
+        return state, meta
+
+    if src != "auto":
+        raise ValueError(f"ic_source must be auto|cds|arco, got {ic_source}")
+
+    # auto: CDS GRIB cache (no download) → ARCO / local npy
+    try:
+        state, meta = build_student_state_from_cds(
+            init_yyyymmdd,
+            cache_dir=cache_dir,
+            n320_latlon_path=n320_latlon_path,
+            allow_download=False,
+            init_hhmm=init_hhmm,
+        )
+        meta = dict(meta)
+        meta["ic_source"] = "cds_era5_cache"
+        return state, meta
+    except Exception as exc:
+        print(
+            f"[ic] CDS cache miss for {init_yyyymmdd} {init_hhmm} ({exc}); "
+            "falling back to ARCO/on-disk",
+            flush=True,
+        )
+        return build_student_state_from_ondisk(
+            init_yyyymmdd,
+            init_hhmm,
+            arco_path=arco_path,
+            state_cache_dir=state_cache,
+        )
+
+
 def build_student_state_from_cds(
     init_yyyymmdd: str,
     *,
@@ -297,6 +369,9 @@ def score_student_6h(
     allow_download: bool,
     student_forecast_dir: Path | None = None,
     student_leads: tuple[int, ...] = (6,),
+    ic_source: str = "auto",
+    arco_path: str = ARCO_DEFAULT,
+    state_cache_dir: Path | None = None,
 ) -> list[dict[str, Any]]:
     """Analysis-forced student skill at one or more leads (each is a +6h one-step).
 
@@ -314,6 +389,29 @@ def score_student_6h(
     if student_forecast_dir is not None:
         student_forecast_dir.mkdir(parents=True, exist_ok=True)
 
+    # Prefetch ARCO ICs once when needed (18Z etc. not in CDS cache).
+    ic_prefetched: dict[tuple[str, str], tuple[np.ndarray, dict[str, Any]]] = {}
+    if ic_source in ("arco", "auto"):
+        specs: list[tuple[str, str]] = []
+        for init in inits:
+            for lead in student_leads:
+                try:
+                    specs.append(_ic_datetime_for_lead(init, lead))
+                except ValueError:
+                    continue
+        # Deduplicate
+        uniq = sorted(set(specs))
+        if ic_source == "arco":
+            print(f"[ic] prefetching {len(uniq)} ARCO ICs", flush=True)
+            ic_prefetched = prefetch_arco_student_states(
+                uniq,
+                arco_path=arco_path,
+                state_cache_dir=state_cache_dir,
+            )
+        else:
+            # auto: only prefetch times that miss CDS cache (probe lazily below)
+            pass
+
     for init in inits:
         fc_path = forecast_dir / f"{init}_00Z.nc"
         if not fc_path.is_file():
@@ -324,19 +422,28 @@ def score_student_6h(
             for lead in student_leads:
                 try:
                     ic_date, ic_hhmm = _ic_datetime_for_lead(init, lead)
-                    state, state_meta = build_student_state_from_cds(
-                        ic_date,
-                        cache_dir=cds_cache,
-                        n320_latlon_path=n320_latlon_path,
-                        allow_download=allow_download,
-                        init_hhmm=ic_hhmm,
-                    )
+                    key = (ic_date, ic_hhmm)
+                    if key in ic_prefetched:
+                        state, state_meta = ic_prefetched[key]
+                    else:
+                        state, state_meta = build_student_state(
+                            ic_date,
+                            ic_source=ic_source,
+                            cache_dir=cds_cache,
+                            n320_latlon_path=n320_latlon_path,
+                            allow_download=allow_download,
+                            init_hhmm=ic_hhmm,
+                            arco_path=arco_path,
+                            state_cache_dir=state_cache_dir,
+                        )
+                        if state_meta.get("ic_source", "").startswith("arco"):
+                            ic_prefetched[key] = (state, state_meta)
                 except Exception as exc:  # noqa: BLE001
                     results.append(
                         {
                             "init_date": init,
                             "lead_hours": lead,
-                            "error": f"CDS/state build failed: {exc}",
+                            "error": f"IC/state build failed: {exc}",
                         }
                     )
                     print(f"[student] {init} +{lead}h state fail: {exc}", flush=True)
@@ -452,6 +559,7 @@ def score_student_6h(
                     )
                     ds_out.attrs["reference_time"] = f"{init} 00:00:00"
                     ds_out.attrs["ic_time"] = f"{ic_date} {ic_hhmm}"
+                    ds_out.attrs["ic_source"] = str(state_meta.get("ic_source", ic_source))
                     ds_out.attrs["checkpoint"] = str(ckpt)
                     ds_out.attrs["protocol"] = "analysis_forced_6h_step"
                     ds_out.to_netcdf(out_nc)
@@ -570,7 +678,7 @@ def main() -> None:
         "--student_ckpt",
         type=Path,
         default=None,
-        help="If set, also score student analysis-forced leads from CDS IC cache",
+        help="If set, also score student analysis-forced leads from ERA5 IC (CDS cache and/or ARCO)",
     )
     p.add_argument(
         "--student_leads",
@@ -581,6 +689,24 @@ def main() -> None:
     )
     p.add_argument("--device", default=None, help="cuda/cpu for student; default auto")
     p.add_argument("--cds_cache", type=Path, default=Path(AIFS_AFRICA_CACHE_DIR))
+    p.add_argument(
+        "--ic_source",
+        choices=("auto", "cds", "arco"),
+        default="auto",
+        help="Student IC builder: auto=CDS GRIB cache then ARCO; arco=public ARCO ERA5; "
+        "cds=CDS cache/API only",
+    )
+    p.add_argument(
+        "--arco_path",
+        default=ARCO_DEFAULT,
+        help="ARCO ERA5 zarr URL/path for --ic_source arco|auto fallback",
+    )
+    p.add_argument(
+        "--state_cache_dir",
+        type=Path,
+        default=_REPO_ROOT / DEFAULT_STATE_CACHE,
+        help="Local npy cache for ARCO-built 65-ch states",
+    )
     p.add_argument(
         "--n320_latlon",
         type=Path,
@@ -616,6 +742,8 @@ def main() -> None:
         "forecast_dir": str(args.forecast_dir),
         "domain": "africa",
         "truth_source": "gcs://code4earth/era5",
+        "ic_source": args.ic_source,
+        "arco_path": args.arco_path if args.ic_source in ("auto", "arco") else None,
         "leads_hours": list(leads),
         "student_leads_hours": list(student_leads),
         "teacher_variables": list(TEACHER_VARS),
@@ -626,6 +754,7 @@ def main() -> None:
             "Student multi-lead (if requested) is analysis-forced: each lead is a fresh ERA5 IC + one +6h step.",
             "msl not scored held-out (no GCS truth stem in Mvua protocol; teacher forecast NCs lack msl).",
             "MVP cache gate accepted with documented tp soft-fail (21.2% > 15%); this protocol is off-cache Jan-2023.",
+            "IC path can use public ARCO ERA5 (no CDS) when CDS GRIB cache lacks 18Z / other times.",
         ],
         "teacher_results": [],
         "student_results": [],
@@ -650,7 +779,7 @@ def main() -> None:
 
             print(
                 f"[heldout] scoring student analysis-forced leads={student_leads} "
-                f"ckpt={args.student_ckpt}",
+                f"ckpt={args.student_ckpt} ic_source={args.ic_source}",
                 flush=True,
             )
             dev = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -666,6 +795,9 @@ def main() -> None:
                 allow_download=args.allow_download,
                 student_forecast_dir=args.student_forecast_dir,
                 student_leads=student_leads,
+                ic_source=args.ic_source,
+                arco_path=args.arco_path,
+                state_cache_dir=args.state_cache_dir,
             )
             report["aggregate"]["student"] = _aggregate_student(
                 report["student_results"], leads=student_leads

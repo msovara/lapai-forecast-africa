@@ -184,14 +184,31 @@ Global: tp +22.1% fail; msl −18.1% pass; 2t −63.5% pass (same soft-fail patt
 ### Multi-lead / free-run progress (secondary)
 
 - **Implemented:** analysis-forced multi-lead path via `--student_leads` (e.g. `6,24`): each lead = ERA5 IC at `init+(lead−6)h` + one +6h step. Aggregates include ACC/POD by lead.
-- **Ran:** +6h on Cassava GPU1 (CDS 00Z cache hits).
-- **+24h blocked:** needs 18Z CDS ICs; Cassava lack of working CDS auth (`.cdsapirc`) / prior missing `cdsapi`. Code path ready; not scored.
+- **Ran:** +6h and **+24h** on Cassava GPU1 with **public ARCO ERA5 ICs** (no live CDS).
+- **CDS bypass (option 2):** `utils/era5_ondisk_ic.py` builds the same 65-ch 1° student state from `gs://gcp-public-data-arco-era5/...` (anon). `--ic_source auto` tries CDS GRIB cache then ARCO; `--ic_source arco` forces ARCO. Local npy cache: `data/cache/student_ic_arco/`.
+- **+24h unblock:** 18Z CDS GRIBs were MISS on Cassava (no `.cdsapirc`); ARCO supplies 18Z pressure-level fields without CDS.
 - **Free-run:** **not supported** — student Cout=`tp/msl/2t` cannot update 65-ch state. Do **not** claim PLAN multi-day free-run or z500/t850 compliance.
+
+### Held-out analysis-forced multi-lead (v5, ARCO IC, ARCO surface truth)
+
+Protocol: analysis-forced only. IC at `init+(L−6)h` → one +6h step. Surface truth for student/K1 comparison: public ARCO ERA5 (code4earth ADC unavailable on Cassava for this run). Teacher multi-lead table retained from prior code4earth scoring.
+
+| lead | var | student RMSE | K1 RMSE | deg vs K1 | student ACC | K1 ACC |
+|------|-----|--------------|---------|-----------|-------------|--------|
+| 6 h  | t2m | **1.415** | 1.214 | **+16.6%** | **0.977** | 0.983 |
+| 6 h  | tp  | 0.000389 | 0.001322 | −70.0%* | ≈0 | 0.518 |
+| 24 h | t2m | **2.913** | 1.475 | **+97.5%** | **0.904** | 0.973 |
+| 24 h | tp  | 0.000358 | 0.000507 | −26.8%* | ≈0 | 0.415 |
+
+\*tp still all-dry (POD₁ₘₘ=0) — out-of-scope; do not read as precip skill.
 
 ### Artifacts (v5)
 
-- Reports: `TRACKB_GATE_V5.json`, `TRACKB_HELD_OUT_JAN2023_V5.json`, `TRACKB_HELD_OUT_JAN2023_V5_MERGED.json`, `TRACKB_HELD_OUT_JAN2023_V5_L24.json`, scorecards `TRACKB_STUDENT_SCORECARD_V5*.json`
+- Reports: `TRACKB_GATE_V5.json`, `TRACKB_HELD_OUT_JAN2023_V5.json`, `TRACKB_HELD_OUT_JAN2023.json` (canonical ARCO multi-lead), `TRACKB_HELD_OUT_JAN2023_V5_L24.json` (prior CDS-fail), scorecards `TRACKB_STUDENT_SCORECARD_V5*.json`
+- IC path: `utils/era5_ondisk_ic.py`; `--ic_source {auto,cds,arco}` on `evaluation/trackB_held_out_jan2023.py`
+- Launch/rescore: `scripts/run_trackB_held_out_arco_l6_24_cassava.sh`, `scripts/rescore_trackB_held_out_arco.py`
 - Config: `configs/student_global_v5.yaml`
 - Train/eval: `scripts/run_trackB_stable_v5.sh`, `run_trackB_v5_post_eval.sh`, `run_trackB_v5_pipeline.sh`, `run_trackB_v5_multilead24.sh`, `merge_trackB_held_out_v5.py`
 - Cassava forecasts (not in git): `data/processed/trackB_student_heldout_v5/forecasts/`
+- Cassava IC npy cache (not in git): `data/cache/student_ic_arco/`
 

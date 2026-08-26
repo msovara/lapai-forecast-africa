@@ -1,35 +1,855 @@
 {
   "protocol": "trackB_held_out_jan2023",
-  "timestamp_utc": "2026-08-25T20:20:09.366601+00:00",
-  "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
-  "candidate_student": "models/student_global_stable_v3.ckpt",
-  "forecast_dir": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts",
+  "timestamp_utc": "2026-08-26T16:17:41.831161+00:00",
+  "candidate_student": "models/student_global_stable_v5.ckpt",
   "domain": "africa",
-  "truth_source": "gcs://code4earth/era5",
-  "leads_hours": [
+  "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+  "ic_source": "arco_era5",
+  "student_leads_hours": [
     6,
-    24,
-    72,
-    120,
-    240
-  ],
-  "teacher_variables": [
-    "t2m",
-    "tp",
-    "u10",
-    "v10"
+    24
   ],
   "student_variables_scored": [
     "tp",
     "t2m"
   ],
   "caveats": [
-    "Student MVP outputs tp/msl/2t only \u2014 no z500/t850 heads; PLAN Week-9 skill table incomplete.",
-    "Student has no free-running multi-day rollout (65\u21923 channel heads); multi-lead table is K1-only.",
-    "Student held-out comparison is analysis-forced 6h one-step from CDS ERA5 ICs (Jan 2023 weekly 00Z).",
-    "msl not scored held-out (no GCS truth stem in Mvua protocol; teacher forecast NCs lack msl).",
-    "MVP cache gate accepted with documented tp soft-fail (21.2% > 15%); this protocol is off-cache Jan-2023."
+    "Analysis-forced multi-lead only (not free-run).",
+    "Student IC from public ARCO ERA5 pressure levels (no CDS).",
+    "Surface truth for scoring also from public ARCO ERA5 (code4earth ADC unavailable on Cassava).",
+    "tp out-of-scope for Track B promotion decisions; t2m is primary."
   ],
+  "student_results": [
+    {
+      "model": "student",
+      "init_date": "20230101",
+      "lead_hours": 6,
+      "valid_time": "2023-01-01T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230101_00Z.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0010506743817610613,
+          "student_rmse_vs_era5": 0.00030577616950449205,
+          "student_acc": -0.008428518568026963,
+          "teacher_rmse_vs_era5": 0.0009122655709944888,
+          "teacher_acc": 0.5220976661721064,
+          "degradation_pct_vs_teacher": -66.48167165059665,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.7673107890499195
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.2788370130470992,
+          "student_rmse_vs_era5": 1.459322048987103,
+          "student_acc": 0.9729326318724496,
+          "teacher_rmse_vs_era5": 1.2082040712452173,
+          "teacher_acc": 0.9814054096009156,
+          "degradation_pct_vs_teacher": 20.78440089041206
+        }
+      },
+      "state_meta": {
+        "init_date": "20230101",
+        "init_time": "0000",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-01T00:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230101_00Z_L024h.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0003733995345352232,
+          "student_rmse_vs_era5": 0.00034389149662088556,
+          "student_acc": -0.010455279961876245,
+          "teacher_rmse_vs_era5": 0.0003853316291779199,
+          "teacher_acc": 0.3802166098559851,
+          "degradation_pct_vs_teacher": -10.754407222019163,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.4894278606965174
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 2.9706809234018277,
+          "student_rmse_vs_era5": 2.779335306373925,
+          "student_acc": 0.9056056460790235,
+          "teacher_rmse_vs_era5": 1.465614269107766,
+          "teacher_acc": 0.9710535006981728,
+          "degradation_pct_vs_teacher": 89.63620680807944
+        }
+      },
+      "state_meta": {
+        "init_date": "20230101",
+        "init_time": "1800",
+        "ic_source": "arco_era5",
+        "cache_path": "/local/Mthetho/lapai-forecast/data/cache/student_ic_arco/state_20230101_1800_65x181x360.npy",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-01T18:00:00.000000000",
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230108",
+      "lead_hours": 6,
+      "valid_time": "2023-01-08T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230108_00Z.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.001717836858799743,
+          "student_rmse_vs_era5": 0.0004075080977225053,
+          "student_acc": 0.003563928103305506,
+          "teacher_rmse_vs_era5": 0.0015394912360831231,
+          "teacher_acc": 0.4808446081903084,
+          "degradation_pct_vs_teacher": -73.52969031773675,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.8115680072300046
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.304120392349729,
+          "student_rmse_vs_era5": 1.3934411216861127,
+          "student_acc": 0.9762139491927732,
+          "teacher_rmse_vs_era5": 1.181527974448449,
+          "teacher_acc": 0.9827258979324935,
+          "degradation_pct_vs_teacher": 17.935516705525924
+        }
+      },
+      "state_meta": {
+        "init_date": "20230108",
+        "init_time": "0000",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-08T00:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "valid_time": "2023-01-09T00:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230108_00Z_L024h.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0004795956074790845,
+          "student_rmse_vs_era5": 0.0003406243391223907,
+          "student_acc": 0.0023895927933075445,
+          "teacher_rmse_vs_era5": 0.0004378487044484358,
+          "teacher_acc": 0.4106626685471462,
+          "degradation_pct_vs_teacher": -22.20501381830512,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.5657894736842105
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 2.8311730732935434,
+          "student_rmse_vs_era5": 2.7135983167290125,
+          "student_acc": 0.909811129199051,
+          "teacher_rmse_vs_era5": 1.4352250079746445,
+          "teacher_acc": 0.9719791236483413,
+          "degradation_pct_vs_teacher": 89.07128162143566
+        }
+      },
+      "state_meta": {
+        "init_date": "20230108",
+        "init_time": "1800",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-08T18:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230115",
+      "lead_hours": 6,
+      "valid_time": "2023-01-15T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230115_00Z.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0009918627742738007,
+          "student_rmse_vs_era5": 0.0002796760111286005,
+          "student_acc": -0.0044524972600265365,
+          "teacher_rmse_vs_era5": 0.0008946423566101703,
+          "teacher_acc": 0.3986970103708126,
+          "degradation_pct_vs_teacher": -68.73879164537858,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.6850828729281768
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.2210679170601377,
+          "student_rmse_vs_era5": 1.3302985162133063,
+          "student_acc": 0.9797097172696086,
+          "teacher_rmse_vs_era5": 1.1532434815760202,
+          "teacher_acc": 0.9847923347103241,
+          "degradation_pct_vs_teacher": 15.352788675234745
+        }
+      },
+      "state_meta": {
+        "init_date": "20230115",
+        "init_time": "0000",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-15T00:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "valid_time": "2023-01-16T00:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230115_00Z_L024h.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0004344304749789819,
+          "student_rmse_vs_era5": 0.0002998620618243743,
+          "student_acc": -0.0038051995227496326,
+          "teacher_rmse_vs_era5": 0.00041691328909810373,
+          "teacher_acc": 0.3170521716750493,
+          "degradation_pct_vs_teacher": -28.075676725715052,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.46153846153846156
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 2.9739252665281,
+          "student_rmse_vs_era5": 2.907012891859922,
+          "student_acc": 0.9034840877679249,
+          "teacher_rmse_vs_era5": 1.4353386523620166,
+          "teacher_acc": 0.9734654479194561,
+          "degradation_pct_vs_teacher": 102.53149924417448
+        }
+      },
+      "state_meta": {
+        "init_date": "20230115",
+        "init_time": "1800",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-15T18:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230122",
+      "lead_hours": 6,
+      "valid_time": "2023-01-22T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230122_00Z.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0019111470292369807,
+          "student_rmse_vs_era5": 0.0004634231732571277,
+          "student_acc": -0.010356655264946179,
+          "teacher_rmse_vs_era5": 0.0016185971680036633,
+          "teacher_acc": 0.6610430453263525,
+          "degradation_pct_vs_teacher": -71.36883824968616,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.8401360544217688
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.3841100659838996,
+          "student_rmse_vs_era5": 1.4291261845481458,
+          "student_acc": 0.9782286784417247,
+          "teacher_rmse_vs_era5": 1.2411892728283154,
+          "teacher_acc": 0.9834605767359184,
+          "degradation_pct_vs_teacher": 15.141680308884393
+        }
+      },
+      "state_meta": {
+        "init_date": "20230122",
+        "init_time": "0000",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-22T00:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "valid_time": "2023-01-23T00:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230122_00Z_L024h.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0007105285408609951,
+          "student_rmse_vs_era5": 0.00041547736742966507,
+          "student_acc": -0.006737338275598319,
+          "teacher_rmse_vs_era5": 0.0005647971120083904,
+          "teacher_acc": 0.5580097149864258,
+          "degradation_pct_vs_teacher": -26.437767014734153,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.7233853006681514
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 3.147317882008023,
+          "student_rmse_vs_era5": 2.9311429130934314,
+          "student_acc": 0.9067289778858639,
+          "teacher_rmse_vs_era5": 1.5372098008336785,
+          "teacher_acc": 0.9727199857542893,
+          "degradation_pct_vs_teacher": 90.67943175380341
+        }
+      },
+      "state_meta": {
+        "init_date": "20230122",
+        "init_time": "1800",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-22T18:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230129",
+      "lead_hours": 6,
+      "valid_time": "2023-01-29T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230129_00Z.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0018692936835450356,
+          "student_rmse_vs_era5": 0.0004909633064648779,
+          "student_acc": 0.005163296723900029,
+          "teacher_rmse_vs_era5": 0.0016434709136577573,
+          "teacher_acc": 0.5251168029640727,
+          "degradation_pct_vs_teacher": -70.12643774922822,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.7358490566037735
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.3569588230053051,
+          "student_rmse_vs_era5": 1.4618898060862673,
+          "student_acc": 0.9789884053964886,
+          "teacher_rmse_vs_era5": 1.286288545042701,
+          "teacher_acc": 0.9839905581974675,
+          "degradation_pct_vs_teacher": 13.651778344783187
+        }
+      },
+      "state_meta": {
+        "init_date": "20230129",
+        "init_time": "0000",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-29T00:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    },
+    {
+      "model": "student",
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "valid_time": "2023-01-30T00:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "protocol": "analysis_forced_6h_step",
+      "truth_source": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+      "forecast_nc": "/local/Mthetho/lapai-forecast/data/processed/trackB_student_heldout_v5/forecasts/20230129_00Z_L024h.nc",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0008337815841230695,
+          "student_rmse_vs_era5": 0.00038970430577802627,
+          "student_acc": 0.015818336452668356,
+          "teacher_rmse_vs_era5": 0.0007277647120511205,
+          "teacher_acc": 0.4090555415072918,
+          "degradation_pct_vs_teacher": -46.451882136509504,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.44640820980615736
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 3.2748103324270903,
+          "student_rmse_vs_era5": 3.2359980654102634,
+          "student_acc": 0.8946980414219179,
+          "teacher_rmse_vs_era5": 1.5013867543144885,
+          "teacher_acc": 0.973916996487035,
+          "degradation_pct_vs_teacher": 115.53394261079472
+        }
+      },
+      "state_meta": {
+        "init_date": "20230129",
+        "init_time": "1800",
+        "ic_source": "arco_era5",
+        "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
+        "arco_time_selected": "2023-01-29T18:00:00.000000000",
+        "state_shape": [
+          65,
+          181,
+          360
+        ],
+        "levels": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          400,
+          500,
+          600,
+          700,
+          850,
+          925,
+          1000
+        ],
+        "variables": [
+          "t",
+          "u",
+          "v",
+          "q",
+          "z"
+        ]
+      }
+    }
+  ],
+  "aggregate": {
+    "student": {
+      "by_lead": {
+        "6": {
+          "tp": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
+            "student_rmse_mean": 0.0003894693516155207,
+            "teacher_rmse_mean": 0.0013216934490698406,
+            "degradation_pct_mean": -70.04908592252528,
+            "student_acc_mean": -0.0029020892531588295,
+            "teacher_acc_mean": 0.5175598266047305,
+            "student_pod_1mm_mean": 0.0,
+            "teacher_pod_1mm_mean": 0.7679893560467286
+          },
+          "t2m": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 1.3090188422892344,
+            "student_rmse_mean": 1.414815535504187,
+            "teacher_rmse_mean": 1.2140906690281406,
+            "degradation_pct_mean": 16.57323298496806,
+            "student_acc_mean": 0.977214676434609,
+            "teacher_acc_mean": 0.9832749554354236
+          }
+        },
+        "24": {
+          "tp": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 0.0005663471483954709,
+            "student_rmse_mean": 0.0003579119141550684,
+            "teacher_rmse_mean": 0.000506531089356794,
+            "degradation_pct_mean": -26.7849493834566,
+            "student_acc_mean": -0.0005579777028496588,
+            "teacher_acc_mean": 0.41499934131437966,
+            "student_pod_1mm_mean": 0.0,
+            "teacher_pod_1mm_mean": 0.5373098612786997
+          },
+          "t2m": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 3.039581495531717,
+            "student_rmse_mean": 2.913417498693311,
+            "teacher_rmse_mean": 1.4749548969185189,
+            "degradation_pct_mean": 97.49047240765753,
+            "student_acc_mean": 0.9040655764707562,
+            "teacher_acc_mean": 0.9726270109014589
+          }
+        }
+      },
+      "tp": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
+        "student_rmse_mean": 0.0003894693516155207,
+        "teacher_rmse_mean": 0.0013216934490698406,
+        "degradation_pct_mean": -70.04908592252528,
+        "student_acc_mean": -0.0029020892531588295,
+        "teacher_acc_mean": 0.5175598266047305,
+        "student_pod_1mm_mean": 0.0,
+        "teacher_pod_1mm_mean": 0.7679893560467286
+      },
+      "t2m": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 1.3090188422892344,
+        "student_rmse_mean": 1.414815535504187,
+        "teacher_rmse_mean": 1.2140906690281406,
+        "degradation_pct_mean": 16.57323298496806,
+        "student_acc_mean": 0.977214676434609,
+        "teacher_acc_mean": 0.9832749554354236
+      }
+    },
+    "teacher": {
+      "6": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 1.2140917768977473,
+          "rmse_std": 0.04635458915962195
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.0013216946285807452,
+          "rmse_std": 0.00034325806373008673
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 1.187995513525654,
+          "rmse_std": 0.09050313102265788
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 1.2699534856703658,
+          "rmse_std": 0.07612372538008376
+        }
+      },
+      "24": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 1.474953813258783,
+          "rmse_std": 0.03952107772470267
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.000506532342333124,
+          "rmse_std": 0.00012631471385637726
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 1.9591185018158406,
+          "rmse_std": 0.16115508871705547
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 2.1311503522903417,
+          "rmse_std": 0.13430876304960995
+        }
+      },
+      "72": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 2.435375410691558,
+          "rmse_std": 0.10590282130538638
+        },
+        "tp": {
+          "n": 4,
+          "rmse_mean": 0.0008059867782805351,
+          "rmse_std": 0.00014333289076716053
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 3.1516163919878717,
+          "rmse_std": 0.157530480141203
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 3.2423903749105945,
+          "rmse_std": 0.13573677784361857
+        }
+      },
+      "120": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 3.091154178184033,
+          "rmse_std": 0.19854496585390746
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.0009934132693975599,
+          "rmse_std": 0.0001011168055132611
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 3.1291199530788427,
+          "rmse_std": 0.24993711474663094
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 3.3817836917529354,
+          "rmse_std": 0.2817017210337072
+        }
+      },
+      "240": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 3.45515859756203,
+          "rmse_std": 0.16698699082393242
+        },
+        "tp": {
+          "n": 4,
+          "rmse_mean": 0.001150669952309278,
+          "rmse_std": 8.063249331871756e-05
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 4.682665417816212,
+          "rmse_std": 0.22116176101988816
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 4.138912015650535,
+          "rmse_std": 0.2697709334423787
+        }
+      }
+    }
+  },
   "teacher_results": [
     {
       "model": "K1_teacher",
@@ -674,333 +1494,13 @@
       }
     }
   ],
-  "student_results": [
-    {
-      "model": "student_v3",
-      "init_date": "20230101",
-      "lead_hours": 6,
-      "valid_time": "2023-01-01T06:00:00.000000000",
-      "ckpt": "models/student_global_stable_v3.ckpt",
-      "state_meta": {
-        "init_date": "20230101",
-        "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
-        "n320_points": 542080,
-        "state_shape": [
-          65,
-          181,
-          360
-        ]
-      },
-      "variables": {
-        "tp": {
-          "student_rmse_vs_era5": 0.00030577645395375063,
-          "student_acc": -0.008428671184656757,
-          "teacher_rmse_vs_era5": 0.0009122671146710834,
-          "teacher_acc": 0.5220949125816312,
-          "degradation_pct_vs_teacher": -66.48169718756135,
-          "student_rmse_vs_teacher_field": 0.0010506743817610613,
-          "student_pod_1mm": 0.0
-        },
-        "t2m": {
-          "student_rmse_vs_era5": 3.2019354789989736,
-          "student_acc": 0.8609838699968998,
-          "teacher_rmse_vs_era5": 1.208202700521498,
-          "teacher_acc": 0.9814054472127651,
-          "degradation_pct_vs_teacher": 165.01641468082454,
-          "student_rmse_vs_teacher_field": 2.926536601357663
-        }
-      },
-      "forecast_nc": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackB_student_heldout\\forecasts\\20230101_00Z.nc"
-    },
-    {
-      "model": "student_v3",
-      "init_date": "20230108",
-      "lead_hours": 6,
-      "valid_time": "2023-01-08T06:00:00.000000000",
-      "ckpt": "models/student_global_stable_v3.ckpt",
-      "state_meta": {
-        "init_date": "20230108",
-        "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
-        "n320_points": 542080,
-        "state_shape": [
-          65,
-          181,
-          360
-        ]
-      },
-      "variables": {
-        "tp": {
-          "student_rmse_vs_era5": 0.00040750801620624956,
-          "student_acc": 0.0035639608122108733,
-          "teacher_rmse_vs_era5": 0.0015394920254390842,
-          "teacher_acc": 0.48084572484398924,
-          "degradation_pct_vs_teacher": -73.52970918507859,
-          "student_rmse_vs_teacher_field": 0.001717836858799743,
-          "student_pod_1mm": 0.0
-        },
-        "t2m": {
-          "student_rmse_vs_era5": 2.9803092341473105,
-          "student_acc": 0.8847710557878732,
-          "teacher_rmse_vs_era5": 1.181533155668847,
-          "teacher_acc": 0.9827257521316815,
-          "degradation_pct_vs_teacher": 152.2408465516319,
-          "student_rmse_vs_teacher_field": 2.581423656031503
-        }
-      },
-      "forecast_nc": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackB_student_heldout\\forecasts\\20230108_00Z.nc"
-    },
-    {
-      "model": "student_v3",
-      "init_date": "20230115",
-      "lead_hours": 6,
-      "valid_time": "2023-01-15T06:00:00.000000000",
-      "ckpt": "models/student_global_stable_v3.ckpt",
-      "state_meta": {
-        "init_date": "20230115",
-        "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
-        "n320_points": 542080,
-        "state_shape": [
-          65,
-          181,
-          360
-        ]
-      },
-      "variables": {
-        "tp": {
-          "student_rmse_vs_era5": 0.00027967727075503817,
-          "student_acc": -0.004453314851964396,
-          "teacher_rmse_vs_era5": 0.0008946444121552882,
-          "teacher_acc": 0.39869702747421143,
-          "degradation_pct_vs_teacher": -68.73872267516123,
-          "student_rmse_vs_teacher_field": 0.0009918627742738007,
-          "student_pod_1mm": 0.0
-        },
-        "t2m": {
-          "student_rmse_vs_era5": 3.2478628537107492,
-          "student_acc": 0.8713870663809381,
-          "teacher_rmse_vs_era5": 1.1532444327898792,
-          "teacher_acc": 0.9847923047423804,
-          "degradation_pct_vs_teacher": 181.62831411669245,
-          "student_rmse_vs_teacher_field": 2.9274310200870364
-        }
-      },
-      "forecast_nc": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackB_student_heldout\\forecasts\\20230115_00Z.nc"
-    },
-    {
-      "model": "student_v3",
-      "init_date": "20230122",
-      "lead_hours": 6,
-      "valid_time": "2023-01-22T06:00:00.000000000",
-      "ckpt": "models/student_global_stable_v3.ckpt",
-      "state_meta": {
-        "init_date": "20230122",
-        "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
-        "n320_points": 542080,
-        "state_shape": [
-          65,
-          181,
-          360
-        ]
-      },
-      "variables": {
-        "tp": {
-          "student_rmse_vs_era5": 0.00046342305607501786,
-          "student_acc": -0.01035702276783651,
-          "teacher_rmse_vs_era5": 0.0016185983269774403,
-          "teacher_acc": 0.6610423102321318,
-          "degradation_pct_vs_teacher": -71.3688659903405,
-          "student_rmse_vs_teacher_field": 0.0019111470292369807,
-          "student_pod_1mm": 0.0
-        },
-        "t2m": {
-          "student_rmse_vs_era5": 3.4615039916712877,
-          "student_acc": 0.8637455252673802,
-          "teacher_rmse_vs_era5": 1.2411910971107651,
-          "teacher_acc": 0.9834605293158242,
-          "degradation_pct_vs_teacher": 178.88566069551652,
-          "student_rmse_vs_teacher_field": 2.987061525785036
-        }
-      },
-      "forecast_nc": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackB_student_heldout\\forecasts\\20230122_00Z.nc"
-    },
-    {
-      "model": "student_v3",
-      "init_date": "20230129",
-      "lead_hours": 6,
-      "valid_time": "2023-01-29T06:00:00.000000000",
-      "ckpt": "models/student_global_stable_v3.ckpt",
-      "state_meta": {
-        "init_date": "20230129",
-        "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
-        "n320_points": 542080,
-        "state_shape": [
-          65,
-          181,
-          360
-        ]
-      },
-      "variables": {
-        "tp": {
-          "student_rmse_vs_era5": 0.000490963038346604,
-          "student_acc": 0.0051632662415474,
-          "teacher_rmse_vs_era5": 0.0016434712636608285,
-          "teacher_acc": 0.5251161842709202,
-          "degradation_pct_vs_teacher": -70.12646042541779,
-          "student_rmse_vs_teacher_field": 0.0018692936835450356,
-          "student_pod_1mm": 0.0
-        },
-        "t2m": {
-          "student_rmse_vs_era5": 3.3925153312292418,
-          "student_acc": 0.8831800240450258,
-          "teacher_rmse_vs_era5": 1.2862874983977464,
-          "teacher_acc": 0.9839905743669562,
-          "degradation_pct_vs_teacher": 163.74471768209682,
-          "student_rmse_vs_teacher_field": 2.986960068434753
-        }
-      },
-      "forecast_nc": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackB_student_heldout\\forecasts\\20230129_00Z.nc"
-    }
+  "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
+  "leads_hours": [
+    6,
+    24,
+    72,
+    120,
+    240
   ],
-  "aggregate": {
-    "teacher": {
-      "6": {
-        "t2m": {
-          "n": 5,
-          "rmse_mean": 1.2140917768977473,
-          "rmse_std": 0.04635458915962195
-        },
-        "tp": {
-          "n": 5,
-          "rmse_mean": 0.0013216946285807452,
-          "rmse_std": 0.00034325806373008673
-        },
-        "u10": {
-          "n": 5,
-          "rmse_mean": 1.187995513525654,
-          "rmse_std": 0.09050313102265788
-        },
-        "v10": {
-          "n": 5,
-          "rmse_mean": 1.2699534856703658,
-          "rmse_std": 0.07612372538008376
-        }
-      },
-      "24": {
-        "t2m": {
-          "n": 5,
-          "rmse_mean": 1.474953813258783,
-          "rmse_std": 0.03952107772470267
-        },
-        "tp": {
-          "n": 5,
-          "rmse_mean": 0.000506532342333124,
-          "rmse_std": 0.00012631471385637726
-        },
-        "u10": {
-          "n": 5,
-          "rmse_mean": 1.9591185018158406,
-          "rmse_std": 0.16115508871705547
-        },
-        "v10": {
-          "n": 5,
-          "rmse_mean": 2.1311503522903417,
-          "rmse_std": 0.13430876304960995
-        }
-      },
-      "72": {
-        "t2m": {
-          "n": 5,
-          "rmse_mean": 2.435375410691558,
-          "rmse_std": 0.10590282130538638
-        },
-        "tp": {
-          "n": 4,
-          "rmse_mean": 0.0008059867782805351,
-          "rmse_std": 0.00014333289076716053
-        },
-        "u10": {
-          "n": 5,
-          "rmse_mean": 3.1516163919878717,
-          "rmse_std": 0.157530480141203
-        },
-        "v10": {
-          "n": 5,
-          "rmse_mean": 3.2423903749105945,
-          "rmse_std": 0.13573677784361857
-        }
-      },
-      "120": {
-        "t2m": {
-          "n": 5,
-          "rmse_mean": 3.091154178184033,
-          "rmse_std": 0.19854496585390746
-        },
-        "tp": {
-          "n": 5,
-          "rmse_mean": 0.0009934132693975599,
-          "rmse_std": 0.0001011168055132611
-        },
-        "u10": {
-          "n": 5,
-          "rmse_mean": 3.1291199530788427,
-          "rmse_std": 0.24993711474663094
-        },
-        "v10": {
-          "n": 5,
-          "rmse_mean": 3.3817836917529354,
-          "rmse_std": 0.2817017210337072
-        }
-      },
-      "240": {
-        "t2m": {
-          "n": 5,
-          "rmse_mean": 3.45515859756203,
-          "rmse_std": 0.16698699082393242
-        },
-        "tp": {
-          "n": 4,
-          "rmse_mean": 0.001150669952309278,
-          "rmse_std": 8.063249331871756e-05
-        },
-        "u10": {
-          "n": 5,
-          "rmse_mean": 4.682665417816212,
-          "rmse_std": 0.22116176101988816
-        },
-        "v10": {
-          "n": 5,
-          "rmse_mean": 4.138912015650535,
-          "rmse_std": 0.2697709334423787
-        }
-      }
-    },
-    "student_6h": {
-      "tp": {
-        "n_era5": 5,
-        "n_vs_teacher_field": 5,
-        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
-        "student_rmse_mean": 0.000389469567067332,
-        "teacher_rmse_mean": 0.0013216946285807452,
-        "degradation_pct_mean": -70.0490910927119
-      },
-      "t2m": {
-        "n_era5": 5,
-        "n_vs_teacher_field": 5,
-        "student_rmse_vs_teacher_field_mean": 2.8818825743391985,
-        "student_rmse_mean": 3.2568253779515124,
-        "teacher_rmse_mean": 1.2140917768977473,
-        "degradation_pct_mean": 168.30319074535245
-      }
-    }
-  },
-  "protocol_notes": {
-    "teacher_scored": "local GCS ADC",
-    "student_inferred": "Cassava GPU1 lapai-anemoi; CDS IC cache; Africa regrid from 1deg",
-    "student_era5_rescored": "local GCS ADC after scp of student NCs"
-  }
+  "truth_source_teacher": "gcs://code4earth/era5"
 }
