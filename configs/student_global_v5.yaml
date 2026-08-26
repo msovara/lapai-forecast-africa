@@ -1,0 +1,50 @@
+# Track B — LapAI student focused tp recovery v5 (ONE attempt from v4)
+#
+# Resume from stable v4. Keep what worked for held-out t2m (Africa mix +
+# input z-score). Stronger asymmetric / thresholded precip loss to punish
+# all-dry collapse. β/γ still off. No A2 round 2.
+#
+# Decision rule: after this single train→eval, if held-out ACC/POD₁ₘₘ still ~0,
+# declare tp out-of-scope for this Cout=3 student head.
+
+lat: 181
+lon: 360
+base_channels: 256
+stages: [2, 3, 3]
+
+epochs: 80
+epochs_stage_a_only: 80
+epoch_start_feature_loss: 999
+epoch_start_spectral_loss: 999
+beta_ramp_epochs: 1
+gamma_ramp_epochs: 1
+grad_clip: 1.0
+normalize_targets: true
+normalize_inputs: true
+physical_constraints: true
+tp_mode: softplus_soft
+
+# Cout order: tp, msl, 2t — keep t2m weight (worked in v4); emphasize tp
+channel_weights: [6.0, 0.25, 2.5]
+africa_mix: 0.5
+
+# Stronger precip levers vs v4 (precip_log1p_weight=2, wet_boost=4 default)
+precip_log1p_weight: 6.0
+precip_wet_boost: 12.0
+precip_underpred_weight: 4.0
+precip_pod_weight: 2.0
+precip_dry_collapse_weight: 1.0
+# Nudge tp head out of the negative-logit / all-dry basin on resume
+tp_logit_boost: 0.0002
+
+resume: models/student_global_stable_v4.ckpt
+
+teacher_ckpt: models/teacher_pruned.ckpt
+distill_config: configs/student_distill.yaml
+
+output_ckpt: models/student_global_stable_v5.ckpt
+
+notes: >-
+  One-shot tp recovery from v4. Softplus_soft + asymmetric underpred/POD/dry-collapse
+  precip terms. Keep africa_mix + input norm. If ACC/POD stay ~0 on Jan-2023, stop
+  chasing precip for this student head.

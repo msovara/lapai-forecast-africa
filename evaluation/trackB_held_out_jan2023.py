@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Track B held-out Jan-2023 skill: K1 multi-lead + student 6h one-step.
+"""Track B held-out Jan-2023 skill: K1 multi-lead + student analysis-forced leads.
 
 Protocol (honest MVP; see caveats in output JSON):
 
@@ -8,23 +8,26 @@ Protocol (honest MVP; see caveats in output JSON):
    at leads ``{6,24,72,120,240}`` h for vars available in those files
    (``t2m, tp, u10, v10``). This is the multi-lead reference table.
 
-2. **Student held-out 6h** (optional ``--student_ckpt``): CDS ERA5 IC cache → 65-ch
-   1° state → ``student_global_stable_v3`` predicts ``tp/msl/2t``; score ``tp`` and
-   ``2t`` (as t2m) on the Africa eval box vs GCS and vs K1 +6h from the same
-   forecast files. Student cannot free-run (Cout=3 surface heads only).
+2. **Student held-out analysis-forced** (optional ``--student_ckpt``): CDS ERA5 IC
+   → 65-ch 1° state → student predicts ``tp/msl/2t``; score ``tp`` and ``2t``
+   (as t2m) on the Africa eval box vs GCS and vs K1 at matching lead(s).
+   Default student leads: ``6`` (IC at init 00Z). Optional ``6,24`` uses IC at
+   init+(lead−6)h so each step remains a one-step +6h prediction (not free-run).
 
 Not PLAN-complete: no z500/t850 student heads; no free-running multi-day student
-rollout; msl has no GCS truth stem in this repo's Mvua protocol.
+rollout (Cout=3 cannot close the 65-ch state); msl has no GCS truth stem in this
+repo's Mvua protocol.
 
 Usage::
 
   # Teacher multi-lead only (CPU / laptop OK if GCS ADC works):
   python -u evaluation/trackB_held_out_jan2023.py
 
-  # + student 6h on Cassava GPU1:
+  # + student analysis-forced on Cassava GPU1:
   CUDA_VISIBLE_DEVICES=1 MKL_INTERFACE_LAYER=GNU \\
     python -u evaluation/trackB_held_out_jan2023.py \\
-      --student_ckpt models/student_global_stable_v3.ckpt --device cuda
+      --student_ckpt models/student_global_stable_v5.ckpt --device cuda \\
+      --student_leads 6,24 --allow_download
 """
 
 from __future__ import annotations
@@ -32,7 +35,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -200,8 +203,9 @@ def build_student_state_from_cds(
     cache_dir: Path,
     n320_latlon_path: Path,
     allow_download: bool = False,
+    init_hhmm: str = "0000",
 ) -> tuple[np.ndarray, dict[str, Any]]:
-    """Return state_in (65,H,W) for 00Z init from CDS IC cache (t−6h, t0 stacked fields)."""
+    """Return state_in (65,H,W) for init from CDS IC cache (t−6h, t0 stacked fields)."""
     from lapai_inference.cache_schema import lat_lon_mesh
     from utils.cds_ic import retrieve_era5_fields
 
@@ -212,7 +216,7 @@ def build_student_state_from_cds(
         )
     fields = retrieve_era5_fields(
         init_yyyymmdd,
-        "0000",
+        init_hhmm,
         cache_dir=cache_dir,
         allow_download=allow_download,
     )
@@ -236,12 +240,24 @@ def build_student_state_from_cds(
     state = np.stack(channels, axis=0)
     meta = {
         "init_date": init_yyyymmdd,
-        "init_time": "0000",
+        "init_time": init_hhmm,
         "cache_dir": str(cache_dir),
         "n320_points": int(n320_latlon.shape[0]),
         "state_shape": list(state.shape),
     }
     return state, meta
+
+
+def _ic_datetime_for_lead(init_yyyymmdd: str, lead_hours: int) -> tuple[str, str]:
+    """IC time for analysis-forced +6h step targeting valid_time = init+lead.
+
+    Student is a one-step +6h head, so IC = init + (lead − 6) h.
+    """
+    if lead_hours < 6 or (lead_hours - 6) % 6 != 0:
+        raise ValueError(f"student lead must be 6,12,18,... got {lead_hours}")
+    init_dt = datetime.strptime(init_yyyymmdd + "0000", "%Y%m%d%H%M")
+    ic_dt = init_dt + timedelta(hours=lead_hours - 6)
+    return ic_dt.strftime("%Y%m%d"), ic_dt.strftime("%H%M")
 
 
 def _student_pred_to_africa_da(
@@ -280,7 +296,13 @@ def score_student_6h(
     n320_latlon_path: Path,
     allow_download: bool,
     student_forecast_dir: Path | None = None,
+    student_leads: tuple[int, ...] = (6,),
 ) -> list[dict[str, Any]]:
+    """Analysis-forced student skill at one or more leads (each is a +6h one-step).
+
+    For lead L, IC is taken at init+(L−6)h so valid_time = init+L. This is **not**
+    free-running rollout (student Cout=3 cannot update the 65-ch state).
+    """
     import torch
     from evaluation.trackB_gate import _load_student
     from lapai_inference.cache_schema import lat_lon_mesh
@@ -297,121 +319,146 @@ def score_student_6h(
         if not fc_path.is_file():
             results.append({"init_date": init, "error": f"missing forecast {fc_path.name}"})
             continue
-        try:
-            state, state_meta = build_student_state_from_cds(
-                init,
-                cache_dir=cds_cache,
-                n320_latlon_path=n320_latlon_path,
-                allow_download=allow_download,
-            )
-        except Exception as exc:  # noqa: BLE001
-            results.append({"init_date": init, "error": f"CDS/state build failed: {exc}"})
-            print(f"[student] {init} state fail: {exc}", flush=True)
-            continue
-
-        with torch.no_grad():
-            x = torch.as_tensor(state[None, ...], dtype=torch.float32, device=device)
-            if ckpt_meta.get("normalize_inputs") and ckpt_meta.get("input_mean") is not None:
-                im = torch.as_tensor(ckpt_meta["input_mean"], dtype=torch.float32, device=device)
-                istd = torch.as_tensor(ckpt_meta["input_std"], dtype=torch.float32, device=device)
-                x = normalize_channels(x, im, istd)
-            out = net(x)["pred"]
-            if bool(ckpt_meta.get("physical_constraints", True)):
-                out = apply_soft_physical_constraints(
-                    out, tp_mode=str(ckpt_meta.get("tp_mode", "relu"))
-                )
-            pred = out[0].detach().cpu().numpy()  # (3,H,W) tp, msl, 2t
-
         fc = xr.open_dataset(fc_path)
         try:
-            step6, vt6 = forecast_step_and_valid_time(fc, 6)
-            row: dict[str, Any] = {
-                "model": "student_v3",
-                "init_date": init,
-                "lead_hours": 6,
-                "valid_time": str(vt6),
-                "ckpt": str(ckpt),
-                "state_meta": state_meta,
-                "variables": {},
-            }
-            chan = {"tp": 0, "msl": 1, "t2m": 2}
-            stud_fields: dict[str, xr.DataArray] = {}
-            for var in STUDENT_SCORE_VARS:
-                template_name = _resolve_fc_var(fc, var)
-                if template_name is None:
-                    row["variables"][var] = {"error": "no teacher template grid"}
-                    continue
-                template = fc[template_name].isel(time=step6)
-                stud_da = _student_pred_to_africa_da(
-                    pred[chan[var]],
-                    name=var,
-                    lat_full=lat_full,
-                    lon_full=lon_full,
-                    template=template,
-                ).assign_coords(name=var)
-                stud_fields[var] = stud_da
-
-                # Always score student vs teacher on Africa grid (no GCS required).
-                p = np.asarray(stud_da.values, dtype=np.float64)
-                t = np.asarray(template.values, dtype=np.float64)
-                lat = np.asarray(stud_da.latitude.values, dtype=np.float64)
-                from lapai_inference.cache_schema import cosine_latitude_weights
-
-                w = np.asarray(cosine_latitude_weights(lat), dtype=np.float64).reshape(-1, 1)
-                mask = np.isfinite(p) & np.isfinite(t)
-                svt = float(
-                    np.sqrt(np.sum(w * (p - t) ** 2 * mask) / max(np.sum(w * mask), 1e-12))
-                )
-                cell: dict[str, Any] = {
-                    "student_rmse_vs_teacher_field": svt,
-                }
-
+            for lead in student_leads:
                 try:
-                    if getattr(cache, "_disabled", False):
-                        raise RuntimeError("ERA5 truth scoring disabled (--no_era5)")
-                    truth = cache.at(var, vt6)
-                    stud_scores = _score_point(stud_da, truth)
-                    teach_scores = _score_point(template.assign_coords(name=var), truth)
-                    s_rmse = float(stud_scores["rmse"])
-                    t_rmse = float(teach_scores["rmse"])
-                    cell.update(
+                    ic_date, ic_hhmm = _ic_datetime_for_lead(init, lead)
+                    state, state_meta = build_student_state_from_cds(
+                        ic_date,
+                        cache_dir=cds_cache,
+                        n320_latlon_path=n320_latlon_path,
+                        allow_download=allow_download,
+                        init_hhmm=ic_hhmm,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    results.append(
                         {
-                            "student_rmse_vs_era5": s_rmse,
-                            "student_acc": float(stud_scores.get("acc", float("nan"))),
-                            "teacher_rmse_vs_era5": t_rmse,
-                            "teacher_acc": float(teach_scores.get("acc", float("nan"))),
-                            "degradation_pct_vs_teacher": _degradation_pct(s_rmse, t_rmse),
+                            "init_date": init,
+                            "lead_hours": lead,
+                            "error": f"CDS/state build failed: {exc}",
                         }
                     )
-                    if var == "tp" and "pod_1mm" in stud_scores:
-                        cell["student_pod_1mm"] = float(stud_scores["pod_1mm"])
-                except Exception as exc:  # noqa: BLE001
-                    cell["era5_score_error"] = str(exc)
-                    print(f"[student] {init} +6h {var} ERA5 score skipped: {exc}", flush=True)
+                    print(f"[student] {init} +{lead}h state fail: {exc}", flush=True)
+                    continue
 
-                row["variables"][var] = cell
-                print(f"[student] {init} +6h {var} {cell}", flush=True)
+                with torch.no_grad():
+                    x = torch.as_tensor(state[None, ...], dtype=torch.float32, device=device)
+                    if ckpt_meta.get("normalize_inputs") and ckpt_meta.get("input_mean") is not None:
+                        im = torch.as_tensor(
+                            ckpt_meta["input_mean"], dtype=torch.float32, device=device
+                        )
+                        istd = torch.as_tensor(
+                            ckpt_meta["input_std"], dtype=torch.float32, device=device
+                        )
+                        x = normalize_channels(x, im, istd)
+                    out = net(x)["pred"]
+                    if bool(ckpt_meta.get("physical_constraints", True)):
+                        out = apply_soft_physical_constraints(
+                            out, tp_mode=str(ckpt_meta.get("tp_mode", "relu"))
+                        )
+                    pred = out[0].detach().cpu().numpy()  # (3,H,W) tp, msl, 2t
 
-            if student_forecast_dir is not None and stud_fields:
-                # One-step NC matching Track A layout (time=1 at +6h) for local GCS rescore.
-                out_nc = student_forecast_dir / f"{init}_00Z.nc"
-                data_vars = {}
-                for name, da in stud_fields.items():
-                    clean = da.reset_coords(drop=True)
-                    if "name" in clean.coords:
-                        clean = clean.drop_vars("name")
-                    clean = clean.expand_dims(time=[np.datetime64(vt6)])
-                    clean.name = name
-                    data_vars[name] = clean
-                ds_out = xr.Dataset(data_vars)
-                ds_out.attrs["title"] = "Track B student held-out Jan-2023 +6h"
-                ds_out.attrs["reference_time"] = f"{init} 00:00:00"
-                ds_out.attrs["checkpoint"] = str(ckpt)
-                ds_out.to_netcdf(out_nc)
-                row["forecast_nc"] = str(out_nc)
-                print(f"[student] wrote {out_nc}", flush=True)
+                step_l, vt_l = forecast_step_and_valid_time(fc, lead)
+                row: dict[str, Any] = {
+                    "model": "student",
+                    "init_date": init,
+                    "lead_hours": lead,
+                    "valid_time": str(vt_l),
+                    "ckpt": str(ckpt),
+                    "state_meta": state_meta,
+                    "protocol": "analysis_forced_6h_step",
+                    "variables": {},
+                }
+                chan = {"tp": 0, "msl": 1, "t2m": 2}
+                stud_fields: dict[str, xr.DataArray] = {}
+                for var in STUDENT_SCORE_VARS:
+                    template_name = _resolve_fc_var(fc, var)
+                    if template_name is None:
+                        row["variables"][var] = {"error": "no teacher template grid"}
+                        continue
+                    template = fc[template_name].isel(time=step_l)
+                    stud_da = _student_pred_to_africa_da(
+                        pred[chan[var]],
+                        name=var,
+                        lat_full=lat_full,
+                        lon_full=lon_full,
+                        template=template,
+                    ).assign_coords(name=var)
+                    stud_fields[var] = stud_da
 
-            results.append(row)
+                    # Always score student vs teacher on Africa grid (no GCS required).
+                    p = np.asarray(stud_da.values, dtype=np.float64)
+                    t = np.asarray(template.values, dtype=np.float64)
+                    lat = np.asarray(stud_da.latitude.values, dtype=np.float64)
+                    from lapai_inference.cache_schema import cosine_latitude_weights
+
+                    w = np.asarray(cosine_latitude_weights(lat), dtype=np.float64).reshape(-1, 1)
+                    mask = np.isfinite(p) & np.isfinite(t)
+                    svt = float(
+                        np.sqrt(np.sum(w * (p - t) ** 2 * mask) / max(np.sum(w * mask), 1e-12))
+                    )
+                    cell: dict[str, Any] = {
+                        "student_rmse_vs_teacher_field": svt,
+                    }
+
+                    try:
+                        if getattr(cache, "_disabled", False):
+                            raise RuntimeError("ERA5 truth scoring disabled (--no_era5)")
+                        truth = cache.at(var, vt_l)
+                        stud_scores = _score_point(stud_da, truth)
+                        teach_scores = _score_point(template.assign_coords(name=var), truth)
+                        s_rmse = float(stud_scores["rmse"])
+                        t_rmse = float(teach_scores["rmse"])
+                        cell.update(
+                            {
+                                "student_rmse_vs_era5": s_rmse,
+                                "student_acc": float(stud_scores.get("acc", float("nan"))),
+                                "teacher_rmse_vs_era5": t_rmse,
+                                "teacher_acc": float(teach_scores.get("acc", float("nan"))),
+                                "degradation_pct_vs_teacher": _degradation_pct(s_rmse, t_rmse),
+                            }
+                        )
+                        if var == "tp" and "pod_1mm" in stud_scores:
+                            cell["student_pod_1mm"] = float(stud_scores["pod_1mm"])
+                        if var == "tp" and "pod_1mm" in teach_scores:
+                            cell["teacher_pod_1mm"] = float(teach_scores["pod_1mm"])
+                    except Exception as exc:  # noqa: BLE001
+                        cell["era5_score_error"] = str(exc)
+                        print(
+                            f"[student] {init} +{lead}h {var} ERA5 score skipped: {exc}",
+                            flush=True,
+                        )
+
+                    row["variables"][var] = cell
+                    print(f"[student] {init} +{lead}h {var} {cell}", flush=True)
+
+                if student_forecast_dir is not None and stud_fields:
+                    out_nc = student_forecast_dir / f"{init}_00Z_L{lead:03d}h.nc"
+                    if lead == 6:
+                        # Keep legacy name used by v3/v4 merge scripts.
+                        out_nc = student_forecast_dir / f"{init}_00Z.nc"
+                    data_vars = {}
+                    for name, da in stud_fields.items():
+                        clean = da.reset_coords(drop=True)
+                        if "name" in clean.coords:
+                            clean = clean.drop_vars("name")
+                        clean = clean.expand_dims(time=[np.datetime64(vt_l)])
+                        clean.name = name
+                        data_vars[name] = clean
+                    ds_out = xr.Dataset(data_vars)
+                    ds_out.attrs["title"] = (
+                        f"Track B student held-out Jan-2023 analysis-forced +{lead}h"
+                    )
+                    ds_out.attrs["reference_time"] = f"{init} 00:00:00"
+                    ds_out.attrs["ic_time"] = f"{ic_date} {ic_hhmm}"
+                    ds_out.attrs["checkpoint"] = str(ckpt)
+                    ds_out.attrs["protocol"] = "analysis_forced_6h_step"
+                    ds_out.to_netcdf(out_nc)
+                    row["forecast_nc"] = str(out_nc)
+                    print(f"[student] wrote {out_nc}", flush=True)
+
+                results.append(row)
         finally:
             fc.close()
     return results
@@ -439,32 +486,76 @@ def _aggregate_teacher(results: list[dict[str, Any]], leads: tuple[int, ...], va
     return agg
 
 
-def _aggregate_student(results: list[dict[str, Any]]) -> dict[str, Any]:
-    agg: dict[str, Any] = {}
-    for var in STUDENT_SCORE_VARS:
-        s_rmses, t_rmses, degs, svt = [], [], [], []
-        for r in results:
-            cell = (r.get("variables") or {}).get(var) or {}
-            if "student_rmse_vs_teacher_field" in cell:
-                svt.append(cell["student_rmse_vs_teacher_field"])
-            if "student_rmse_vs_era5" not in cell:
-                continue
-            s_rmses.append(cell["student_rmse_vs_era5"])
-            t_rmses.append(cell["teacher_rmse_vs_era5"])
-            degs.append(cell["degradation_pct_vs_teacher"])
-        row: dict[str, Any] = {"n_era5": len(s_rmses), "n_vs_teacher_field": len(svt)}
-        if svt:
-            row["student_rmse_vs_teacher_field_mean"] = float(np.mean(svt))
-        if s_rmses:
-            row.update(
+def _aggregate_student(
+    results: list[dict[str, Any]],
+    *,
+    leads: tuple[int, ...] | None = None,
+) -> dict[str, Any]:
+    """Aggregate student skill; include ACC/POD means (not just RMSE)."""
+    if leads is None:
+        leads = tuple(
+            sorted(
                 {
-                    "student_rmse_mean": float(np.mean(s_rmses)),
-                    "teacher_rmse_mean": float(np.mean(t_rmses)),
-                    "degradation_pct_mean": float(np.mean(degs)),
+                    int(r["lead_hours"])
+                    for r in results
+                    if r.get("lead_hours") is not None and "variables" in r
                 }
             )
-        agg[var] = row
-    return agg
+        )
+    if not leads:
+        leads = (6,)
+
+    by_lead: dict[str, Any] = {}
+    for lead in leads:
+        lead_rows = [r for r in results if r.get("lead_hours") == lead]
+        agg_lead: dict[str, Any] = {}
+        for var in STUDENT_SCORE_VARS:
+            s_rmses, t_rmses, degs, svt = [], [], [], []
+            s_acc, t_acc, s_pod, t_pod = [], [], [], []
+            for r in lead_rows:
+                cell = (r.get("variables") or {}).get(var) or {}
+                if "student_rmse_vs_teacher_field" in cell:
+                    svt.append(cell["student_rmse_vs_teacher_field"])
+                if "student_rmse_vs_era5" not in cell:
+                    continue
+                s_rmses.append(cell["student_rmse_vs_era5"])
+                t_rmses.append(cell["teacher_rmse_vs_era5"])
+                degs.append(cell["degradation_pct_vs_teacher"])
+                if "student_acc" in cell:
+                    s_acc.append(cell["student_acc"])
+                if "teacher_acc" in cell:
+                    t_acc.append(cell["teacher_acc"])
+                if "student_pod_1mm" in cell:
+                    s_pod.append(cell["student_pod_1mm"])
+                if "teacher_pod_1mm" in cell:
+                    t_pod.append(cell["teacher_pod_1mm"])
+            row: dict[str, Any] = {"n_era5": len(s_rmses), "n_vs_teacher_field": len(svt)}
+            if svt:
+                row["student_rmse_vs_teacher_field_mean"] = float(np.mean(svt))
+            if s_rmses:
+                row.update(
+                    {
+                        "student_rmse_mean": float(np.mean(s_rmses)),
+                        "teacher_rmse_mean": float(np.mean(t_rmses)),
+                        "degradation_pct_mean": float(np.mean(degs)),
+                    }
+                )
+            if s_acc:
+                row["student_acc_mean"] = float(np.mean(s_acc))
+            if t_acc:
+                row["teacher_acc_mean"] = float(np.mean(t_acc))
+            if s_pod:
+                row["student_pod_1mm_mean"] = float(np.mean(s_pod))
+            if t_pod:
+                row["teacher_pod_1mm_mean"] = float(np.mean(t_pod))
+            agg_lead[var] = row
+        by_lead[str(lead)] = agg_lead
+
+    # Backward-compatible flat "student_6h" view when 6h present.
+    out: dict[str, Any] = {"by_lead": by_lead}
+    if "6" in by_lead:
+        out.update(by_lead["6"])
+    return out
 
 
 def main() -> None:
@@ -479,7 +570,14 @@ def main() -> None:
         "--student_ckpt",
         type=Path,
         default=None,
-        help="If set, also score student 6h from CDS IC cache",
+        help="If set, also score student analysis-forced leads from CDS IC cache",
+    )
+    p.add_argument(
+        "--student_leads",
+        type=str,
+        default="6",
+        help="Comma-separated analysis-forced leads (hours). Each is a +6h one-step "
+        "from IC at init+(lead-6)h. Example: 6,24",
     )
     p.add_argument("--device", default=None, help="cuda/cpu for student; default auto")
     p.add_argument("--cds_cache", type=Path, default=Path(AIFS_AFRICA_CACHE_DIR))
@@ -493,14 +591,14 @@ def main() -> None:
         "--student_forecast_dir",
         type=Path,
         default=_REPO_ROOT / "data/processed/trackB_student_heldout/forecasts",
-        help="Write student Africa +6h NetCDFs for offline GCS rescore",
+        help="Write student Africa NetCDFs for offline GCS rescore",
     )
     p.add_argument(
         "--out",
         type=Path,
         default=_REPO_ROOT / "reports/TRACKB_HELD_OUT_JAN2023.json",
     )
-    p.add_argument("--skip_teacher", action="store_true", help="Only run student 6h block")
+    p.add_argument("--skip_teacher", action="store_true", help="Only run student block")
     p.add_argument(
         "--no_era5",
         action="store_true",
@@ -509,6 +607,7 @@ def main() -> None:
     args = p.parse_args()
 
     leads = tuple(int(x) for x in args.leads.split(",") if x.strip())
+    student_leads = tuple(int(x) for x in args.student_leads.split(",") if x.strip())
     report: dict[str, Any] = {
         "protocol": "trackB_held_out_jan2023",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
@@ -518,12 +617,13 @@ def main() -> None:
         "domain": "africa",
         "truth_source": "gcs://code4earth/era5",
         "leads_hours": list(leads),
+        "student_leads_hours": list(student_leads),
         "teacher_variables": list(TEACHER_VARS),
         "student_variables_scored": list(STUDENT_SCORE_VARS),
         "caveats": [
             "Student MVP outputs tp/msl/2t only — no z500/t850 heads; PLAN Week-9 skill table incomplete.",
-            "Student has no free-running multi-day rollout (65→3 channel heads); multi-lead table is K1-only.",
-            "Student held-out comparison is analysis-forced 6h one-step from CDS ERA5 ICs (Jan 2023 weekly 00Z).",
+            "Student cannot free-run multi-day (65→3 channel heads); iterative rollout not supported.",
+            "Student multi-lead (if requested) is analysis-forced: each lead is a fresh ERA5 IC + one +6h step.",
             "msl not scored held-out (no GCS truth stem in Mvua protocol; teacher forecast NCs lack msl).",
             "MVP cache gate accepted with documented tp soft-fail (21.2% > 15%); this protocol is off-cache Jan-2023.",
         ],
@@ -548,7 +648,11 @@ def main() -> None:
         if args.student_ckpt is not None:
             import torch
 
-            print(f"[heldout] scoring student 6h ckpt={args.student_ckpt}", flush=True)
+            print(
+                f"[heldout] scoring student analysis-forced leads={student_leads} "
+                f"ckpt={args.student_ckpt}",
+                flush=True,
+            )
             dev = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
             device = torch.device(dev)
             report["student_results"] = score_student_6h(
@@ -561,8 +665,16 @@ def main() -> None:
                 n320_latlon_path=args.n320_latlon,
                 allow_download=args.allow_download,
                 student_forecast_dir=args.student_forecast_dir,
+                student_leads=student_leads,
             )
-            report["aggregate"]["student_6h"] = _aggregate_student(report["student_results"])
+            report["aggregate"]["student"] = _aggregate_student(
+                report["student_results"], leads=student_leads
+            )
+            report["aggregate"]["student_6h"] = {
+                k: v
+                for k, v in report["aggregate"]["student"].items()
+                if k in STUDENT_SCORE_VARS
+            }
     finally:
         cache.close()
 

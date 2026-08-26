@@ -1,0 +1,265 @@
+{
+  "protocol": "trackB_held_out_jan2023",
+  "timestamp_utc": "2026-08-26T13:29:46.404301+00:00",
+  "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
+  "candidate_student": "models/student_global_stable_v5.ckpt",
+  "forecast_dir": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_k1_a1bplus/forecasts",
+  "domain": "africa",
+  "truth_source": "gcs://code4earth/era5",
+  "leads_hours": [
+    6,
+    24,
+    72,
+    120,
+    240
+  ],
+  "student_leads_hours": [
+    6,
+    24
+  ],
+  "teacher_variables": [
+    "t2m",
+    "tp",
+    "u10",
+    "v10"
+  ],
+  "student_variables_scored": [
+    "tp",
+    "t2m"
+  ],
+  "caveats": [
+    "Student MVP outputs tp/msl/2t only \u2014 no z500/t850 heads; PLAN Week-9 skill table incomplete.",
+    "Student cannot free-run multi-day (65\u21923 channel heads); iterative rollout not supported.",
+    "Student multi-lead (if requested) is analysis-forced: each lead is a fresh ERA5 IC + one +6h step.",
+    "msl not scored held-out (no GCS truth stem in Mvua protocol; teacher forecast NCs lack msl).",
+    "MVP cache gate accepted with documented tp soft-fail (21.2% > 15%); this protocol is off-cache Jan-2023."
+  ],
+  "teacher_results": [],
+  "student_results": [
+    {
+      "model": "student",
+      "init_date": "20230101",
+      "lead_hours": 6,
+      "valid_time": "2023-01-01T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230101",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0010506743817610613,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.2779746879158427,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        }
+      },
+      "forecast_nc": "data/processed/trackB_student_heldout_v5/forecasts/20230101_00Z.nc"
+    },
+    {
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student",
+      "init_date": "20230108",
+      "lead_hours": 6,
+      "valid_time": "2023-01-08T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230108",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.001717836858799743,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.3023692486071754,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        }
+      },
+      "forecast_nc": "data/processed/trackB_student_heldout_v5/forecasts/20230108_00Z.nc"
+    },
+    {
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student",
+      "init_date": "20230115",
+      "lead_hours": 6,
+      "valid_time": "2023-01-15T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230115",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0009918627742738007,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.219835032335121,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        }
+      },
+      "forecast_nc": "data/processed/trackB_student_heldout_v5/forecasts/20230115_00Z.nc"
+    },
+    {
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student",
+      "init_date": "20230122",
+      "lead_hours": 6,
+      "valid_time": "2023-01-22T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230122",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0019111470292369807,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.3834548750433824,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        }
+      },
+      "forecast_nc": "data/processed/trackB_student_heldout_v5/forecasts/20230122_00Z.nc"
+    },
+    {
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student",
+      "init_date": "20230129",
+      "lead_hours": 6,
+      "valid_time": "2023-01-29T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230129",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_teacher_field": 0.0018692936835450356,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        },
+        "t2m": {
+          "student_rmse_vs_teacher_field": 1.3536127796017319,
+          "era5_score_error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information."
+        }
+      },
+      "forecast_nc": "data/processed/trackB_student_heldout_v5/forecasts/20230129_00Z.nc"
+    },
+    {
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    }
+  ],
+  "aggregate": {
+    "student": {
+      "by_lead": {
+        "6": {
+          "tp": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+          },
+          "t2m": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+          }
+        },
+        "24": {
+          "tp": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 0
+          },
+          "t2m": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 0
+          }
+        }
+      },
+      "tp": {
+        "n_era5": 0,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+      },
+      "t2m": {
+        "n_era5": 0,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+      }
+    },
+    "student_6h": {
+      "tp": {
+        "n_era5": 0,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+      },
+      "t2m": {
+        "n_era5": 0,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+      }
+    }
+  }
+}
