@@ -158,6 +158,10 @@ def train_epoch(
     africa_mix: float = 0.0,
     africa_spatial: Optional[torch.Tensor] = None,
     precip_log1p_weight: float = 0.0,
+    precip_wet_boost: float = 4.0,
+    precip_underpred_weight: float = 0.0,
+    precip_pod_weight: float = 0.0,
+    precip_dry_collapse_weight: float = 0.0,
 ) -> tuple[float, dict[str, float]]:
     net.train()
     running = 0.0
@@ -198,6 +202,10 @@ def train_epoch(
             africa_mix=africa_mix,
             africa_spatial_weights=africa_spatial,
             precip_log1p_weight=precip_log1p_weight,
+            precip_wet_boost=precip_wet_boost,
+            precip_underpred_weight=precip_underpred_weight,
+            precip_pod_weight=precip_pod_weight,
+            precip_dry_collapse_weight=precip_dry_collapse_weight,
         )
         if not torch.isfinite(loss):
             raise RuntimeError(
@@ -296,6 +304,15 @@ def main() -> None:
     precip_log1p_weight = float(
         yml.get("precip_log1p_weight", distill.get("precip_log1p_weight", 0.0))
     )
+    precip_wet_boost = float(yml.get("precip_wet_boost", distill.get("precip_wet_boost", 4.0)))
+    precip_underpred_weight = float(
+        yml.get("precip_underpred_weight", distill.get("precip_underpred_weight", 0.0))
+    )
+    precip_pod_weight = float(yml.get("precip_pod_weight", distill.get("precip_pod_weight", 0.0)))
+    precip_dry_collapse_weight = float(
+        yml.get("precip_dry_collapse_weight", distill.get("precip_dry_collapse_weight", 0.0))
+    )
+    tp_logit_boost = float(yml.get("tp_logit_boost", distill.get("tp_logit_boost", 0.0)))
     # Cout order: tp, msl, 2t — up-weight tp/2t when msl already near gate.
     cw_raw = yml.get("channel_weights", distill.get("channel_weights"))
     channel_weights_list = [float(x) for x in cw_raw] if cw_raw is not None else None
@@ -368,6 +385,10 @@ def main() -> None:
             if i < len(hs):
                 h.load_state_dict(hs[i])
         print(f"[Track B] resumed model+heads from {resume}")
+        if tp_logit_boost != 0.0 and net.head.bias is not None and net.head.bias.numel() >= 1:
+            with torch.no_grad():
+                net.head.bias[0] = net.head.bias[0] + float(tp_logit_boost)
+            print(f"[Track B] tp_logit_boost={tp_logit_boost} applied to head bias[0]")
     elif (
         target_mean is not None
         and net.head.bias is not None
@@ -396,11 +417,15 @@ def main() -> None:
         print(
             f"[Track B] africa_mix={africa_mix} mask_frac={float(africa_spatial.mean()):.4f} "
             f"tp_mode={tp_mode} precip_log1p_weight={precip_log1p_weight} "
+            f"wet_boost={precip_wet_boost} underpred={precip_underpred_weight} "
+            f"pod={precip_pod_weight} dry_collapse={precip_dry_collapse_weight} "
             f"normalize_inputs={normalize_inputs}"
         )
     else:
         print(
             f"[Track B] africa_mix=0 tp_mode={tp_mode} precip_log1p_weight={precip_log1p_weight} "
+            f"wet_boost={precip_wet_boost} underpred={precip_underpred_weight} "
+            f"pod={precip_pod_weight} dry_collapse={precip_dry_collapse_weight} "
             f"normalize_inputs={normalize_inputs}"
         )
 
@@ -445,6 +470,10 @@ def main() -> None:
             africa_mix=africa_mix,
             africa_spatial=africa_spatial,
             precip_log1p_weight=precip_log1p_weight,
+            precip_wet_boost=precip_wet_boost,
+            precip_underpred_weight=precip_underpred_weight,
+            precip_pod_weight=precip_pod_weight,
+            precip_dry_collapse_weight=precip_dry_collapse_weight,
         )
         print(
             f"epoch {epoch} loss={loss_m:.6f} "
@@ -465,6 +494,11 @@ def main() -> None:
         "tp_mode": tp_mode,
         "africa_mix": africa_mix,
         "precip_log1p_weight": precip_log1p_weight,
+        "precip_wet_boost": precip_wet_boost,
+        "precip_underpred_weight": precip_underpred_weight,
+        "precip_pod_weight": precip_pod_weight,
+        "precip_dry_collapse_weight": precip_dry_collapse_weight,
+        "tp_logit_boost": tp_logit_boost,
         "channel_weights": channel_weights_list,
         "resume_from": str(resume) if resume is not None else None,
     }

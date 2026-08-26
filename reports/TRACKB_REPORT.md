@@ -138,3 +138,60 @@ Student–teacher field RMSE (Africa): t2m **2.88 → 1.34**; tp unchanged 0.001
 - Config: `configs/student_global_v4.yaml`
 - Train/eval: `scripts/run_trackB_stable_v4.sh`, `scripts/run_trackB_v4_post_eval.sh`, `scripts/merge_trackB_held_out_v4.py`
 - Cassava forecasts (not in git): `data/processed/trackB_student_heldout_v4/forecasts/`
+
+---
+
+## Focused tp recovery v5 (2026-08-26) — ONE attempt; tp out-of-scope
+
+**Decision:** **Declare precipitation (`tp`) out-of-scope for this Cout=3 student head.** Stop further tp-only chase. Keep `student_global_stable_v4.ckpt` / `v5` for **t2m (+ msl on-cache)**; do not claim precip skill.
+
+**Ckpt:** `models/student_global_stable_v5.ckpt` (resume v4; β/γ still off; full cache reused, not rebuilt).
+
+### Levers tried (v5 vs v4)
+
+Kept from v4 (t2m worked): Africa mix `0.5`, input z-score, soft physicality, channel-norm L_A.
+
+Added / strengthened for tp:
+
+| lever | v4 | v5 |
+|-------|----|----|
+| `tp_mode` | softplus (×1000) | **softplus_soft (×50)** |
+| `precip_log1p_weight` | 2.0 | **6.0** |
+| `precip_wet_boost` | 4 (default) | **12** |
+| under-pred on wet | — | **4.0** |
+| soft POD hinge (≥1 mm) | — | **2.0** |
+| dry-collapse mean match | — | **1.0** |
+| `tp_logit_boost` on resume | — | **+0.0002** |
+| channel weights (tp,msl,2t) | [4, 0.3, 3] | **[6, 0.25, 2.5]** |
+| epochs | 100 | 80 |
+
+Train log: L_tp stuck **~1.30** all 80 epochs (v4 L_tp stuck ~0.50). Held-out student `tp` field is **identically zero** (min=max=mean=0).
+
+### Held-out Jan-2023 +6h Africa (ACC/POD primary; RMSE secondary)
+
+| var | metric | v4 | v5 | K1 | notes |
+|-----|--------|----|----|-----|-------|
+| tp | ACC | ≈0 | **−0.003** | ~0.52 | still no spatial skill |
+| tp | POD₁ₘₘ | **0.0** | **0.0** | ~0.77 | all-dry |
+| tp | RMSE | 0.000389 | 0.000389 | 0.00132 | identical dry-bias artifact |
+| t2m | deg vs K1 | +23.9% | **+16.4%** | — | still OK / slightly better |
+| t2m | ACC | ~0.97 | **0.977** | ~0.983 | kept |
+
+### Cache gate (regression only)
+
+Global: tp +22.1% fail; msl −18.1% pass; 2t −63.5% pass (same soft-fail pattern as v4).
+
+### Multi-lead / free-run progress (secondary)
+
+- **Implemented:** analysis-forced multi-lead path via `--student_leads` (e.g. `6,24`): each lead = ERA5 IC at `init+(lead−6)h` + one +6h step. Aggregates include ACC/POD by lead.
+- **Ran:** +6h on Cassava GPU1 (CDS 00Z cache hits).
+- **+24h blocked:** needs 18Z CDS ICs; Cassava lack of working CDS auth (`.cdsapirc`) / prior missing `cdsapi`. Code path ready; not scored.
+- **Free-run:** **not supported** — student Cout=`tp/msl/2t` cannot update 65-ch state. Do **not** claim PLAN multi-day free-run or z500/t850 compliance.
+
+### Artifacts (v5)
+
+- Reports: `TRACKB_GATE_V5.json`, `TRACKB_HELD_OUT_JAN2023_V5.json`, `TRACKB_HELD_OUT_JAN2023_V5_MERGED.json`, `TRACKB_HELD_OUT_JAN2023_V5_L24.json`, scorecards `TRACKB_STUDENT_SCORECARD_V5*.json`
+- Config: `configs/student_global_v5.yaml`
+- Train/eval: `scripts/run_trackB_stable_v5.sh`, `run_trackB_v5_post_eval.sh`, `run_trackB_v5_pipeline.sh`, `run_trackB_v5_multilead24.sh`, `merge_trackB_held_out_v5.py`
+- Cassava forecasts (not in git): `data/processed/trackB_student_heldout_v5/forecasts/`
+

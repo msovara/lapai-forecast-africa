@@ -1,0 +1,1086 @@
+{
+  "protocol": "trackB_held_out_jan2023",
+  "timestamp_utc": "2026-08-26T14:56:40.496900+00:00",
+  "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
+  "candidate_student": "models/student_global_stable_v5.ckpt",
+  "baseline_v4_for_comparison": "models/student_global_stable_v4.ckpt",
+  "domain": "africa",
+  "truth_source": "gcs://code4earth/era5",
+  "leads_hours": [
+    6
+  ],
+  "teacher_results": [
+    {
+      "model": "K1_teacher",
+      "init_date": "20230101",
+      "lead_hours": 6,
+      "valid_time": "2023-01-01T06:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230101_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.208202700521498,
+          "acc": 0.9814054472127651
+        },
+        "tp": {
+          "rmse": 0.0009122671146710834,
+          "acc": 0.5220949125816312,
+          "pod_1mm": 0.7673107890499195
+        },
+        "u10": {
+          "rmse": 1.0789849227430066,
+          "acc": 0.9448972332439541
+        },
+        "v10": {
+          "rmse": 1.1749601476660598,
+          "acc": 0.9214876541857651
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "valid_time": "2023-01-02T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230101_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.4656116691372871,
+          "acc": 0.9710536103993018
+        },
+        "tp": {
+          "rmse": 0.0003853326526349303,
+          "acc": 0.38021625128463127,
+          "pod_1mm": 0.4894278606965174
+        },
+        "u10": {
+          "rmse": 1.6912887690357197,
+          "acc": 0.8405769725471285
+        },
+        "v10": {
+          "rmse": 2.108062264230634,
+          "acc": 0.7221644149686075
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230101",
+      "lead_hours": 72,
+      "valid_time": "2023-01-04T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230101_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.518516674991687,
+          "acc": 0.9179040029834886
+        },
+        "tp": {
+          "rmse": 0.000700351249364603,
+          "acc": 0.10791780468936778,
+          "pod_1mm": 0.25922282341367436
+        },
+        "u10": {
+          "rmse": 3.021738611265627,
+          "acc": 0.45146807682648166
+        },
+        "v10": {
+          "rmse": 3.473848456399374,
+          "acc": 0.37490924120374536
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230101",
+      "lead_hours": 120,
+      "valid_time": "2023-01-06T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230101_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.097795615582633,
+          "acc": 0.8765243204754559
+        },
+        "tp": {
+          "rmse": 0.0009080212765142261,
+          "acc": 0.12926567201581593,
+          "pod_1mm": 0.46113167636171337
+        },
+        "u10": {
+          "rmse": 3.1323498115396995,
+          "acc": 0.5404122265572732
+        },
+        "v10": {
+          "rmse": 3.656193193474458,
+          "acc": 0.3878665322920328
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230101",
+      "lead_hours": 240,
+      "valid_time": "2023-01-11T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230101_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.3171431615043185,
+          "acc": 0.8739740148757048
+        },
+        "tp": {
+          "rmse": 0.0010922103910646886,
+          "acc": 0.168173391074422,
+          "pod_1mm": 0.5759454432734036
+        },
+        "u10": {
+          "rmse": 4.728136922449664,
+          "acc": 0.3787360538709987
+        },
+        "v10": {
+          "rmse": 3.614854005809565,
+          "acc": 0.41482117588619577
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230108",
+      "lead_hours": 6,
+      "valid_time": "2023-01-08T06:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230108_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.181533155668847,
+          "acc": 0.9827257521316815
+        },
+        "tp": {
+          "rmse": 0.0015394920254390842,
+          "acc": 0.48084572484398924,
+          "pod_1mm": 0.8113975576662144
+        },
+        "u10": {
+          "rmse": 1.1207601917840189,
+          "acc": 0.9306215382215535
+        },
+        "v10": {
+          "rmse": 1.2432430987488197,
+          "acc": 0.9204472301206866
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "valid_time": "2023-01-09T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230108_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.4352282614046112,
+          "acc": 0.9719790081026254
+        },
+        "tp": {
+          "rmse": 0.0004378504199883707,
+          "acc": 0.41066041469464837,
+          "pod_1mm": 0.5657894736842105
+        },
+        "u10": {
+          "rmse": 2.1557497829478898,
+          "acc": 0.743101686303238
+        },
+        "v10": {
+          "rmse": 2.1840461967896494,
+          "acc": 0.7375054321754649
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230108",
+      "lead_hours": 72,
+      "valid_time": "2023-01-11T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230108_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.588400451217409,
+          "acc": 0.9186720274381608
+        },
+        "tp": {
+          "rmse": 0.000702238424829587,
+          "acc": 0.24215492850093195,
+          "pod_1mm": 0.5530068195908245
+        },
+        "u10": {
+          "rmse": 2.9804203214179803,
+          "acc": 0.5079224887934457
+        },
+        "v10": {
+          "rmse": 3.1335596689624396,
+          "acc": 0.4595777567261004
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230108",
+      "lead_hours": 120,
+      "valid_time": "2023-01-13T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230108_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.073708583213117,
+          "acc": 0.8894241274896417
+        },
+        "tp": {
+          "rmse": 0.0009035367871942067,
+          "acc": 0.25187071824234036,
+          "pod_1mm": 0.6261378413524057
+        },
+        "u10": {
+          "rmse": 2.959819215684273,
+          "acc": 0.636437248476484
+        },
+        "v10": {
+          "rmse": 3.059030163521063,
+          "acc": 0.47093794841051567
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230108",
+      "lead_hours": 240,
+      "valid_time": "2023-01-18T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230108_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.504130989855694,
+          "acc": 0.8701873576781457
+        },
+        "tp": {
+          "rmse": 0.00105305818156612,
+          "acc": 0.26296007610484123,
+          "pod_1mm": 0.6419392523364486
+        },
+        "u10": {
+          "rmse": 4.255500850016795,
+          "acc": 0.4786990858968215
+        },
+        "v10": {
+          "rmse": 4.203997492925009,
+          "acc": 0.3223301178977124
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230115",
+      "lead_hours": 6,
+      "valid_time": "2023-01-15T06:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230115_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.1532444327898792,
+          "acc": 0.9847923047423804
+        },
+        "tp": {
+          "rmse": 0.0008946444121552882,
+          "acc": 0.39869702747421143,
+          "pod_1mm": 0.6850828729281768
+        },
+        "u10": {
+          "rmse": 1.2005022785476418,
+          "acc": 0.9255266000387543
+        },
+        "v10": {
+          "rmse": 1.265312492603088,
+          "acc": 0.9257534385227243
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "valid_time": "2023-01-16T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230115_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.4353344542275714,
+          "acc": 0.973465611304099
+        },
+        "tp": {
+          "rmse": 0.0004169138813433464,
+          "acc": 0.31705363568897055,
+          "pod_1mm": 0.4611872146118721
+        },
+        "u10": {
+          "rmse": 1.9354746390882565,
+          "acc": 0.8093748850987018
+        },
+        "v10": {
+          "rmse": 1.9745528746340915,
+          "acc": 0.7992593946979121
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230115",
+      "lead_hours": 72,
+      "valid_time": "2023-01-18T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230115_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.3474339249210097,
+          "acc": 0.9278509673760194
+        },
+        "tp": {
+          "rmse": 0.0007722340023527079,
+          "acc": 0.25986924844860093,
+          "pod_1mm": 0.633177570093458
+        },
+        "u10": {
+          "rmse": 3.4211769566802053,
+          "acc": 0.514076270008896
+        },
+        "v10": {
+          "rmse": 3.24049333481916,
+          "acc": 0.5170902676997405
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230115",
+      "lead_hours": 120,
+      "valid_time": "2023-01-20T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230115_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.200069260767294,
+          "acc": 0.8808501991869093
+        },
+        "tp": {
+          "rmse": 0.0009779191695032023,
+          "acc": 0.16229989972549969,
+          "pod_1mm": 0.5466148723640399
+        },
+        "u10": {
+          "rmse": 3.505526882591187,
+          "acc": 0.5381319316894334
+        },
+        "v10": {
+          "rmse": 3.0280397319831818,
+          "acc": 0.5174339639111621
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230115",
+      "lead_hours": 240,
+      "valid_time": "2023-01-25T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230115_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.3736875795906576,
+          "acc": 0.8801123034144398
+        },
+        "tp": {
+          "rmse": 0.0012497018976453656,
+          "acc": 0.027988547844863775,
+          "pod_1mm": 0.23279924599434496
+        },
+        "u10": {
+          "rmse": 4.839079371216917,
+          "acc": 0.3779001235558219
+        },
+        "v10": {
+          "rmse": 4.200615389688136,
+          "acc": 0.272305896415561
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230122",
+      "lead_hours": 6,
+      "valid_time": "2023-01-22T06:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230122_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.2411910971107651,
+          "acc": 0.9834605293158242
+        },
+        "tp": {
+          "rmse": 0.0016185983269774403,
+          "acc": 0.6610423102321318,
+          "pod_1mm": 0.8401360544217688
+        },
+        "u10": {
+          "rmse": 1.1957418357010152,
+          "acc": 0.9388790609259554
+        },
+        "v10": {
+          "rmse": 1.258179543574146,
+          "acc": 0.9282961813506018
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "valid_time": "2023-01-23T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230122_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.537210915541758,
+          "acc": 0.9727199537038438
+        },
+        "tp": {
+          "rmse": 0.0005647997135753384,
+          "acc": 0.5580065498257127,
+          "pod_1mm": 0.7237076648841355
+        },
+        "u10": {
+          "rmse": 1.9216820663157956,
+          "acc": 0.8046539063527778
+        },
+        "v10": {
+          "rmse": 2.0297686941336495,
+          "acc": 0.8160275345926357
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230122",
+      "lead_hours": 72,
+      "valid_time": "2023-01-25T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230122_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.4205458044599997,
+          "acc": 0.9308624913492741
+        },
+        "tp": {
+          "rmse": 0.0010491234365752426,
+          "acc": 0.2699424254273902,
+          "pod_1mm": 0.61875589066918
+        },
+        "u10": {
+          "rmse": 3.2160735830786997,
+          "acc": 0.6142957588771714
+        },
+        "v10": {
+          "rmse": 3.280549043244219,
+          "acc": 0.4873558174239378
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230122",
+      "lead_hours": 120,
+      "valid_time": "2023-01-27T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230122_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.3421626154046566,
+          "acc": 0.8719084398819059
+        },
+        "tp": {
+          "rmse": 0.0011818488962440754,
+          "acc": 0.2089280422586163,
+          "pod_1mm": 0.4895418326693227
+        },
+        "u10": {
+          "rmse": 3.268764949604045,
+          "acc": 0.5414391290434806
+        },
+        "v10": {
+          "rmse": 3.658116197020027,
+          "acc": 0.39415332284738935
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230122",
+      "lead_hours": 240,
+      "valid_time": "2023-02-01T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230122_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.7604175265249022,
+          "acc": 0.8623760741047422
+        },
+        "tp": {},
+        "u10": {
+          "rmse": 4.866665793544199,
+          "acc": 0.3238003939449078
+        },
+        "v10": {
+          "rmse": 4.371385678048133,
+          "acc": 0.2865396166452767
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230129",
+      "lead_hours": 6,
+      "valid_time": "2023-01-29T06:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230129_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.2862874983977464,
+          "acc": 0.9839905743669562
+        },
+        "tp": {
+          "rmse": 0.0016434712636608285,
+          "acc": 0.5251161842709202,
+          "pod_1mm": 0.7358490566037735
+        },
+        "u10": {
+          "rmse": 1.3439883388525875,
+          "acc": 0.9141544012300716
+        },
+        "v10": {
+          "rmse": 1.4080721457597156,
+          "acc": 0.9281176926808921
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "valid_time": "2023-01-30T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230129_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 1.5013837659826872,
+          "acc": 0.9739170936666945
+        },
+        "tp": {
+          "rmse": 0.0007277650441236342,
+          "acc": 0.40905580685212056,
+          "pod_1mm": 0.44640820980615736
+        },
+        "u10": {
+          "rmse": 2.0913972516915416,
+          "acc": 0.7587594531541094
+        },
+        "v10": {
+          "rmse": 2.3593217316636834,
+          "acc": 0.7657738735650654
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230129",
+      "lead_hours": 72,
+      "valid_time": "2023-02-01T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230129_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.3019801978676857,
+          "acc": 0.9371705112735047
+        },
+        "tp": {},
+        "u10": {
+          "rmse": 3.1186724874968466,
+          "acc": 0.5014517589795405
+        },
+        "v10": {
+          "rmse": 3.083501371127781,
+          "acc": 0.5061024787517442
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230129",
+      "lead_hours": 120,
+      "valid_time": "2023-02-03T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230129_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 2.7420348159524615,
+          "acc": 0.9107179827394248
+        },
+        "tp": {
+          "rmse": 0.0009957402175320889,
+          "acc": 0.2073586039843218,
+          "pod_1mm": 0.685690653432589
+        },
+        "u10": {
+          "rmse": 2.779138905975009,
+          "acc": 0.6440451715810169
+        },
+        "v10": {
+          "rmse": 3.5075391727659486,
+          "acc": 0.37092523807983696
+        }
+      }
+    },
+    {
+      "model": "K1_teacher",
+      "init_date": "20230129",
+      "lead_hours": 240,
+      "valid_time": "2023-02-08T00:00:00.000000000",
+      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1_a1bplus\\forecasts\\20230129_00Z.nc",
+      "variables": {
+        "t2m": {
+          "rmse": 3.320413730334576,
+          "acc": 0.8845254541695884
+        },
+        "tp": {
+          "rmse": 0.0012077093389609378,
+          "acc": 0.136030808913566,
+          "pod_1mm": 0.3376926669780476
+        },
+        "u10": {
+          "rmse": 4.723944151853486,
+          "acc": 0.3779378405564224
+        },
+        "v10": {
+          "rmse": 4.303707511781833,
+          "acc": 0.3657137570955877
+        }
+      }
+    }
+  ],
+  "student_results": [
+    {
+      "model": "student_v5",
+      "init_date": "20230101",
+      "lead_hours": 6,
+      "valid_time": "2023-01-01T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230101",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00030577645395375063,
+          "student_acc": -0.008428671184656757,
+          "teacher_rmse_vs_era5": 0.0009122671146710834,
+          "teacher_acc": 0.5220949125816312,
+          "degradation_pct_vs_teacher": -66.48169718756135,
+          "student_rmse_vs_teacher_field": 0.0010506743817610613,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.7673107890499195
+        },
+        "t2m": {
+          "student_rmse_vs_era5": 1.4554610365748533,
+          "student_acc": 0.9730630572742467,
+          "teacher_rmse_vs_era5": 1.208202700521498,
+          "teacher_acc": 0.9814054472127651,
+          "degradation_pct_vs_teacher": 20.464971312067995,
+          "student_rmse_vs_teacher_field": 1.2779746879158427
+        }
+      },
+      "forecast_nc": "data\\processed\\trackB_student_heldout_v5\\forecasts\\20230101_00Z.nc"
+    },
+    {
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student_v5",
+      "init_date": "20230108",
+      "lead_hours": 6,
+      "valid_time": "2023-01-08T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230108",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00040750801620624956,
+          "student_acc": 0.0035639608122108733,
+          "teacher_rmse_vs_era5": 0.0015394920254390842,
+          "teacher_acc": 0.48084572484398924,
+          "degradation_pct_vs_teacher": -73.52970918507859,
+          "student_rmse_vs_teacher_field": 0.001717836858799743,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.8113975576662144
+        },
+        "t2m": {
+          "student_rmse_vs_era5": 1.3921324159661532,
+          "student_acc": 0.9762402772747907,
+          "teacher_rmse_vs_era5": 1.181533155668847,
+          "teacher_acc": 0.9827257521316815,
+          "degradation_pct_vs_teacher": 17.82423618726884,
+          "student_rmse_vs_teacher_field": 1.3023692486071754
+        }
+      },
+      "forecast_nc": "data\\processed\\trackB_student_heldout_v5\\forecasts\\20230108_00Z.nc"
+    },
+    {
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student_v5",
+      "init_date": "20230115",
+      "lead_hours": 6,
+      "valid_time": "2023-01-15T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230115",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00027967727075503817,
+          "student_acc": -0.004453314851964396,
+          "teacher_rmse_vs_era5": 0.0008946444121552882,
+          "teacher_acc": 0.39869702747421143,
+          "degradation_pct_vs_teacher": -68.73872267516123,
+          "student_rmse_vs_teacher_field": 0.0009918627742738007,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.6850828729281768
+        },
+        "t2m": {
+          "student_rmse_vs_era5": 1.3302801173464198,
+          "student_acc": 0.979693167853626,
+          "teacher_rmse_vs_era5": 1.1532444327898792,
+          "teacher_acc": 0.9847923047423804,
+          "degradation_pct_vs_teacher": 15.35109813001772,
+          "student_rmse_vs_teacher_field": 1.219835032335121
+        }
+      },
+      "forecast_nc": "data\\processed\\trackB_student_heldout_v5\\forecasts\\20230115_00Z.nc"
+    },
+    {
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student_v5",
+      "init_date": "20230122",
+      "lead_hours": 6,
+      "valid_time": "2023-01-22T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230122",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.00046342305607501786,
+          "student_acc": -0.01035702276783651,
+          "teacher_rmse_vs_era5": 0.0016185983269774403,
+          "teacher_acc": 0.6610423102321318,
+          "degradation_pct_vs_teacher": -71.3688659903405,
+          "student_rmse_vs_teacher_field": 0.0019111470292369807,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.8401360544217688
+        },
+        "t2m": {
+          "student_rmse_vs_era5": 1.427730155323961,
+          "student_acc": 0.9782512686702173,
+          "teacher_rmse_vs_era5": 1.2411910971107651,
+          "teacher_acc": 0.9834605293158242,
+          "degradation_pct_vs_teacher": 15.029036112764585,
+          "student_rmse_vs_teacher_field": 1.3834548750433824
+        }
+      },
+      "forecast_nc": "data\\processed\\trackB_student_heldout_v5\\forecasts\\20230122_00Z.nc"
+    },
+    {
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    },
+    {
+      "model": "student_v5",
+      "init_date": "20230129",
+      "lead_hours": 6,
+      "valid_time": "2023-01-29T06:00:00.000000000",
+      "ckpt": "models/student_global_stable_v5.ckpt",
+      "state_meta": {
+        "init_date": "20230129",
+        "init_time": "0000",
+        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "n320_points": 542080,
+        "state_shape": [
+          65,
+          181,
+          360
+        ]
+      },
+      "protocol": "analysis_forced_6h_step",
+      "variables": {
+        "tp": {
+          "student_rmse_vs_era5": 0.000490963038346604,
+          "student_acc": 0.0051632662415474,
+          "teacher_rmse_vs_era5": 0.0016434712636608285,
+          "teacher_acc": 0.5251161842709202,
+          "degradation_pct_vs_teacher": -70.12646042541779,
+          "student_rmse_vs_teacher_field": 0.0018692936835450356,
+          "student_pod_1mm": 0.0,
+          "teacher_pod_1mm": 0.7358490566037735
+        },
+        "t2m": {
+          "student_rmse_vs_era5": 1.4577229512032879,
+          "student_acc": 0.979106507912667,
+          "teacher_rmse_vs_era5": 1.2862874983977464,
+          "teacher_acc": 0.9839905743669562,
+          "degradation_pct_vs_teacher": 13.327926534238161,
+          "student_rmse_vs_teacher_field": 1.3536127796017319
+        }
+      },
+      "forecast_nc": "data\\processed\\trackB_student_heldout_v5\\forecasts\\20230129_00Z.nc"
+    },
+    {
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: No module named 'cdsapi'"
+    }
+  ],
+  "aggregate": {
+    "teacher": {
+      "6": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 1.2140917768977473,
+          "rmse_std": 0.04635458915962195
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.0013216946285807452,
+          "rmse_std": 0.00034325806373008673
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 1.187995513525654,
+          "rmse_std": 0.09050313102265788
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 1.2699534856703658,
+          "rmse_std": 0.07612372538008376
+        }
+      },
+      "24": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 1.474953813258783,
+          "rmse_std": 0.03952107772470267
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.000506532342333124,
+          "rmse_std": 0.00012631471385637726
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 1.9591185018158406,
+          "rmse_std": 0.16115508871705547
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 2.1311503522903417,
+          "rmse_std": 0.13430876304960995
+        }
+      },
+      "72": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 2.435375410691558,
+          "rmse_std": 0.10590282130538638
+        },
+        "tp": {
+          "n": 4,
+          "rmse_mean": 0.0008059867782805351,
+          "rmse_std": 0.00014333289076716053
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 3.1516163919878717,
+          "rmse_std": 0.157530480141203
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 3.2423903749105945,
+          "rmse_std": 0.13573677784361857
+        }
+      },
+      "120": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 3.091154178184033,
+          "rmse_std": 0.19854496585390746
+        },
+        "tp": {
+          "n": 5,
+          "rmse_mean": 0.0009934132693975599,
+          "rmse_std": 0.0001011168055132611
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 3.1291199530788427,
+          "rmse_std": 0.24993711474663094
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 3.3817836917529354,
+          "rmse_std": 0.2817017210337072
+        }
+      },
+      "240": {
+        "t2m": {
+          "n": 5,
+          "rmse_mean": 3.45515859756203,
+          "rmse_std": 0.16698699082393242
+        },
+        "tp": {
+          "n": 4,
+          "rmse_mean": 0.001150669952309278,
+          "rmse_std": 8.063249331871756e-05
+        },
+        "u10": {
+          "n": 5,
+          "rmse_mean": 4.682665417816212,
+          "rmse_std": 0.22116176101988816
+        },
+        "v10": {
+          "n": 5,
+          "rmse_mean": 4.138912015650535,
+          "rmse_std": 0.2697709334423787
+        }
+      }
+    },
+    "student": {
+      "by_lead": {
+        "6": {
+          "tp": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
+            "student_rmse_mean": 0.000389469567067332,
+            "teacher_rmse_mean": 0.0013216946285807452,
+            "degradation_pct_mean": -70.0490910927119,
+            "student_acc_mean": -0.002902356350139878,
+            "teacher_acc_mean": 0.5175592318805767,
+            "student_pod_1mm_mean": 0.0,
+            "teacher_pod_1mm_mean": 0.7679552661339706
+          },
+          "t2m": {
+            "n_era5": 5,
+            "n_vs_teacher_field": 5,
+            "student_rmse_vs_teacher_field_mean": 1.3074493247006507,
+            "student_rmse_mean": 1.412665335282935,
+            "teacher_rmse_mean": 1.2140917768977473,
+            "degradation_pct_mean": 16.39945365527146,
+            "student_acc_mean": 0.9772708557971095,
+            "teacher_acc_mean": 0.9832749215539215
+          }
+        }
+      },
+      "tp": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
+        "student_rmse_mean": 0.000389469567067332,
+        "teacher_rmse_mean": 0.0013216946285807452,
+        "degradation_pct_mean": -70.0490910927119,
+        "student_acc_mean": -0.002902356350139878,
+        "teacher_acc_mean": 0.5175592318805767,
+        "student_pod_1mm_mean": 0.0,
+        "teacher_pod_1mm_mean": 0.7679552661339706
+      },
+      "t2m": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 1.3074493247006507,
+        "student_rmse_mean": 1.412665335282935,
+        "teacher_rmse_mean": 1.2140917768977473,
+        "degradation_pct_mean": 16.39945365527146,
+        "student_acc_mean": 0.9772708557971095,
+        "teacher_acc_mean": 0.9832749215539215
+      }
+    },
+    "student_6h": {
+      "tp": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 0.0015081629455233243,
+        "student_rmse_mean": 0.000389469567067332,
+        "teacher_rmse_mean": 0.0013216946285807452,
+        "degradation_pct_mean": -70.0490910927119,
+        "student_acc_mean": -0.002902356350139878,
+        "teacher_acc_mean": 0.5175592318805767,
+        "student_pod_1mm_mean": 0.0,
+        "teacher_pod_1mm_mean": 0.7679552661339706
+      },
+      "t2m": {
+        "n_era5": 5,
+        "n_vs_teacher_field": 5,
+        "student_rmse_vs_teacher_field_mean": 1.3074493247006507,
+        "student_rmse_mean": 1.412665335282935,
+        "teacher_rmse_mean": 1.2140917768977473,
+        "degradation_pct_mean": 16.39945365527146,
+        "student_acc_mean": 0.9772708557971095,
+        "teacher_acc_mean": 0.9832749215539215
+      }
+    },
+    "v4_student_6h_reference": {
+      "note": "see reports/TRACKB_HELD_OUT_JAN2023_V4_MERGED.json aggregate.student_6h",
+      "tp_acc_approx": 0.0,
+      "tp_pod_1mm": 0.0,
+      "tp_rmse": 0.000389,
+      "t2m_deg_pct": 23.9
+    }
+  },
+  "protocol_notes": {
+    "teacher_scored": "prior local GCS ADC (v3 report)",
+    "student_inferred": "Cassava GPU1; analysis-forced CDS IC; v5 tp-recovery ckpt",
+    "student_era5_rescored": "local GCS ADC after student NCs",
+    "tp_decision": "OUT-OF-SCOPE for Cout=3 student head after one v5 attempt (ACC~0, POD1mm=0, field identically zero)",
+    "multi_lead": "analysis-forced code path ready (--student_leads); +6h scored; +24h blocked on CDS 18Z auth on Cassava; free-run not supported"
+  },
+  "tp_out_of_scope": true
+}

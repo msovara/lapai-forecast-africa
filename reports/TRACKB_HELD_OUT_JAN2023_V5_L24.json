@@ -1,0 +1,81 @@
+{
+  "protocol": "trackB_held_out_jan2023",
+  "timestamp_utc": "2026-08-26T14:55:05.271155+00:00",
+  "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
+  "candidate_student": "models/student_global_stable_v5.ckpt",
+  "forecast_dir": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_k1_a1bplus/forecasts",
+  "domain": "africa",
+  "truth_source": "gcs://code4earth/era5",
+  "leads_hours": [
+    6,
+    24,
+    72,
+    120,
+    240
+  ],
+  "student_leads_hours": [
+    24
+  ],
+  "teacher_variables": [
+    "t2m",
+    "tp",
+    "u10",
+    "v10"
+  ],
+  "student_variables_scored": [
+    "tp",
+    "t2m"
+  ],
+  "caveats": [
+    "Student MVP outputs tp/msl/2t only \u2014 no z500/t850 heads; PLAN Week-9 skill table incomplete.",
+    "Student cannot free-run multi-day (65\u21923 channel heads); iterative rollout not supported.",
+    "Student multi-lead (if requested) is analysis-forced: each lead is a fresh ERA5 IC + one +6h step.",
+    "msl not scored held-out (no GCS truth stem in Mvua protocol; teacher forecast NCs lack msl).",
+    "MVP cache gate accepted with documented tp soft-fail (21.2% > 15%); this protocol is off-cache Jan-2023."
+  ],
+  "teacher_results": [],
+  "student_results": [
+    {
+      "init_date": "20230101",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc"
+    },
+    {
+      "init_date": "20230108",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc"
+    },
+    {
+      "init_date": "20230115",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc"
+    },
+    {
+      "init_date": "20230122",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc"
+    },
+    {
+      "init_date": "20230129",
+      "lead_hours": 24,
+      "error": "CDS/state build failed: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc"
+    }
+  ],
+  "aggregate": {
+    "student": {
+      "by_lead": {
+        "24": {
+          "tp": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 0
+          },
+          "t2m": {
+            "n_era5": 0,
+            "n_vs_teacher_field": 0
+          }
+        }
+      }
+    },
+    "student_6h": {}
+  }
+}

@@ -45,6 +45,8 @@ def apply_soft_physical_constraints(
       - ``relu``: hard non-negativity (legacy; zeros grads for negative logits)
       - ``softplus``: scaled softplus ``softplus(1000·x)/1000`` ≈ relu on metre-scale
         tp while keeping a small gradient near zero (escapes all-dry MAE collapse)
+      - ``softplus_soft``: ``softplus(50·x)/50`` — wider basin / stronger near-zero grads
+        for focused tp recovery
       - ``none``: leave tp unconstrained (caller may clamp at eval)
     """
     if pred.shape[1] < 1:
@@ -53,6 +55,9 @@ def apply_soft_physical_constraints(
     if tp_mode == "softplus":
         # Head is in physical metres (~1e-4); scale so softplus acts near zero.
         tp = F.softplus(raw * 1000.0) / 1000.0
+    elif tp_mode == "softplus_soft":
+        # Wider softplus for tp recovery: more gradient near the all-dry basin.
+        tp = F.softplus(raw * 50.0) / 50.0
     elif tp_mode == "none":
         tp = raw
     else:
@@ -91,6 +96,10 @@ def loss_precip_log1p_mae(
     mm_scale: float = 1000.0,
     wet_threshold_m: float = 1.0e-4,
     wet_boost: float = 4.0,
+    underpred_weight: float = 0.0,
+    pod_weight: float = 0.0,
+    dry_collapse_weight: float = 0.0,
+    pod_threshold_m: float = 1.0e-3,
     spatial_weights: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     """
@@ -98,6 +107,9 @@ def loss_precip_log1p_mae(
 
     - Compare ``log1p(tp * mm_scale)`` so light rain is not drowned by MAE in m.
     - Up-weight wet target pixels (``tp >= wet_threshold_m``) by ``wet_boost``.
+    - Optional asymmetric under-prediction penalty on wet pixels (punishes all-dry).
+    - Optional soft POD hinge: encourage pred ≥ ``pod_threshold_m`` where truth is wet.
+    - Optional dry-collapse regularizer on batch mean rates (Africa or global).
     """
     p = pred[:, tp_index : tp_index + 1].clamp_min(0.0)
     t = target[:, tp_index : tp_index + 1].clamp_min(0.0)
@@ -108,9 +120,29 @@ def loss_precip_log1p_mae(
             sw = sw.view(1, 1, sw.shape[0], sw.shape[1])
         w = w * sw.to(device=w.device, dtype=w.dtype)
     wet = (t >= wet_threshold_m).to(dtype=p.dtype)
-    w = w * (1.0 + wet_boost * wet)
+    w_mae = w * (1.0 + wet_boost * wet)
     err = (torch.log1p(p * mm_scale) - torch.log1p(t * mm_scale)).abs()
-    return (w * err).mean()
+    total = (w_mae * err).mean()
+
+    if underpred_weight > 0.0:
+        # Asymmetric: only punish missing rain on wet targets (all-dry is worst case).
+        under = F.relu(t - p)
+        total = total + underpred_weight * (w * wet * under).mean()
+
+    if pod_weight > 0.0:
+        # Soft hit-rate: hinge when truth is ≥1 mm but pred stays below threshold.
+        wet_1mm = (t >= pod_threshold_m).to(dtype=p.dtype)
+        miss = F.relu(pod_threshold_m - p)
+        total = total + pod_weight * (w * wet_1mm * miss).mean()
+
+    if dry_collapse_weight > 0.0:
+        # Match area-weighted mean rates so constant-zero cannot be a local MAE minimum.
+        denom = w.mean().clamp_min(1e-8)
+        mean_p = (w * p).mean() / denom
+        mean_t = (w * t).mean() / denom
+        total = total + dry_collapse_weight * F.relu(mean_t - mean_p)
+
+    return total
 
 
 class FeatureDistillationHead(nn.Module):
@@ -181,6 +213,10 @@ def combined_distillation_loss(
     africa_mix: float = 0.0,
     africa_spatial_weights: Optional[torch.Tensor] = None,
     precip_log1p_weight: float = 0.0,
+    precip_wet_boost: float = 4.0,
+    precip_underpred_weight: float = 0.0,
+    precip_pod_weight: float = 0.0,
+    precip_dry_collapse_weight: float = 0.0,
 ) -> Tuple[torch.Tensor, dict]:
     pred_n = normalize_channels(pred, target_mean, target_std)
     era5_n = normalize_channels(era5, target_mean, target_std)
@@ -204,15 +240,25 @@ def combined_distillation_loss(
     if precip_log1p_weight > 0.0:
         # Physical units (metres), not channel-normalized — log1p needs real scale.
         sw = africa_spatial_weights if (africa_mix > 0.0 and africa_spatial_weights is not None) else spatial_weights
+        precip_kw = dict(
+            wet_boost=precip_wet_boost,
+            underpred_weight=precip_underpred_weight,
+            pod_weight=precip_pod_weight,
+            dry_collapse_weight=precip_dry_collapse_weight,
+        )
         # Domain-mix precip term the same way as L_A when Africa mix is on.
         if africa_mix > 0.0 and africa_spatial_weights is not None:
-            lp_g = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=None)
+            lp_g = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=None, **precip_kw)
             lp_a = loss_precip_log1p_mae(
-                pred, era5, lat_weights, spatial_weights=africa_spatial_weights
+                pred,
+                era5,
+                lat_weights,
+                spatial_weights=africa_spatial_weights,
+                **precip_kw,
             )
             lp = (1.0 - africa_mix) * lp_g + africa_mix * lp_a
         else:
-            lp = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=sw)
+            lp = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=sw, **precip_kw)
         total = total + precip_log1p_weight * lp
         parts["L_tp"] = lp.detach()
     else:
