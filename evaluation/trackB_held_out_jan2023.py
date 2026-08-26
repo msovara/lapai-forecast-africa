@@ -284,7 +284,7 @@ def score_student_6h(
     import torch
     from evaluation.trackB_gate import _load_student
     from lapai_inference.cache_schema import lat_lon_mesh
-    from utils.losses_distillation import apply_soft_physical_constraints
+    from utils.losses_distillation import apply_soft_physical_constraints, normalize_channels
 
     net, ckpt_meta = _load_student(ckpt, device)
     lat_full, lon_full = lat_lon_mesh(181, 360)
@@ -311,9 +311,15 @@ def score_student_6h(
 
         with torch.no_grad():
             x = torch.as_tensor(state[None, ...], dtype=torch.float32, device=device)
+            if ckpt_meta.get("normalize_inputs") and ckpt_meta.get("input_mean") is not None:
+                im = torch.as_tensor(ckpt_meta["input_mean"], dtype=torch.float32, device=device)
+                istd = torch.as_tensor(ckpt_meta["input_std"], dtype=torch.float32, device=device)
+                x = normalize_channels(x, im, istd)
             out = net(x)["pred"]
             if bool(ckpt_meta.get("physical_constraints", True)):
-                out = apply_soft_physical_constraints(out)
+                out = apply_soft_physical_constraints(
+                    out, tp_mode=str(ckpt_meta.get("tp_mode", "relu"))
+                )
             pred = out[0].detach().cpu().numpy()  # (3,H,W) tp, msl, 2t
 
         fc = xr.open_dataset(fc_path)

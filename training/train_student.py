@@ -13,6 +13,7 @@ import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
 
+from evaluation.masks import africa_hw_mask
 from lapai_inference.dataset import LapAIZarrDataset, collate_lapai_batch, open_cache_readonly
 from lapai_inference.model import LapAIStudentCNN, LapAIStudentConfig
 from lapai_inference.cache_schema import cosine_latitude_weights, lat_lon_mesh
@@ -20,6 +21,7 @@ from utils.losses_distillation import (
     FeatureDistillationHead,
     apply_soft_physical_constraints,
     combined_distillation_loss,
+    normalize_channels,
 )
 
 
@@ -76,6 +78,28 @@ def compute_target_stats_from_cache(
     )
 
 
+def compute_input_stats_from_cache(
+    cache: Path, device: torch.device, max_samples: int = 128
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Per-channel mean/std of state_in (subsample T for speed)."""
+    g = open_cache_readonly(cache)
+    t_all = int(g["state_in"].shape[0])
+    n = min(max_samples, t_all)
+    idx = np.linspace(0, t_all - 1, n, dtype=np.int64)
+    x = np.asarray(g["state_in"][idx.tolist()], dtype=np.float64)  # (n,C,H,W)
+    mean = x.mean(axis=(0, 2, 3))
+    std = np.maximum(x.std(axis=(0, 2, 3)), 1e-6)
+    print(
+        "[Track B] input stats from cache "
+        + " ".join(f"c{i}:mean={mean[i]:.4g}/std={std[i]:.4g}" for i in range(min(5, len(mean))))
+        + (" ..." if len(mean) > 5 else "")
+    )
+    return (
+        torch.as_tensor(mean, dtype=torch.float32, device=device),
+        torch.as_tensor(std, dtype=torch.float32, device=device),
+    )
+
+
 def batch_generator_loader(
     loader: DataLoader, device: torch.device, steps: int
 ) -> Iterator[dict]:
@@ -125,22 +149,31 @@ def train_epoch(
     alpha: float = 1.0,
     target_mean: Optional[torch.Tensor] = None,
     target_std: Optional[torch.Tensor] = None,
+    input_mean: Optional[torch.Tensor] = None,
+    input_std: Optional[torch.Tensor] = None,
     grad_clip: float = 1.0,
     physical_constraints: bool = True,
+    tp_mode: str = "relu",
     channel_weights: Optional[torch.Tensor] = None,
+    africa_mix: float = 0.0,
+    africa_spatial: Optional[torch.Tensor] = None,
+    precip_log1p_weight: float = 0.0,
 ) -> tuple[float, dict[str, float]]:
     net.train()
     running = 0.0
-    part_sums = {"L_A": 0.0, "L_B": 0.0, "L_C": 0.0}
+    part_sums = {"L_A": 0.0, "L_B": 0.0, "L_C": 0.0, "L_tp": 0.0}
     gen = batches
     params = list(net.parameters()) + list(heads[0].parameters()) + list(heads[1].parameters())
     for _ in range(steps):
         b = next(gen)
         opt.zero_grad(set_to_none=True)
-        out = net(b["x"])
+        x = b["x"]
+        if input_mean is not None and input_std is not None:
+            x = normalize_channels(x, input_mean, input_std)
+        out = net(x)
         pred = out["pred"]
         if physical_constraints:
-            pred = apply_soft_physical_constraints(pred)
+            pred = apply_soft_physical_constraints(pred, tp_mode=tp_mode)
         use_b = beta_w > 0.0
         use_c = gamma_w > 0.0
         loss, parts = combined_distillation_loss(
@@ -162,11 +195,15 @@ def train_epoch(
             target_mean=target_mean,
             target_std=target_std,
             channel_weights=channel_weights,
+            africa_mix=africa_mix,
+            africa_spatial_weights=africa_spatial,
+            precip_log1p_weight=precip_log1p_weight,
         )
         if not torch.isfinite(loss):
             raise RuntimeError(
                 f"non-finite loss L_A={float(parts['L_A'])} "
-                f"L_B={float(parts['L_B'])} L_C={float(parts['L_C'])}"
+                f"L_B={float(parts['L_B'])} L_C={float(parts['L_C'])} "
+                f"L_tp={float(parts['L_tp'])}"
             )
         loss.backward()
         if grad_clip and grad_clip > 0:
@@ -252,13 +289,20 @@ def main() -> None:
     spectral_k_warmup = int(spectral_k_warmup) if spectral_k_warmup is not None else None
     grad_clip = float(yml.get("grad_clip", distill.get("grad_clip", 1.0)))
     normalize_targets = bool(yml.get("normalize_targets", True))
+    normalize_inputs = bool(yml.get("normalize_inputs", False))
     physical_constraints = bool(yml.get("physical_constraints", True))
+    tp_mode = str(yml.get("tp_mode", distill.get("tp_mode", "relu")))
+    africa_mix = float(yml.get("africa_mix", distill.get("africa_mix", 0.0)))
+    precip_log1p_weight = float(
+        yml.get("precip_log1p_weight", distill.get("precip_log1p_weight", 0.0))
+    )
     # Cout order: tp, msl, 2t — up-weight tp/2t when msl already near gate.
     cw_raw = yml.get("channel_weights", distill.get("channel_weights"))
     channel_weights_list = [float(x) for x in cw_raw] if cw_raw is not None else None
 
     device = torch.device(args.device)
 
+    input_mean = input_std = None
     if cache is not None:
         ds = LapAIZarrDataset(cache)
         cfg = cfg_from_dataset(ds, yml)
@@ -281,6 +325,8 @@ def main() -> None:
             target_mean, target_std = compute_target_stats_from_cache(cache, device)
         else:
             target_mean = target_std = None
+        if normalize_inputs:
+            input_mean, input_std = compute_input_stats_from_cache(cache, device)
     else:
         model_kwargs: dict[str, Any] = {}
         if "lat" in yml:
@@ -341,6 +387,23 @@ def main() -> None:
         channel_weights = torch.tensor(channel_weights_list, dtype=torch.float32, device=device)
         print(f"[Track B] channel_weights (tp,msl,2t)={channel_weights_list}")
 
+    africa_spatial = None
+    if africa_mix > 0.0:
+        lat_np, lon_np = lat_lon_mesh(cfg.lat, cfg.lon)
+        africa_spatial = torch.as_tensor(
+            africa_hw_mask(lat_np, lon_np), dtype=torch.float32, device=device
+        )
+        print(
+            f"[Track B] africa_mix={africa_mix} mask_frac={float(africa_spatial.mean()):.4f} "
+            f"tp_mode={tp_mode} precip_log1p_weight={precip_log1p_weight} "
+            f"normalize_inputs={normalize_inputs}"
+        )
+    else:
+        print(
+            f"[Track B] africa_mix=0 tp_mode={tp_mode} precip_log1p_weight={precip_log1p_weight} "
+            f"normalize_inputs={normalize_inputs}"
+        )
+
     opt = optim.AdamW(
         list(net.parameters()) + list(heads[0].parameters()) + list(heads[1].parameters()),
         lr=3e-4,
@@ -373,13 +436,20 @@ def main() -> None:
             alpha=alpha,
             target_mean=target_mean,
             target_std=target_std,
+            input_mean=input_mean,
+            input_std=input_std,
             grad_clip=grad_clip,
             physical_constraints=physical_constraints,
+            tp_mode=tp_mode,
             channel_weights=channel_weights,
+            africa_mix=africa_mix,
+            africa_spatial=africa_spatial,
+            precip_log1p_weight=precip_log1p_weight,
         )
         print(
             f"epoch {epoch} loss={loss_m:.6f} "
             f"L_A={parts['L_A']:.6f} L_B={parts['L_B']:.6f} L_C={parts['L_C']:.6f} "
+            f"L_tp={parts['L_tp']:.6f} "
             f"beta_w={beta_w:.4f} gamma_w={gamma_w:.4f} "
             f"cache={cache} teacher={teacher_ckpt}"
         )
@@ -390,13 +460,20 @@ def main() -> None:
         "cfg": asdict(cfg),
         "teacher_ckpt": str(teacher_ckpt),
         "normalize_targets": normalize_targets,
+        "normalize_inputs": normalize_inputs,
         "physical_constraints": physical_constraints,
+        "tp_mode": tp_mode,
+        "africa_mix": africa_mix,
+        "precip_log1p_weight": precip_log1p_weight,
         "channel_weights": channel_weights_list,
         "resume_from": str(resume) if resume is not None else None,
     }
     if target_mean is not None and target_std is not None:
         blob["target_mean"] = target_mean.detach().cpu()
         blob["target_std"] = target_std.detach().cpu()
+    if input_mean is not None and input_std is not None:
+        blob["input_mean"] = input_mean.detach().cpu()
+        blob["input_std"] = input_std.detach().cpu()
     torch.save(blob, out)
     print("saved", out.resolve(), "params", net.count_parameters())
 

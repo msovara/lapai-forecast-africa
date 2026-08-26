@@ -91,3 +91,50 @@ Student–teacher field RMSE (Africa, no ERA5): tp 0.00151, t2m 2.88.
 - Cassava student forecasts (not in git): `data/processed/trackB_student_heldout/forecasts/`
 - Merge/rescore helper: `scripts/merge_trackB_held_out_student.py`
 - Cassava launchers: `scripts/run_trackB_held_out_*cassava.sh`
+
+---
+
+## Generalization v4 (2026-08-26) — held-out t2m fix
+
+**Goal:** improve **held-out** Jan-2023 Africa t2m / honest tp skill (not cache-gate 3/3).  
+**Ckpt:** `models/student_global_stable_v4.ckpt` (resume v3; β/γ still off).
+
+### Root cause / mask fix
+
+First v4 train crashed on `africa_hw_mask`: in-place `&=` on a `(H,1)` lat mask cannot expand to `(H,W)`. Fixed in `evaluation/masks.py` to build `(lat_ok & lon_ok)` via broadcasting → shape `(181,360)`, `mask_frac≈0.0945`.
+
+### Levers (v4)
+
+1. Full teacher cache `teacher_k1_cache_full2020_2021.zarr` (T=730; already built — not rebuilt).
+2. Africa-weighted L_A (`africa_mix=0.5`) after mask fix.
+3. Input channel z-score (`normalize_inputs=true`) for train/held-out parity.
+4. Precip-aware term (`precip_log1p_weight=2.0`) + `tp_mode=softplus`.
+5. Channel weights `[4.0, 0.3, 3.0]` for `(tp, msl, 2t)`.
+
+### Cache MVP gate (optional regression; full cache, global)
+
+| var | degradation vs K1 | |
+|-----|-------------------|---|
+| tp  | **+22.1%** fail (≤15%) | soft-fail unchanged |
+| msl | **−1.1%** pass | |
+| 2t  | **−58.4%** pass | |
+
+Africa-domain cache: tp +16.1%, msl −65.6%, 2t −83.4%.
+
+### Held-out Jan-2023 +6h Africa (before → after)
+
+| var | v3 deg vs K1 | v4 deg vs K1 | v3 RMSE | v4 RMSE | K1 RMSE | notes |
+|-----|--------------|--------------|---------|---------|---------|-------|
+| t2m | **+168%** | **+23.9%** | 3.26 | 1.50 | 1.21 | ACC≈0.97; large generalization win |
+| tp  | −70% RMSE* | −70% RMSE* | 0.000389 | 0.000389 | 0.00132 | still ACC≈0, POD₁ₘₘ=0 → dry-bias, not skill |
+
+\*Identical tp RMSE/ACC/POD to v3: softplus + precip log1p did **not** escape all-dry collapse on held-out CDS ICs.
+
+Student–teacher field RMSE (Africa): t2m **2.88 → 1.34**; tp unchanged 0.00151.
+
+### Artifacts (v4)
+
+- Reports: `TRACKB_GATE_V4.json`, `TRACKB_HELD_OUT_JAN2023_V4.json`, `TRACKB_HELD_OUT_JAN2023_V4_MERGED.json`, scorecards `TRACKB_STUDENT_SCORECARD_V4*.json`
+- Config: `configs/student_global_v4.yaml`
+- Train/eval: `scripts/run_trackB_stable_v4.sh`, `scripts/run_trackB_v4_post_eval.sh`, `scripts/merge_trackB_held_out_v4.py`
+- Cassava forecasts (not in git): `data/processed/trackB_student_heldout_v4/forecasts/`

@@ -26,11 +26,11 @@ from typing import Any
 import numpy as np
 import torch
 
-from evaluation.masks import AFRICA_LAT, AFRICA_LON, africa_crop, area_rmse, lat_lon_to_indices
+from evaluation.masks import AFRICA_LAT, AFRICA_LON, africa_hw_mask
 from lapai_inference.cache_schema import cosine_latitude_weights, lat_lon_mesh
 from lapai_inference.dataset import open_cache_readonly
 from lapai_inference.model import LapAIStudentCNN, LapAIStudentConfig
-from utils.losses_distillation import apply_soft_physical_constraints
+from utils.losses_distillation import apply_soft_physical_constraints, normalize_channels
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -41,46 +41,41 @@ DEFAULT_MAX_DEGRAD_PCT = 15.0
 
 
 def _area_rmse_per_channel(
-    pred: torch.Tensor, target: torch.Tensor, lat_weights: torch.Tensor
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    lat_weights: torch.Tensor,
+    spatial_mask: torch.Tensor | None = None,
 ) -> list[float]:
-    """pred/target (N,C,H,W) or (C,H,W) → list of C cosine-lat RMSE values."""
+    """pred/target (N,C,H,W) or (C,H,W) → list of C cosine-lat RMSE values.
+
+    Optional ``spatial_mask`` (H,W) restricts both numerator and denominator.
+    """
     if pred.ndim == 3:
         pred = pred.unsqueeze(0)
         target = target.unsqueeze(0)
     out: list[float] = []
+    w = lat_weights.view(1, 1, -1, 1).to(pred)
+    if spatial_mask is not None:
+        sm = spatial_mask
+        if sm.ndim == 2:
+            sm = sm.view(1, 1, sm.shape[0], sm.shape[1])
+        w = w * sm.to(device=w.device, dtype=w.dtype)
     for c in range(pred.shape[1]):
-        r = area_rmse(pred[:, c : c + 1], target[:, c : c + 1], lat_weights)
-        out.append(float(r.detach().cpu()))
+        diff2 = (pred[:, c : c + 1] - target[:, c : c + 1]) ** 2
+        num = (w * diff2).sum()
+        den = w.expand_as(diff2).sum().clamp_min(1e-12)
+        out.append(float(torch.sqrt(num / den).detach().cpu()))
     return out
 
 
-def _load_student(ckpt_path: Path, device: torch.device) -> tuple[LapAIStudentCNN, dict[str, Any]]:
-    blob = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    cfg_dict = dict(blob.get("cfg") or {})
-    # dataclass fields only
-    allowed = {f.name for f in LapAIStudentConfig.__dataclass_fields__.values()}  # type: ignore[attr-defined]
-    cfg = LapAIStudentConfig(**{k: v for k, v in cfg_dict.items() if k in allowed})
-    net = LapAIStudentCNN(cfg)
-    net.load_state_dict(blob["model"])
-    net.to(device)
-    net.eval()
-    meta = {
-        "teacher_ckpt": blob.get("teacher_ckpt"),
-        "cfg": asdict(cfg),
-        "ckpt": str(ckpt_path),
-        "physical_constraints": bool(blob.get("physical_constraints", True)),
-        "normalize_targets": bool(blob.get("normalize_targets", False)),
-    }
-    return net, meta
-
-
-def _domain_slices(
+def _domain_mask(
     lat: np.ndarray, lon: np.ndarray, domain: str
-) -> tuple[slice, slice] | None:
+) -> torch.Tensor | None:
+    """Optional (H,W) spatial mask; Africa uses wrap-aware box (lon 0..360 safe)."""
     if domain == "global":
         return None
     if domain == "africa":
-        return lat_lon_to_indices(lat, lon, AFRICA_LAT, AFRICA_LON)
+        return torch.as_tensor(africa_hw_mask(lat, lon, AFRICA_LAT, AFRICA_LON), dtype=torch.float32)
     raise ValueError(f"Unknown domain {domain!r}")
 
 
@@ -111,9 +106,6 @@ def score_student_on_cache(
         init_arr = np.asarray(g["init_id"][:])
 
     net, ckpt_meta = _load_student(ckpt, device)
-    if ckpt_meta["cfg"].get("in_channels_raw") not in (None, cin):
-        # cfg may store exact cin from training
-        pass
     if int(ckpt_meta["cfg"]["out_channels"]) != cout:
         raise ValueError(
             f"Checkpoint out_channels={ckpt_meta['cfg']['out_channels']} != cache Cout={cout}"
@@ -121,9 +113,8 @@ def score_student_on_cache(
 
     lat, lon = lat_lon_mesh(h, w)
     w_lat_full = torch.as_tensor(cosine_latitude_weights(lat).squeeze(), dtype=torch.float32)
-    sl = _domain_slices(lat, lon, domain)
+    spat = _domain_mask(lat, lon, domain)
 
-    # Accumulators for squared error (recompute exact RMSE at end via area_rmse on stacked)
     stud_preds: list[torch.Tensor] = []
     teach_preds: list[torch.Tensor] = []
     era5_tgts: list[torch.Tensor] = []
@@ -132,31 +123,27 @@ def score_student_on_cache(
     for start in range(0, n, batch_size):
         stop = min(start + batch_size, n)
         x = torch.as_tensor(np.asarray(g["state_in"][start:stop], dtype=np.float32), device=device)
+        if ckpt_meta.get("normalize_inputs") and ckpt_meta.get("input_mean") is not None:
+            im = torch.as_tensor(ckpt_meta["input_mean"], dtype=torch.float32, device=device)
+            istd = torch.as_tensor(ckpt_meta["input_std"], dtype=torch.float32, device=device)
+            x = normalize_channels(x, im, istd)
         era5 = torch.as_tensor(np.asarray(g["era5_target"][start:stop], dtype=np.float32))
         teacher = torch.as_tensor(np.asarray(g["teacher_pred"][start:stop], dtype=np.float32))
         out = net(x)
-        # Match training soft constraints (relu tp, mild msl clamp) when ckpt used them.
         pred = out["pred"]
         if bool(ckpt_meta.get("physical_constraints", True)):
-            pred = apply_soft_physical_constraints(pred)
+            pred = apply_soft_physical_constraints(
+                pred, tp_mode=str(ckpt_meta.get("tp_mode", "relu"))
+            )
         pred = pred.detach().cpu()
 
-        if sl is not None:
-            lat_sl, lon_sl = sl
-            pred_d = africa_crop(pred, lat_sl, lon_sl)
-            era5_d = africa_crop(era5, lat_sl, lon_sl)
-            teach_d = africa_crop(teacher, lat_sl, lon_sl)
-            w_lat = w_lat_full[lat_sl]
-        else:
-            pred_d, era5_d, teach_d, w_lat = pred, era5, teacher, w_lat_full
-
-        stud_preds.append(pred_d)
-        teach_preds.append(teach_d)
-        era5_tgts.append(era5_d)
+        stud_preds.append(pred)
+        teach_preds.append(teacher)
+        era5_tgts.append(era5)
 
         for i, idx in enumerate(range(start, stop)):
-            s_rmse = _area_rmse_per_channel(pred_d[i], era5_d[i], w_lat)
-            t_rmse = _area_rmse_per_channel(teach_d[i], era5_d[i], w_lat)
+            s_rmse = _area_rmse_per_channel(pred[i], era5[i], w_lat_full, spat)
+            t_rmse = _area_rmse_per_channel(teacher[i], era5[i], w_lat_full, spat)
             row: dict[str, Any] = {
                 "sample_index": int(idx),
                 "lead_hours": int(lead_arr[idx]) if lead_arr is not None else DEFAULT_LEAD_HOURS,
@@ -178,14 +165,10 @@ def score_student_on_cache(
     stud_all = torch.cat(stud_preds, dim=0)
     teach_all = torch.cat(teach_preds, dim=0)
     era5_all = torch.cat(era5_tgts, dim=0)
-    if sl is not None:
-        w_lat = w_lat_full[sl[0]]
-    else:
-        w_lat = w_lat_full
 
-    stud_agg = _area_rmse_per_channel(stud_all, era5_all, w_lat)
-    teach_agg = _area_rmse_per_channel(teach_all, era5_all, w_lat)
-    stud_vs_teach = _area_rmse_per_channel(stud_all, teach_all, w_lat)
+    stud_agg = _area_rmse_per_channel(stud_all, era5_all, w_lat_full, spat)
+    teach_agg = _area_rmse_per_channel(teach_all, era5_all, w_lat_full, spat)
+    stud_vs_teach = _area_rmse_per_channel(stud_all, teach_all, w_lat_full, spat)
 
     aggregate: dict[str, Any] = {}
     for v, sr, tr, svt in zip(variables, stud_agg, teach_agg, stud_vs_teach):
@@ -216,6 +199,30 @@ def score_student_on_cache(
         "aggregate": aggregate,
         "per_sample": per_sample,
     }
+
+
+def _load_student(ckpt_path: Path, device: torch.device) -> tuple[LapAIStudentCNN, dict[str, Any]]:
+    blob = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    cfg_dict = dict(blob.get("cfg") or {})
+    # dataclass fields only
+    allowed = {f.name for f in LapAIStudentConfig.__dataclass_fields__.values()}  # type: ignore[attr-defined]
+    cfg = LapAIStudentConfig(**{k: v for k, v in cfg_dict.items() if k in allowed})
+    net = LapAIStudentCNN(cfg)
+    net.load_state_dict(blob["model"])
+    net.to(device)
+    net.eval()
+    meta = {
+        "teacher_ckpt": blob.get("teacher_ckpt"),
+        "cfg": asdict(cfg),
+        "ckpt": str(ckpt_path),
+        "physical_constraints": bool(blob.get("physical_constraints", True)),
+        "normalize_targets": bool(blob.get("normalize_targets", False)),
+        "normalize_inputs": bool(blob.get("normalize_inputs", False)),
+        "tp_mode": str(blob.get("tp_mode", "relu")),
+        "input_mean": blob.get("input_mean"),
+        "input_std": blob.get("input_std"),
+    }
+    return net, meta
 
 
 def gate_from_scorecard(
@@ -283,10 +290,23 @@ def gate_from_scorecard(
     }
 
 
+def _json_default(o: Any) -> Any:
+    if isinstance(o, torch.Tensor):
+        t = o.detach().cpu()
+        return t.item() if t.ndim == 0 else t.tolist()
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    if isinstance(o, (np.floating, np.integer)):
+        return o.item()
+    if isinstance(o, Path):
+        return str(o)
+    raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
+
 def write_json(obj: dict[str, Any], path: Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(obj, indent=2, default=_json_default), encoding="utf-8")
     return path
 
 

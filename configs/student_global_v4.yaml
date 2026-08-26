@@ -1,0 +1,48 @@
+# Track B — LapAI student generalization v4 (held-out Jan-2023 focus)
+#
+# Resume from stable v3. Primary objective: off-cache Africa t2m / honest tp
+# (ACC/POD), not cache-gate 3/3.
+#
+# Levers vs v3:
+#   - Full 2020–2021 teacher cache (v3 T=256 only covered 2020-01→09)
+#   - Input channel z-score (state_in) for train/eval parity
+#   - Africa domain mix on L_A (wrap-aware mask)
+#   - precip log1p + wet-pixel term; softplus tp (escape all-dry ReLU collapse)
+#   - β/γ still off (no feature/spectral distill)
+
+lat: 181
+lon: 360
+base_channels: 256
+stages: [2, 3, 3]
+
+epochs: 100
+epochs_stage_a_only: 100
+epoch_start_feature_loss: 999
+epoch_start_spectral_loss: 999
+beta_ramp_epochs: 1
+gamma_ramp_epochs: 1
+grad_clip: 1.0
+normalize_targets: true
+normalize_inputs: true
+physical_constraints: true
+tp_mode: softplus
+
+# Cout order: tp, msl, 2t
+channel_weights: [4.0, 0.3, 3.0]
+africa_mix: 0.5
+precip_log1p_weight: 2.0
+
+resume: models/student_global_stable_v3.ckpt
+
+teacher_ckpt: models/teacher_pruned.ckpt
+distill_config: configs/student_distill.yaml
+
+# Prefer full-year cache when present
+# cache: data/processed/lapai/teacher_k1_cache_full2020_2021.zarr
+
+output_ckpt: models/student_global_stable_v4.ckpt
+
+notes: >-
+  Generalization pass after held-out Jan-2023: t2m +168% vs K1, tp dry-bias
+  (ACC≈0, POD=0). Expand cache to full ERA5 2020–21; Africa-weighted L_A;
+  precip-aware log1p; input norm; softplus tp. Do not chase cache 3/3 as primary.

@@ -34,30 +34,83 @@ def normalize_channels(
     return (x - m) / s
 
 
-def apply_soft_physical_constraints(pred: torch.Tensor) -> torch.Tensor:
+def apply_soft_physical_constraints(
+    pred: torch.Tensor, *, tp_mode: str = "relu"
+) -> torch.Tensor:
     """
     Soft physicality on Cout=3 (tp, msl, 2t): non-negative tp only.
     No hard msl clamp in the forward path (zeros grads when pred << 1e5).
+
+    tp_mode:
+      - ``relu``: hard non-negativity (legacy; zeros grads for negative logits)
+      - ``softplus``: scaled softplus ``softplus(1000·x)/1000`` ≈ relu on metre-scale
+        tp while keeping a small gradient near zero (escapes all-dry MAE collapse)
+      - ``none``: leave tp unconstrained (caller may clamp at eval)
     """
     if pred.shape[1] < 1:
         return pred
-    tp = F.relu(pred[:, 0:1])
+    raw = pred[:, 0:1]
+    if tp_mode == "softplus":
+        # Head is in physical metres (~1e-4); scale so softplus acts near zero.
+        tp = F.softplus(raw * 1000.0) / 1000.0
+    elif tp_mode == "none":
+        tp = raw
+    else:
+        tp = F.relu(raw)
     rest = pred[:, 1:]
     return torch.cat([tp, rest], dim=1)
+
 
 def loss_area_weighted_mae(
     pred: torch.Tensor,
     target: torch.Tensor,
     lat_weights: torch.Tensor,
     channel_weights: Optional[torch.Tensor] = None,
+    spatial_weights: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Cosine-lat MAE; optional per-channel weights broadcast as (1,C,1,1)."""
+    """Cosine-lat MAE; optional per-channel and/or (H,W)/(1,1,H,W) spatial weights."""
     w = latitude_broadcast_weights(lat_weights, pred)
+    if spatial_weights is not None:
+        sw = spatial_weights
+        if sw.ndim == 2:
+            sw = sw.view(1, 1, sw.shape[0], sw.shape[1])
+        w = w * sw.to(device=w.device, dtype=w.dtype)
     err = w * (pred - target).abs()
     if channel_weights is not None:
         cw = channel_weights.view(1, -1, 1, 1).to(device=err.device, dtype=err.dtype)
         err = err * cw
     return err.mean()
+
+
+def loss_precip_log1p_mae(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    lat_weights: torch.Tensor,
+    *,
+    tp_index: int = 0,
+    mm_scale: float = 1000.0,
+    wet_threshold_m: float = 1.0e-4,
+    wet_boost: float = 4.0,
+    spatial_weights: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """
+    Precipitation-aware term on channel ``tp_index`` (metres):
+
+    - Compare ``log1p(tp * mm_scale)`` so light rain is not drowned by MAE in m.
+    - Up-weight wet target pixels (``tp >= wet_threshold_m``) by ``wet_boost``.
+    """
+    p = pred[:, tp_index : tp_index + 1].clamp_min(0.0)
+    t = target[:, tp_index : tp_index + 1].clamp_min(0.0)
+    w = latitude_broadcast_weights(lat_weights, p)
+    if spatial_weights is not None:
+        sw = spatial_weights
+        if sw.ndim == 2:
+            sw = sw.view(1, 1, sw.shape[0], sw.shape[1])
+        w = w * sw.to(device=w.device, dtype=w.dtype)
+    wet = (t >= wet_threshold_m).to(dtype=p.dtype)
+    w = w * (1.0 + wet_boost * wet)
+    err = (torch.log1p(p * mm_scale) - torch.log1p(t * mm_scale)).abs()
+    return (w * err).mean()
 
 
 class FeatureDistillationHead(nn.Module):
@@ -124,12 +177,46 @@ def combined_distillation_loss(
     target_mean: Optional[torch.Tensor] = None,
     target_std: Optional[torch.Tensor] = None,
     channel_weights: Optional[torch.Tensor] = None,
+    spatial_weights: Optional[torch.Tensor] = None,
+    africa_mix: float = 0.0,
+    africa_spatial_weights: Optional[torch.Tensor] = None,
+    precip_log1p_weight: float = 0.0,
 ) -> Tuple[torch.Tensor, dict]:
     pred_n = normalize_channels(pred, target_mean, target_std)
     era5_n = normalize_channels(era5, target_mean, target_std)
-    la = loss_area_weighted_mae(pred_n, era5_n, lat_weights, channel_weights=channel_weights)
+    la_g = loss_area_weighted_mae(
+        pred_n, era5_n, lat_weights, channel_weights=channel_weights, spatial_weights=spatial_weights
+    )
+    if africa_mix > 0.0 and africa_spatial_weights is not None:
+        la_a = loss_area_weighted_mae(
+            pred_n,
+            era5_n,
+            lat_weights,
+            channel_weights=channel_weights,
+            spatial_weights=africa_spatial_weights,
+        )
+        la = (1.0 - africa_mix) * la_g + africa_mix * la_a
+    else:
+        la = la_g
     total = alpha * la
     parts = {"L_A": la.detach()}
+
+    if precip_log1p_weight > 0.0:
+        # Physical units (metres), not channel-normalized — log1p needs real scale.
+        sw = africa_spatial_weights if (africa_mix > 0.0 and africa_spatial_weights is not None) else spatial_weights
+        # Domain-mix precip term the same way as L_A when Africa mix is on.
+        if africa_mix > 0.0 and africa_spatial_weights is not None:
+            lp_g = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=None)
+            lp_a = loss_precip_log1p_mae(
+                pred, era5, lat_weights, spatial_weights=africa_spatial_weights
+            )
+            lp = (1.0 - africa_mix) * lp_g + africa_mix * lp_a
+        else:
+            lp = loss_precip_log1p_mae(pred, era5, lat_weights, spatial_weights=sw)
+        total = total + precip_log1p_weight * lp
+        parts["L_tp"] = lp.detach()
+    else:
+        parts["L_tp"] = torch.tensor(0.0, device=pred.device)
 
     if use_feature_loss and feat_s2 is not None and feat_s3 is not None and feat_t10 is not None and feat_t14 is not None:
         lb = heads[0](feat_s2, feat_t10) + heads[1](feat_s3, feat_t14)
