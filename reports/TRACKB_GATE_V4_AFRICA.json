@@ -1,0 +1,80 @@
+{
+  "step": "trackB_student",
+  "protocol": "trackB_cache_mvp",
+  "passed": false,
+  "pass_count": 2,
+  "total_checks": 3,
+  "max_rmse_degradation_pct": 15.0,
+  "variables": [
+    "tp",
+    "msl",
+    "2t"
+  ],
+  "leads_hours": [
+    6
+  ],
+  "baseline": "K1 teacher_pred on same cache (models/teacher_pruned.ckpt)",
+  "candidate": "models/student_global_stable_v4.ckpt",
+  "cache": "data/processed/lapai/teacher_k1_cache_full2020_2021.zarr",
+  "domain": "africa",
+  "n_samples": 730,
+  "checks": [
+    {
+      "variable": "tp",
+      "lead_hours": 6,
+      "passed": false,
+      "student_rmse_vs_era5": 0.0017796780448406935,
+      "teacher_rmse_vs_era5": 0.001533167203888297,
+      "student_rmse_vs_teacher": 0.0014807418920099735,
+      "degradation_pct": 16.07853600880681,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "msl",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 99.7127685546875,
+      "teacher_rmse_vs_era5": 290.1050720214844,
+      "student_rmse_vs_teacher": 309.0457763671875,
+      "degradation_pct": -65.6287400079296,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "2t",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 1.076464056968689,
+      "teacher_rmse_vs_era5": 6.487402439117432,
+      "student_rmse_vs_teacher": 6.611379623413086,
+      "degradation_pct": -83.4068555624378,
+      "max_allowed_pct": 15.0
+    }
+  ],
+  "aggregate": {
+    "tp": {
+      "student_rmse_vs_era5": 0.0017796780448406935,
+      "teacher_rmse_vs_era5": 0.001533167203888297,
+      "student_rmse_vs_teacher": 0.0014807418920099735,
+      "degradation_pct_vs_teacher": 16.07853600880681
+    },
+    "msl": {
+      "student_rmse_vs_era5": 99.7127685546875,
+      "teacher_rmse_vs_era5": 290.1050720214844,
+      "student_rmse_vs_teacher": 309.0457763671875,
+      "degradation_pct_vs_teacher": -65.6287400079296
+    },
+    "2t": {
+      "student_rmse_vs_era5": 1.076464056968689,
+      "teacher_rmse_vs_era5": 6.487402439117432,
+      "student_rmse_vs_teacher": 6.611379623413086,
+      "degradation_pct_vs_teacher": -83.4068555624378
+    }
+  },
+  "caveats": [
+    "MVP cache gate: one-step 6h lead only (not PLAN {24,72,120,240}h skill table).",
+    "Channels are tp/msl/2t only (no u10/v10/z500/t850).",
+    "Cache T\u2248730 from 2020\u20132021 ERA5; same store used for train \u2192 not held-out.",
+    "Full Jan-2023 Track-A-style init forecast + ERA5 GCS truth scoring still TODO."
+  ],
+  "timestamp_utc": "2026-08-26T10:42:10.184026+00:00"
+}

@@ -14,8 +14,11 @@ beta_ramp_epochs: 1
 gamma_ramp_epochs: 1
 spectral_k_warmup: 40
 grad_clip: 1.0
-# Optional override; student_global.yaml is authoritative when both set.
+# Optional override; student_global.yaml / student_global_v4.yaml are authoritative when both set.
 # channel_weights: [3.0, 0.4, 3.0]
+# africa_mix: 0.5
+# precip_log1p_weight: 2.0
+# tp_mode: softplus
 
 
 # Same handoff path as student_global.yaml (explicit for scripts that only load distill yaml)
