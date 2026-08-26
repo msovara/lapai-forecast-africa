@@ -100,7 +100,7 @@ class LapAIStudentConfig:
     zonal_kernel: int = 11
     merid_kernel: int = 11
     out_channels: int = 3
-    """Tp, MSLP, T2m headline outputs for distillation demo; extend for full state."""
+    """Intentional Cout=3 head order: tp, msl, 2t (partial-state MVP; no 3→65 decoder)."""
 
 
 class LapAIStudentCNN(nn.Module):
