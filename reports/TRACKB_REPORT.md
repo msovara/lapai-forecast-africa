@@ -1,5 +1,7 @@
 # Track B report — student MVP gate + held-out Jan-2023
 
+> **State closure (2026-08-26):** **Case A** — Cout=3 (`tp`/`msl`/`2t`) is intentional; free-run is not possible. See [`TRACKB_STATE_CLOSURE.md`](TRACKB_STATE_CLOSURE.md).
+
 **Date:** 2026-08-25  
 **MVP gate:** **FAIL 2/3** (≤15% RMSE degradation vs K1 on cache) — **accepted soft-fail for MVP**.  
 **Decision:** Do **not** run another tp-reweight training round. Promote `student_global_stable_v3.ckpt` as the Track B MVP student and proceed to **held-out Jan-2023** skill vs K1.
