@@ -1,14 +1,74 @@
-# LapAI-Forecast
+# LapAI-Forecast / Mvula
 
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
 
 The same project often lives under `tiny-media-analysis/lapai-forecast/` on local machines; `origin` should point at the URL above.
 
+**Mvula** (ECMWF Code for Earth 2026 — African Stream) shrinks advanced AI weather models toward laptop-scale use for African contexts.
+
+> **Close-out (Aug 2026):** Frozen student **`student_global_stable_v5.ckpt`** delivers analysis-forced African **t2m** skill and ~**6×** compression vs the K1 teacher. It does **not** deliver a free-running 10-day forecast. Full claim boundary: [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md).
+
+## Close-out quickstart
+
+```text
+Clone → install env → get v5 ckpt → view packaged AF t2m results → launch Streamlit
+```
+
+1. **Clone**
+   ```bash
+   git clone https://github.com/msovara/lapai-forecast-africa.git
+   cd lapai-forecast-africa
+   git checkout trackb-v5-c4e   # preferred freeze tag when published; else main
+   ```
+
+2. **Install** (Track B / student inference)
+   ```bash
+   # Option A — conda (Cassava / CHPC style)
+   # conda env from environment-credit.yml or environment-credit-lengau.yml
+   # Option B — editable pip
+   pip install -e ".[dev]"
+   pip install -r requirements_streamlit.txt   # for the dashboard
+   ```
+
+3. **Checkpoint** (not in git)
+   - Cassava: `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt` (~9 MiB)
+   - Copy to `models/student_global_stable_v5.ckpt` locally if needed
+
+4. **Results already packaged** (no re-run required to inspect skill)
+   - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — 61 inits × leads 6/12/18/24
+   - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / CPU proxy
+   - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — full close-out narrative
+
+5. **Re-run AF t2m eval** (optional; needs ARCO/network + GPU recommended)
+   ```bash
+   # Cassava example
+   bash scripts/run_trackB_t2m_expanded_cassava.sh
+   ```
+
+6. **Streamlit demo**
+   ```bash
+   streamlit run streamlit_status.py
+   # Windows: run_status_dashboard.bat
+   ```
+
+### What Mvula v5 achieves vs limitations
+
+| Achieves | Limitations |
+|----------|-------------|
+| ~6× smaller than K1; ~2 s/step CPU proxy | Not a measured i7/16 GB laptop yet |
+| Strong-ish AF **+6 h t2m** on Africa (ACC≈0.97) | **+24 h** degrades sharply vs K1 |
+| Open eval + dashboard | **No** free-run / 10-day student |
+| Honest Case A docs | **tp** failed / out-of-scope |
+
+---
+
+## Original proposal targets (context)
+
+The proposal aimed at a mid-range laptop (Intel i7, 16 GB RAM, no GPU), a **10-day** 1° global forecast, ≤15% RMSE vs AIFS globally, LoRA adaptation, and ONNX packaging. Those remain the **programme north star**; the **shipped freeze** is the scoped AF t2m + compression result above — see FINAL_REPORT §2.
+
 A compressed, laptop-deployable AI Numerical Weather Prediction (NWP) model distilled from ECMWF AIFS, with regional adaptation for Africa.
 
-> **Code for Earth — African Stream proposal.** The goal is to bridge the gap in operational AI weather forecasting across Africa by producing a 10-day, 1° global forecast model that runs on a mid-range consumer laptop (Intel i7, 16 GB RAM, no GPU), and to enable low-cost regional fine-tuning by African National Meteorological and Hydrological Services (NMHS).
-
-## Targets
+## Targets (proposal)
 
 - **Hardware:** Intel i7 CPU, 16 GB RAM, no discrete GPU.
 - **Forecast spec:** 10-day global forecast at 1° resolution.
@@ -111,9 +171,11 @@ Swap the demo store for real Anemoi/AIFS exports aligned with `lapai_inference/c
 
 ## Track B — reproduce analysis-forced t2m evaluation (v5 freeze)
 
-**Handover docs:** [`reports/TRACKB_METHODOLOGY_HANDOVER.md`](reports/TRACKB_METHODOLOGY_HANDOVER.md), [`reports/TRACKB_STATE_CLOSURE.md`](reports/TRACKB_STATE_CLOSURE.md), [`reports/TRACKB_REPORT.md`](reports/TRACKB_REPORT.md).
+**Close-out:** [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) · methodology [`reports/TRACKB_METHODOLOGY_HANDOVER.md`](reports/TRACKB_METHODOLOGY_HANDOVER.md) · Case A [`reports/TRACKB_STATE_CLOSURE.md`](reports/TRACKB_STATE_CLOSURE.md).
 
 Frozen student: `models/student_global_stable_v5.ckpt` (Cout=`tp/msl/2t`; **Case A** — no free-run). Primary gate variable: **t2m**. tp is out-of-scope.
+
+Packaged results (preferred for reviewers): [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md).
 
 ```bash
 # Cassava (GPU1 + public ARCO ERA5 ICs; no CDS)
@@ -123,7 +185,15 @@ bash scripts/run_trackB_t2m_expanded_cassava.sh
 # → reports/figures/trackb_t2m_v5_{bias,rmse}_L{006,024}h.png
 ```
 
-Protocol: for each lead \(L\in\{6,12,18,24\}\), IC at `init+(L−6)h` → one +6h student step (analysis-forced). Default: every 5th day in 2023 (~73 inits). Results tag: `trackb-v5-eval` when published.
+Protocol: for each lead \(L\in\{6,12,18,24\}\), IC at `init+(L−6)h` → one +6h student step (analysis-forced). Production campaign: **61** inits across four seasons. Release tag: **`trackb-v5-c4e`**.
+
+CPU size/speed proxy:
+
+```bash
+export CUDA_VISIBLE_DEVICES=
+export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 MKL_INTERFACE_LAYER=GNU
+python -u scripts/bench_mvula_laptop_v5.py
+```
 
 ## CHPC Lengau environments
 

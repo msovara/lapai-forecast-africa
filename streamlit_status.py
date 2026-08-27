@@ -773,6 +773,8 @@ def _render_mvula_tab() -> None:
     st.subheader("Mvula Code for Earth — dual deliverables")
     st.markdown(
         """
+**Close-out control doc:** `reports/FINAL_REPORT.md`
+
 **Headline close-out (→ 23 Sep 2026):**
 1. **Forecast skill** — analysis-forced **t2m** (frozen `student_global_stable_v5`)
 2. **Laptop / deployment** — size + CPU inference demo
@@ -1259,6 +1261,7 @@ def main() -> None:
     with st.sidebar:
         st.header("Reports")
         for name in (
+            "FINAL_REPORT.md",
             "MVULA_CODE4EARTH_STATUS_MATRIX.md",
             "MVULA_LAPTOP_BENCHMARK.json",
             "TRACKB_STATE_CLOSURE.md",
