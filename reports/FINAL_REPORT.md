@@ -5,8 +5,10 @@
 **Report date:** 2026-08-27  
 **Close-out horizon:** 23 September 2026  
 **Frozen student:** `models/student_global_stable_v5.ckpt`  
-**Evidence commit (packaged eval + dashboard):** `3b7cde4`  
-**Release tag (intended):** `trackb-v5-c4e`
+**Evidence commits:** `3b7cde4` (AF t2m package) · `aa0b218` (consumer laptop bench)  
+**Release tag:** [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) (checkout this tag or `main`)
+
+**Mentors — open first:** this file → [`MVULA_CODE4EARTH_STATUS_MATRIX.md`](MVULA_CODE4EARTH_STATUS_MATRIX.md) → [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) + [figures](figures/) → [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) → repo [README close-out quickstart](../README.md#close-out-quickstart).
 
 ---
 
@@ -50,7 +52,7 @@ Control documents: [`PLAN.md`](../PLAN.md), [`MVULA_CODE4EARTH_STATUS_MATRIX.md`
 - Phase 0 N320 teacher baseline closed.
 - A1 grid coarsening gate **passed** (≤5% vs Phase 0).
 - A2 round-1 **K1** (1/16 heads + recovery) **accepted** as distillation teacher with documented tp trade-off.
-- Evidence: `TRACKA_REPORT.md`, `TRACKA_A1_GATE.json`, prune scorecards.
+- Evidence: [`LAPAI_TRACKA_TEAM_REPORT.md`](LAPAI_TRACKA_TEAM_REPORT.md), [`TRACKA_A1_GATE.json`](TRACKA_A1_GATE.json), [`TRACKA_A2_GATE_K1_VS_A1B.json`](TRACKA_A2_GATE_K1_VS_A1B.json), [`PHASE0_CLOSURE.md`](PHASE0_CLOSURE.md).
 
 ### 3.2 Track B — distilled student v5
 
@@ -87,7 +89,12 @@ Source: [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) / `.json` (commit `3b
 2. **Skill deteriorates quickly** — RMSE growth +6→+24 h ≈ **+134%**; persists in all seasons.
 3. **+24 h degradation vs K1 persists** — ≈**+103%** (K1 n=3).
 
-Spatial maps: `reports/figures/trackb_t2m_v5_{rmse,bias}_L{006,024}h.png`.
+Spatial maps (Africa t2m):
+
+| Lead | RMSE | Bias |
+|------|------|------|
+| +6 h | [trackb_t2m_v5_rmse_L006h.png](figures/trackb_t2m_v5_rmse_L006h.png) | [trackb_t2m_v5_bias_L006h.png](figures/trackb_t2m_v5_bias_L006h.png) |
+| +24 h | [trackb_t2m_v5_rmse_L024h.png](figures/trackb_t2m_v5_rmse_L024h.png) | [trackb_t2m_v5_bias_L024h.png](figures/trackb_t2m_v5_bias_L024h.png) |
 
 ### 3.4 Model compression & laptop inference (deployment deliverable)
 
@@ -155,7 +162,7 @@ African AF t2m skill + CPU size/speed evidence
 | Size | 8.9 MiB on disk (`sha256` prefix `5cf7080054bff60e…`) |
 | Repo symlink / local name | `models/student_global_stable_v5.ckpt` |
 | Teacher (Cassava) | `models/teacher_pruned.ckpt` → K1 `inference-last.ckpt` under `trackA_prune_k1_from_a1bplus_runs/...` |
-| Packaged eval commit | `3b7cde4` on `main` |
+| Packaged eval + laptop commits | `3b7cde4` (AF t2m) · `aa0b218` (laptop) on `main` |
 
 Checkpoints are **not** stored in git (by design). Document the Cassava path in release notes when tagging.
 
@@ -182,18 +189,18 @@ Use this list to close gaps **without** new science campaigns:
 
 | Evidence | Present? | Location |
 |----------|----------|----------|
-| Status matrix | Yes | `MVULA_CODE4EARTH_STATUS_MATRIX.md` |
-| Expanded AF t2m tables | Yes | `TRACKB_T2M_EXPANDED.md` / `.json` |
-| Spatial RMSE/bias maps | Yes | `reports/figures/trackb_t2m_v5_*.png` |
+| Status matrix | Yes | [`MVULA_CODE4EARTH_STATUS_MATRIX.md`](MVULA_CODE4EARTH_STATUS_MATRIX.md) |
+| Expanded AF t2m tables | Yes | [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) / [`.json`](TRACKB_T2M_EXPANDED.json) |
+| Spatial RMSE/bias maps | Yes | [figures/](figures/) (`trackb_t2m_v5_{rmse,bias}_L{006,024}h.png`) |
 | K1 comparison at +6/+24 | Yes (n=3 for deg%) | same |
 | Seasonal breakdown | Yes | same |
-| Case A write-up | Yes | `TRACKB_STATE_CLOSURE.md` |
-| Laptop size / CPU (consumer laptop) | Yes | `MVULA_LAPTOP_BENCHMARK.*` (i7-11800H) |
+| Case A write-up | Yes | [`TRACKB_STATE_CLOSURE.md`](TRACKB_STATE_CLOSURE.md) |
+| Laptop size / CPU (consumer laptop) | Yes | [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) / [`.json`](MVULA_LAPTOP_BENCHMARK.json) |
 | Real i7 laptop bench | **Yes** | same |
 | ONNX smoke | **No** | optional |
-| FINAL_REPORT | **This file** | `reports/FINAL_REPORT.md` |
-| Annotated release tag | Pending | `trackb-v5-c4e` |
-| Streamlit shows expanded results | Yes | `streamlit_status.py` |
+| FINAL_REPORT | **This file** | [`FINAL_REPORT.md`](FINAL_REPORT.md) |
+| Release tag | **Yes** | [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) |
+| Streamlit shows expanded results | Yes | [`streamlit_status.py`](../streamlit_status.py) |
 
 ---
 
