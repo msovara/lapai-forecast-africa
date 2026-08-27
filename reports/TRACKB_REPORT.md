@@ -214,3 +214,26 @@ Protocol: analysis-forced only. IC at `init+(L−6)h` → one +6h step. Surface 
 - Cassava forecasts (not in git): `data/processed/trackB_student_heldout_v5/forecasts/`
 - Cassava IC npy cache (not in git): `data/cache/student_ic_arco/`
 
+---
+
+## Expanded t2m statistical evaluation (v5 freeze, multi-season)
+
+**Goal:** Characterise whether +6h t2m skill holds outside January and how fast skill deteriorates through +24h under analysis-forced ICs.
+
+| Item | Value |
+|------|-------|
+| Runner | `evaluation/trackB_t2m_expanded.py` |
+| Launcher | `scripts/run_trackB_t2m_expanded_cassava.sh` |
+| Ckpt | `models/student_global_stable_v5.ckpt` (frozen) |
+| Leads | +6, +12, +18, +24 h (analysis-forced) |
+| Default inits | every 5 days in 2023 (~73) |
+| IC / truth | public ARCO ERA5 |
+| Reports | `reports/TRACKB_T2M_EXPANDED.json`, `TRACKB_T2M_EXPANDED.md` |
+| Figures | `reports/figures/trackb_t2m_v5_*_L006h.png`, `*_L024h.png` |
+| Handover | `reports/TRACKB_METHODOLOGY_HANDOVER.md` |
+
+**tp:** out-of-scope dry-collapse note only — do not gate.  
+**K1:** compared with identical RMSE/ACC/bias vs ERA5 where teacher NCs exist (typically Jan-2023 weekly); gaps documented in JSON.
+
+See `TRACKB_T2M_EXPANDED.md` for lead tables, seasonal breakdown, and persistence verdict once the Cassava production run completes.
+

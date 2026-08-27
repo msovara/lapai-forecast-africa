@@ -61,10 +61,24 @@ def load_era5_slice(
     return aligned
 
 
-def field_stats(a: xr.DataArray, b: xr.DataArray) -> dict[str, float]:
-    """RMSE and bias (a minus b) over finite points."""
-    p = np.asarray(a.values, dtype=np.float64)
-    t = np.asarray(b.values, dtype=np.float64)
+def field_stats(a: xr.DataArray | np.ndarray, b: xr.DataArray | np.ndarray) -> dict[str, float]:
+    """RMSE and bias (a minus b) over finite points.
+
+    Accepts xarray DataArrays or plain ndarrays (Streamlit often passes the latter).
+    """
+
+    def _as_float64(x: xr.DataArray | np.ndarray) -> np.ndarray:
+        # Prefer .values only for xarray; never call .values on ndarray.
+        if isinstance(x, xr.DataArray):
+            data = x.values
+        elif hasattr(x, "values") and not isinstance(x, np.ndarray):
+            data = x.values  # pandas / other array wrappers
+        else:
+            data = x
+        return np.asarray(data, dtype=np.float64)
+
+    p = _as_float64(a)
+    t = _as_float64(b)
     mask = np.isfinite(p) & np.isfinite(t)
     if not mask.any():
         return {"rmse": float("nan"), "bias": float("nan")}
