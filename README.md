@@ -36,7 +36,7 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
 
 4. **Results already packaged** (no re-run required to inspect skill)
    - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — 61 inits × leads 6/12/18/24
-   - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / CPU proxy
+   - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / laptop CPU (i7-11800H)
    - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — full close-out narrative
 
 5. **Re-run AF t2m eval** (optional; needs ARCO/network + GPU recommended)
@@ -55,7 +55,7 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
 
 | Achieves | Limitations |
 |----------|-------------|
-| ~6× smaller than K1; ~2 s/step CPU proxy | Not a measured i7/16 GB laptop yet |
+| ~6× smaller than K1; **~2.5 s/step on i7 laptop CPU** | IC fetch/build not in that timing |
 | Strong-ish AF **+6 h t2m** on Africa (ACC≈0.97) | **+24 h** degrades sharply vs K1 |
 | Open eval + dashboard | **No** free-run / 10-day student |
 | Honest Case A docs | **tp** failed / out-of-scope |
@@ -187,7 +187,7 @@ bash scripts/run_trackB_t2m_expanded_cassava.sh
 
 Protocol: for each lead \(L\in\{6,12,18,24\}\), IC at `init+(L−6)h` → one +6h student step (analysis-forced). Production campaign: **61** inits across four seasons. Release tag: **`trackb-v5-c4e`**.
 
-CPU size/speed proxy:
+Laptop CPU size/speed (i7-11800H measured):
 
 ```bash
 export CUDA_VISIBLE_DEVICES=

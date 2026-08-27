@@ -22,7 +22,7 @@ Mvula set out to shrink advanced AI weather models so useful forecasting can run
 |----------|---------------------|
 | Compressed student (~9 MiB, ~2.2 M params) vs K1 teacher | 10-day autonomous / free-running student forecasts |
 | Analysis-forced African **t2m** skill at +6…+24 h | PLAN Week-9 multi-var skill table (`z500`/`t850`/`tp` @ 24–240 h free-run) |
-| CPU inference of the student head (Cassava proxy; real laptop TO COMPLETE) | Finished ONNX / INT8 NMHS product |
+| CPU inference of the student head (**measured** on i7-11800H / 32 GB laptop) | Finished ONNX / INT8 NMHS product |
 | Open code + reproducible AF eval artefacts | Operational NMHS pilot or LoRA country adapters |
 | Honest Case A architecture limit (Cout=3) | That v5 “is” a closed dynamical NWP emulator |
 
@@ -91,17 +91,19 @@ Spatial maps: `reports/figures/trackb_t2m_v5_{rmse,bias}_L{006,024}h.png`.
 
 ### 3.4 Model compression & laptop inference (deployment deliverable)
 
-Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md).
+Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) (**consumer laptop**, 2026-08-27).
 
 | Metric | Student v5 | K1 teacher |
 |--------|------------|------------|
 | Disk size | **8.8 MiB** | 52.8 MiB (~**6×** larger) |
 | Parameters | **2.17 M** | (Anemoi GT) |
-| +6 h step (CPU, 4 threads) | **~2.0 s** | — |
-| AF 4-lead infer-only | **~8 s** | — |
+| Hardware | **i7-11800H** (8C/16T), **32 GB** RAM, Windows | — |
+| +6 h step (CPU, 4 threads) | **~2.53 s** | — |
+| AF 4-lead infer-only | **~10.1 s** | — |
+| Peak process RSS | **~1.19 GiB** | — |
 | GPU required for student forward | **No** | Typically yes |
 
-**Caveat:** timings are a **Cassava CPU proxy**, not yet a measured Intel i7 / 16 GB consumer laptop. Real-laptop re-bench is the preferred remaining experiment.
+**Answer:** Mvula v5 **runs on a normal laptop CPU** without a discrete GPU. Timing excludes ERA5 IC fetch/build. Cassava CPU proxy (~2.0 s/step) is superseded by this measurement for close-out claims.
 
 ### 3.5 Open source & tooling
 
@@ -115,7 +117,7 @@ Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md).
 
 | Item | Status | Note |
 |------|--------|------|
-| Real i7/16 GB laptop wall-clock + peak RAM | **TO COMPLETE** | Highest-value remaining experiment |
+| Real i7/16 GB laptop wall-clock + peak RAM | **DONE** (i7-11800H / 32 GB measured) | See §3.4 |
 | ONNX / INT8 package | **NOT SHOWN** | Optional; only if &lt;1 day and risk-free |
 | LoRA Africa adapters | **NOT SHOWN** | Scaffold only |
 | Free-run / Cout=65 v6 | **NOT POSSIBLE** on v5 | Future architecture |
@@ -186,8 +188,8 @@ Use this list to close gaps **without** new science campaigns:
 | K1 comparison at +6/+24 | Yes (n=3 for deg%) | same |
 | Seasonal breakdown | Yes | same |
 | Case A write-up | Yes | `TRACKB_STATE_CLOSURE.md` |
-| Laptop size / CPU proxy | Yes | `MVULA_LAPTOP_BENCHMARK.*` |
-| Real i7/16 GB bench | **No** | remaining |
+| Laptop size / CPU (consumer laptop) | Yes | `MVULA_LAPTOP_BENCHMARK.*` (i7-11800H) |
+| Real i7 laptop bench | **Yes** | same |
 | ONNX smoke | **No** | optional |
 | FINAL_REPORT | **This file** | `reports/FINAL_REPORT.md` |
 | Annotated release tag | Pending | `trackb-v5-c4e` |
@@ -197,11 +199,10 @@ Use this list to close gaps **without** new science campaigns:
 
 ## 9. Future work (post–Code for Earth)
 
-1. Real consumer-laptop benchmark (replace Cassava proxy caveat).  
+1. Optional ONNX Runtime packaging for NMHS distribution (not required for v5 close-out).  
 2. If pursuing PLAN alignment: full-state (Cout≥65) student + free-run curriculum — **new architecture**, not a v5 tweak.  
 3. Precip head redesign (current Cout=3 tp collapsed).  
-4. LoRA / ENACTS regional adapters and extremes suite.  
-5. ONNX Runtime packaging for NMHS distribution.
+4. LoRA / ENACTS regional adapters and extremes suite.
 
 ---
 

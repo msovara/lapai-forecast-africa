@@ -98,12 +98,13 @@ Searched repo for decoder / reconstruct / state_out / free-run / rollout closure
 
 ---
 
-## Recommended next evaluation framing
+## Recommended evaluation framing (locked for Code4Earth handover)
 
 1. **Stop** treating free-run / full-state rollout as a Track B deliverable for this checkpoint family.
 2. **Keep** analysis-forced scoring as the honest protocol: primary metric **t2m (`2t`)**; **tp out-of-scope** (already declared); **msl** on-cache only unless a truth stem is added.
-3. **Strengthen statistical eval next** (no new architecture): more months / more inits / more leads for **t2m** under analysis-forced ICs (ARCO/ERA5), with ACC + RMSE vs K1.
-4. If free-run is later required: open a **separate design track** for Cout≥65 (or explicit 3→65 reconstruction + teacher-aligned state targets). Prefer a written design + tiny PoC head smoke before any large retrain.
+3. **Production statistical eval (in progress / freeze):** multi-season 2023 inits, leads `{6,12,18,24}` h, ARCO ERA5 ICs — see `evaluation/trackB_t2m_expanded.py`, `reports/TRACKB_T2M_EXPANDED.md`.
+4. **Do not** chase CDS auth, tp recovery, Cout redesign, or v6 architecture before handover.
+5. If free-run is later required: open a **separate design track** for Cout≥65 (or explicit 3→65 reconstruction + teacher-aligned state targets). Prefer a written design + tiny PoC head smoke before any large retrain.
 
 ---
 
@@ -111,4 +112,6 @@ Searched repo for decoder / reconstruct / state_out / free-run / rollout closure
 
 - Cassava ckpt: `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt`
 - Inspect helper: `scripts/_inspect_v5_state_closure.py`
+- Expanded t2m eval: `evaluation/trackB_t2m_expanded.py` + `scripts/run_trackB_t2m_expanded_cassava.sh`
+- Results: `reports/TRACKB_T2M_EXPANDED.json` / `.md`, figures under `reports/figures/`
 - Related narrative: `reports/TRACKB_REPORT.md` (held-out / tp out-of-scope sections)
