@@ -13,7 +13,7 @@
 
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
-| Forecast skill (AF t2m, frozen v5) | **RUNNING** → package when finished | Production multi-season campaign on Cassava GPU1 (`trackB_t2m_expanded`; ~73 inits × leads 6/12/18/24). Do not kill. |
+| Forecast skill (AF t2m, frozen v5) | **DONE** | Production multi-season campaign packaged (`TRACKB_T2M_EXPANDED.*`; 61 inits × leads 6/12/18/24). |
 | Laptop / deployment demonstration | **PARTIAL** | CPU-only timed demo + size shrink documented (`MVULA_LAPTOP_BENCHMARK.md`). ONNX + consumer-laptop parity **TO COMPLETE**. |
 
 ---
@@ -27,8 +27,8 @@
 | 3 | **Attention-head pruning** | **PARTIAL** | A2 round-1 **K1** (1/16 heads + recovery) **accepted** with documented tp trade-off (31/40 vs A1b+; t2m clean). A2 rounds 2–3 **not started** (`TRACKA_REPORT.md`). |
 | 4 | **LoRA** (Africa regional adapters) | **NOT SHOWN** | Config/scaffold exists (`configs/lora_africa.yaml`, `utils/lora_adapters.py`); no trained adapters / `LORA_REPORT.md` skill sweep. |
 | 5 | **Quantization** (INT8 / ONNX size) | **NOT SHOWN** | PLAN §7.2 stretch; no ONNX export or quantisation run in this close-out. |
-| 6 | **t2m retention** (skill vs teacher / ERA5) | **PARTIAL** (+ **RUNNING** production eval) | On-cache: 2t beats K1. Held-out Jan-2023 AF +6h Africa: ~+16–21% RMSE vs K1, ACC≈0.97 (`TRACKB_REPORT.md`, `TRACKB_HELD_OUT_JAN2023_V5.json`). Expanded multi-month AF campaign **RUNNING**. |
-| 7 | **Multi-lead evaluation** | **PARTIAL** | Teacher free-run leads {6,24,72,120,240}h scored. Student: **analysis-forced** leads {6,24} done; expanded {6,12,18,24} **RUNNING**. Not free-run multi-day student leads. |
+| 6 | **t2m retention** (skill vs teacher / ERA5) | **DONE** | Expanded AF campaign: 61 inits × seasons DJF/MAM/JJA/SON × leads 6/12/18/24 (`TRACKB_T2M_EXPANDED.*`). +6h RMSE≈1.38 (~+17% vs K1); +24h RMSE≈3.23 (~+103% vs K1). |
+| 7 | **Multi-lead evaluation** | **DONE** (AF only) | Student analysis-forced leads {6,12,18,24} packaged. Not free-run multi-day. |
 | 8 | **African evaluation** | **PARTIAL** | Africa box scoring throughout Track A/B gates and held-out. Extremes suite (`eval_africa_extremes.py` / ≤20% extremes budget) **not** closed as a formal gate. |
 | 9 | **Laptop inference** | **PARTIAL** | v5 runs **CPU-only** (~2 s / +6h step, ~9 MiB ckpt) — see `MVULA_LAPTOP_BENCHMARK.md`. Consumer i7/16 GB end-to-end + ONNX package **TO COMPLETE**. |
 | 10 | **Model size reduction** | **DONE** (student vs K1 teacher) | Student **8.8 MiB** / **2.17 M** params vs K1 teacher **52.8 MiB** (~**6×** smaller on disk). Full AIFS public ckpt shrink not re-benchmarked here. |
@@ -54,10 +54,10 @@
 
 ### Remains (do not over-claim)
 
-- Finish & publish production AF t2m campaign artefacts (`TRACKB_T2M_EXPANDED.*`).
 - Consumer-laptop / ONNX packaging and 16 GB RAM demonstration.
 - LoRA, quantisation, full PLAN Week-9 variable table (`z500`/`t850`), free-run 10-day student.
 - Formal African extremes ≤20% gate.
+- `FINAL_REPORT.md` + release tag by 23 Sep.
 
 ### Explicit non-goals for close-out
 

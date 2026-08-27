@@ -109,6 +109,22 @@ pytest
 
 Swap the demo store for real Anemoi/AIFS exports aligned with `lapai_inference/cache_schema.py` (`state_in`, `era5_target`, `teacher_pred`, `teacher_feat_L10`, `teacher_feat_L14`).
 
+## Track B — reproduce analysis-forced t2m evaluation (v5 freeze)
+
+**Handover docs:** [`reports/TRACKB_METHODOLOGY_HANDOVER.md`](reports/TRACKB_METHODOLOGY_HANDOVER.md), [`reports/TRACKB_STATE_CLOSURE.md`](reports/TRACKB_STATE_CLOSURE.md), [`reports/TRACKB_REPORT.md`](reports/TRACKB_REPORT.md).
+
+Frozen student: `models/student_global_stable_v5.ckpt` (Cout=`tp/msl/2t`; **Case A** — no free-run). Primary gate variable: **t2m**. tp is out-of-scope.
+
+```bash
+# Cassava (GPU1 + public ARCO ERA5 ICs; no CDS)
+cd /local/Mthetho/lapai-forecast
+bash scripts/run_trackB_t2m_expanded_cassava.sh
+# → reports/TRACKB_T2M_EXPANDED.json / .md
+# → reports/figures/trackb_t2m_v5_{bias,rmse}_L{006,024}h.png
+```
+
+Protocol: for each lead \(L\in\{6,12,18,24\}\), IC at `init+(L−6)h` → one +6h student step (analysis-forced). Default: every 5th day in 2023 (~73 inits). Results tag: `trackb-v5-eval` when published.
+
 ## CHPC Lengau environments
 
 **Operations guide:** see [`docs/LENGAU.md`](docs/LENGAU.md) — PBS **Track A** defaults to isolated **`lapai-anemoi`** ([`environment-anemoi.yml`](environment-anemoi.yml): PyTorch + CUDA + Anemoi packages). **Track B / LoRA** uses **`lapai-credit`** ([`environment-credit-lengau.yml`](environment-credit-lengau.yml)). Override with `LAPAI_CONDA_TRACK_A` / `B` for CHPC shared stacks.

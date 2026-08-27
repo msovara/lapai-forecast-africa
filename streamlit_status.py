@@ -18,7 +18,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 st.set_page_config(
-    page_title="LapAI-Forecast Status",
+    page_title="Mvula / LapAI Status",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -294,6 +294,12 @@ def _fetch_spatial_fields(
 
 
 def _render_spatial_maps_tab() -> None:
+    import importlib
+
+    import evaluation.spatial_maps as spatial_maps
+
+    # Streamlit often keeps imported helpers cached; force-reload after code fixes.
+    spatial_maps = importlib.reload(spatial_maps)
     from evaluation.spatial_maps import DEFAULT_INITS, DEFAULT_LEADS, VAR_LABELS, field_stats
 
     st.subheader("Spatial patterns — ERA5 vs AIFS teacher vs coarsened output")
@@ -565,16 +571,431 @@ def _tracka_graph() -> str:
 
 TODOS = [
     ("Phase 0 closed — N320 teacher baseline + scorecard", True),
-    ("Lengau lustre env (anemoi 0.14, sklearn, trimesh fixes)", True),
-    ("Track A smoke coarsen training (finite loss, O96 ckpt)", True),
-    ("Track A offline forecasts — 5 Jan 2023 inits", True),
-    ("GCS scorecard + A1 gate (failed on smoke — expected)", True),
-    ("IC regridding design doc in PLAN.md", True),
-    ("Mario-style O96 IC builder + earthkit O96 cache prep", False),
-    ("Rebuild full training Zarr (fix missing timesteps)", False),
-    ("Longer coarsen fine-tune + real A1 gate attempt", False),
-    ("2024–2025 paired verification with Oxford", False),
+    ("Track A A1 coarsening gate passed; K1 prune accepted as teacher", True),
+    ("Track B student v5 frozen (Cout=3: tp/msl/2t; Case A — no free-run)", True),
+    ("Laptop CPU proxy bench (~9 MiB, ~2 s/step) documented", True),
+    ("Mvula status matrix + state closure docs on GitHub", True),
+    ("AF t2m production campaign (multi-season × 6/12/18/24h)", True),
+    ("Package TRACKB_T2M_EXPANDED + Dueben-style skill scorecard", True),
+    ("FINAL_REPORT + README freeze/tag by 23 Sep 2026", False),
+    ("Real consumer i7/16 GB laptop re-bench (optional ONNX smoke)", False),
+    ("Do not reopen free-run / Cout=65 / tp recovery before close-out", True),
 ]
+
+# Hard-coded matrix fallback if markdown parse fails (matches MVULA_CODE4EARTH_STATUS_MATRIX.md).
+MVULA_MATRIX_ROWS = [
+    ("AIFS compression", "PARTIAL"),
+    ("Grid coarsening", "DONE"),
+    ("Attention-head pruning", "PARTIAL"),
+    ("LoRA", "NOT SHOWN"),
+    ("Quantization", "NOT SHOWN"),
+    ("t2m retention", "DONE (expanded AF)"),
+    ("Multi-lead evaluation", "DONE (AF 6–24h)"),
+    ("African evaluation", "PARTIAL"),
+    ("Laptop inference", "PARTIAL"),
+    ("Model size reduction", "DONE"),
+    ("Inference speed-up", "PARTIAL"),
+    ("10-day forecast", "NOT POSSIBLE"),
+    ("Free-running v5", "NOT POSSIBLE"),
+    ("tp prediction", "FAILED"),
+    ("Open-source repository", "DONE"),
+    ("Reproducibility", "PARTIAL"),
+    ("Documentation", "PARTIAL"),
+    ("Community / local relevance", "PARTIAL"),
+]
+
+
+def _load_text(name: str) -> str | None:
+    path = REPORTS / name
+    if not path.is_file():
+        return None
+    return path.read_text(encoding="utf-8")
+
+
+def _held_out_student_long(blob: dict | None) -> pd.DataFrame:
+    """Flatten student_results from TRACKB_HELD_OUT_* JSON."""
+    if not blob:
+        return pd.DataFrame()
+    rows: list[dict] = []
+    for r in blob.get("student_results") or []:
+        init = r.get("init_date")
+        lead = r.get("lead_hours")
+        for var, metrics in (r.get("variables") or {}).items():
+            m = metrics or {}
+            rows.append(
+                {
+                    "init": str(init),
+                    "lead_h": int(lead) if lead is not None else None,
+                    "variable": str(var),
+                    "student_rmse": m.get("student_rmse_vs_era5"),
+                    "teacher_rmse": m.get("teacher_rmse_vs_era5"),
+                    "student_acc": m.get("student_acc"),
+                    "teacher_acc": m.get("teacher_acc"),
+                    "deg_pct": m.get("degradation_pct_vs_teacher"),
+                    "pod_1mm": m.get("student_pod_1mm"),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _expanded_t2m_long(blob: dict | None) -> pd.DataFrame:
+    """Flatten TRACKB_T2M_EXPANDED.json (aggregate + optional per-init rows)."""
+    if not blob:
+        return pd.DataFrame()
+    rows: list[dict] = []
+
+    by_lead = ((blob.get("aggregate") or {}).get("by_lead")) or {}
+    for lead_s, m in by_lead.items():
+        m = m or {}
+        rows.append(
+            {
+                "init": "ALL",
+                "season": "ALL",
+                "lead_h": int(lead_s),
+                "variable": "t2m",
+                "student_rmse": m.get("student_rmse_mean"),
+                "teacher_rmse": m.get("teacher_rmse_mean"),
+                "student_acc": m.get("student_acc_mean"),
+                "teacher_acc": m.get("teacher_acc_mean"),
+                "deg_pct": m.get("degradation_pct_mean"),
+                "bias": m.get("student_bias_mean"),
+                "n": m.get("n_student"),
+            }
+        )
+
+    by_season = ((blob.get("aggregate") or {}).get("by_season_lead")) or {}
+    for season, leads in by_season.items():
+        for lead_s, m in (leads or {}).items():
+            m = m or {}
+            rows.append(
+                {
+                    "init": "ALL",
+                    "season": str(season),
+                    "lead_h": int(lead_s),
+                    "variable": "t2m",
+                    "student_rmse": m.get("student_rmse_mean"),
+                    "teacher_rmse": m.get("teacher_rmse_mean"),
+                    "student_acc": m.get("student_acc_mean"),
+                    "teacher_acc": m.get("teacher_acc_mean"),
+                    "deg_pct": m.get("degradation_pct_mean"),
+                    "bias": m.get("student_bias_mean"),
+                    "n": m.get("n_student"),
+                }
+            )
+
+    # Fallback: raw student_results list if aggregate missing
+    if not rows:
+        records = blob.get("results") or blob.get("student_results") or []
+        for r in records:
+            variables = r.get("variables") or {}
+            m = variables.get("t2m") or variables.get("2t") or {}
+            if not m and (r.get("variable") in (None, "t2m", "2t")):
+                m = r
+            if not m:
+                continue
+            rows.append(
+                {
+                    "init": str(r.get("init_date") or r.get("init")),
+                    "season": r.get("season") or r.get("month"),
+                    "lead_h": int(r.get("lead_hours") or r.get("lead_h") or 0),
+                    "variable": "t2m",
+                    "student_rmse": m.get("student_rmse_vs_era5") or m.get("rmse"),
+                    "teacher_rmse": m.get("teacher_rmse_vs_era5") or m.get("teacher_rmse"),
+                    "student_acc": m.get("student_acc") or m.get("acc"),
+                    "teacher_acc": m.get("teacher_acc"),
+                    "deg_pct": m.get("degradation_pct_vs_teacher") or m.get("deg_pct"),
+                    "bias": m.get("bias") or m.get("student_bias"),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _skill_matrix_heatmap(df: pd.DataFrame, *, value_col: str, title: str) -> go.Figure:
+    """Dueben-style skill matrix: lead × season (or init) heatmap."""
+    if df.empty or value_col not in df.columns:
+        return go.Figure()
+    work = df.dropna(subset=[value_col, "lead_h"]).copy()
+    if work.empty:
+        return go.Figure()
+    if "season" in work.columns and work["season"].notna().any():
+        idx_col = "season"
+    else:
+        idx_col = "init"
+    pivot = work.pivot_table(index=idx_col, columns="lead_h", values=value_col, aggfunc="mean")
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=pivot.values,
+            x=[f"+{int(c)}h" for c in pivot.columns],
+            y=[str(i) for i in pivot.index],
+            colorscale="RdYlGn_r" if "deg" in value_col or "rmse" in value_col.lower() else "RdYlGn",
+            text=[[f"{v:.2f}" if pd.notna(v) else "" for v in row] for row in pivot.values],
+            texttemplate="%{text}",
+            colorbar=dict(title=value_col),
+        )
+    )
+    fig.update_xaxes(title="Lead")
+    fig.update_yaxes(title=idx_col)
+    return _layout(fig, title=title, height=380)
+
+
+def _lead_skill_lines(df: pd.DataFrame, *, metric: str) -> go.Figure:
+    fig = go.Figure()
+    if df.empty:
+        return fig
+    s_col = "student_rmse" if metric == "rmse" else "student_acc"
+    t_col = "teacher_rmse" if metric == "rmse" else "teacher_acc"
+    for col, label, color in (
+        (s_col, "Student v5", "#ffb74d"),
+        (t_col, "K1 teacher", "#64b5f6"),
+    ):
+        if col not in df.columns:
+            continue
+        sub = df.dropna(subset=[col, "lead_h"])
+        if sub.empty:
+            continue
+        agg = sub.groupby("lead_h", as_index=False)[col].mean()
+        fig.add_trace(
+            go.Scatter(
+                x=agg["lead_h"],
+                y=agg[col],
+                mode="lines+markers",
+                name=label,
+                line=dict(color=color, width=2.5),
+                marker=dict(size=8),
+            )
+        )
+    fig.update_xaxes(title="Lead time (h)")
+    fig.update_yaxes(title="RMSE (K)" if metric == "rmse" else "ACC")
+    return _layout(fig, title=f"t2m {metric.upper()} vs lead (Africa · analysis-forced)")
+
+
+def _render_mvula_tab() -> None:
+    st.subheader("Mvula Code for Earth — dual deliverables")
+    st.markdown(
+        """
+**Headline close-out (→ 23 Sep 2026):**
+1. **Forecast skill** — analysis-forced **t2m** (frozen `student_global_stable_v5`)
+2. **Laptop / deployment** — size + CPU inference demo
+
+Do **not** claim 10-day free-run from v5 (Case A: Cin=65 → Cout=3, no decoder).
+"""
+    )
+    matrix_md = _load_text("MVULA_CODE4EARTH_STATUS_MATRIX.md")
+    st.markdown("#### Objective status matrix")
+    st.dataframe(
+        pd.DataFrame(MVULA_MATRIX_ROWS, columns=["Objective", "Status"]),
+        use_container_width=True,
+        hide_index=True,
+    )
+    if matrix_md:
+        with st.expander("Full matrix markdown"):
+            st.markdown(matrix_md)
+    else:
+        st.caption("reports/MVULA_CODE4EARTH_STATUS_MATRIX.md not found — showing built-in summary.")
+
+    closure = _load_text("TRACKB_STATE_CLOSURE.md")
+    st.markdown("#### Case A — state closure")
+    if closure:
+        st.success("Free-run **NOT POSSIBLE** for v5 · outputs `tp`, `msl`, `2t` only · AF / re-IC multi-lead OK")
+        with st.expander("TRACKB_STATE_CLOSURE.md"):
+            st.markdown(closure)
+    else:
+        st.warning("reports/TRACKB_STATE_CLOSURE.md missing")
+
+    st.markdown("#### Original PLAN vs freeze")
+    st.dataframe(
+        pd.DataFrame(
+            [
+                ("10-day free-run laptop AIFS", "AF t2m skill + CPU size/speed demo"),
+                ("Full-state student", "Cout=3 partial-state MVP"),
+                ("Week-9 multi-var 24–240h ≤15%", "t2m @ 6–24h AF vs K1"),
+                ("LoRA + ONNX product", "Docs + proxy bench; ONNX/real laptop TO COMPLETE"),
+                ("tp in skill budget", "tp FAILED / out-of-scope"),
+            ],
+            columns=["Original PLAN", "New close-out"],
+        ),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+def _render_trackb_tab() -> None:
+    st.subheader("Track B — frozen student v5")
+    gate_b = _load_json("TRACKB_GATE_V5.json") or _load_json("TRACKB_GATE.json")
+    held = (
+        _load_json("TRACKB_T2M_EXPANDED.json")
+        or _load_json("TRACKB_HELD_OUT_JAN2023_V5.json")
+        or _load_json("TRACKB_HELD_OUT_JAN2023.json")
+    )
+    expanded = _load_json("TRACKB_T2M_EXPANDED.json")
+
+    if gate_b:
+        checks = gate_b.get("checks") or []
+        pc = sum(1 for c in checks if c.get("passed"))
+        tc = len(checks)
+        ok = bool(gate_b.get("passed"))
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Cache MVP gate", "PASS" if ok else "FAIL (soft)", f"{pc}/{tc}")
+        m2.metric("Student", "v5", "Cout=3 · AF only")
+        m3.metric("Teacher", "K1", "pruned GT")
+        m4.metric("tp", "Out of scope", "dry collapse")
+        gdf = pd.DataFrame(
+            [
+                {
+                    "Var": c.get("variable"),
+                    "Lead (h)": c.get("lead_hours"),
+                    "Passed": c.get("passed"),
+                    "Deg % vs K1": round(float(c.get("degradation_pct", 0)), 1),
+                    "Student RMSE": c.get("student_rmse_vs_era5"),
+                    "Teacher RMSE": c.get("teacher_rmse_vs_era5"),
+                }
+                for c in checks
+            ]
+        )
+        st.markdown("**On-cache MVP gate** (not held-out)")
+        st.dataframe(gdf, use_container_width=True, hide_index=True)
+    else:
+        st.warning("TRACKB_GATE_V5.json not found")
+
+    st.divider()
+    st.markdown("#### Held-out / production AF t2m skill")
+    if expanded:
+        st.success(
+            f"Production expanded results loaded — "
+            f"n_inits={expanded.get('n_inits', '?')}, "
+            f"leads={expanded.get('student_leads_hours', [])}"
+        )
+        verdict = (expanded.get("verdict") or {}).get("summary") or ""
+        if verdict:
+            st.info(verdict)
+        df = _expanded_t2m_long(expanded)
+    elif held:
+        st.info(
+            "Showing Jan-2023 held-out v5 (AF +6h/+24h). "
+            "Multi-season `TRACKB_T2M_EXPANDED.json` not written yet."
+        )
+        df = _held_out_student_long(held)
+    else:
+        st.warning("No held-out / expanded Track B JSON under reports/")
+        df = pd.DataFrame()
+
+    if not df.empty:
+        t2m = df[df["variable"].isin(["t2m", "2t"])].copy() if "variable" in df.columns else df.copy()
+        if t2m.empty and "student_rmse" in df.columns:
+            t2m = df.copy()
+        # Overall lead curves (exclude per-season duplicates when present)
+        overall = t2m[t2m["season"].isin(["ALL", None]) | t2m["season"].isna()].copy() if "season" in t2m.columns else t2m
+        if overall.empty:
+            overall = t2m
+        seasonal = (
+            t2m[t2m["season"].notna() & ~t2m["season"].isin(["ALL"])].copy()
+            if "season" in t2m.columns
+            else pd.DataFrame()
+        )
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.plotly_chart(_lead_skill_lines(overall, metric="rmse"), use_container_width=True)
+        with c2:
+            st.plotly_chart(_lead_skill_lines(overall, metric="acc"), use_container_width=True)
+
+        heat_src = seasonal if not seasonal.empty else overall
+        if "student_rmse" in heat_src.columns and heat_src["student_rmse"].notna().any():
+            st.plotly_chart(
+                _skill_matrix_heatmap(
+                    heat_src,
+                    value_col="student_rmse",
+                    title="t2m RMSE skill matrix (season × lead)",
+                ),
+                use_container_width=True,
+            )
+        if "deg_pct" in heat_src.columns and heat_src["deg_pct"].notna().any():
+            st.plotly_chart(
+                _skill_matrix_heatmap(
+                    heat_src,
+                    value_col="deg_pct",
+                    title="t2m degradation % vs K1 (Dueben-style)",
+                ),
+                use_container_width=True,
+            )
+
+        metric_cols = [
+            c
+            for c in ("student_rmse", "teacher_rmse", "student_acc", "teacher_acc", "deg_pct", "bias")
+            if c in overall.columns
+        ]
+        if "lead_h" in overall.columns and metric_cols:
+            summary = overall.groupby("lead_h", as_index=False)[metric_cols].mean(numeric_only=True)
+            st.markdown("**Lead-time table (mean)**")
+            st.dataframe(summary.round(3), use_container_width=True, hide_index=True)
+
+        if "variable" in df.columns:
+            tp = df[df["variable"] == "tp"]
+            if not tp.empty and "student_acc" in tp.columns:
+                pod = float(tp["pod_1mm"].mean()) if "pod_1mm" in tp.columns else float("nan")
+                st.caption(
+                    f"tp diagnostic: mean ACC≈{tp['student_acc'].mean():.3f}, "
+                    f"POD₁ₘₘ={pod:.3f} (out-of-scope)"
+                )
+
+    # Spatial error maps from campaign figures
+    fig_dir = REPORTS / "figures"
+    map_files = [
+        ("+6h RMSE", fig_dir / "trackb_t2m_v5_rmse_L006h.png"),
+        ("+6h bias", fig_dir / "trackb_t2m_v5_bias_L006h.png"),
+        ("+24h RMSE", fig_dir / "trackb_t2m_v5_rmse_L024h.png"),
+        ("+24h bias", fig_dir / "trackb_t2m_v5_bias_L024h.png"),
+    ]
+    present = [(title, p) for title, p in map_files if p.is_file()]
+    if present:
+        st.divider()
+        st.markdown("#### Spatial error maps (Africa)")
+        cols = st.columns(2)
+        for i, (title, path) in enumerate(present):
+            with cols[i % 2]:
+                st.image(str(path), caption=title, use_container_width=True)
+
+    md = _load_text("TRACKB_T2M_EXPANDED.md")
+    if md:
+        with st.expander("TRACKB_T2M_EXPANDED.md"):
+            st.markdown(md)
+
+
+def _render_laptop_tab() -> None:
+    st.subheader("Laptop / deployment demonstration")
+    bench = _load_json("MVULA_LAPTOP_BENCHMARK.json")
+    md = _load_text("MVULA_LAPTOP_BENCHMARK.md")
+    if not bench:
+        st.warning("reports/MVULA_LAPTOP_BENCHMARK.json not found")
+        if md:
+            st.markdown(md)
+        return
+    st.warning(bench.get("caveat") or "CPU proxy bench — not yet a consumer i7/16 GB measurement.")
+    a, b, c, d = st.columns(4)
+    a.metric("Student ckpt", f"{bench.get('student_ckpt_mib', 0):.1f} MiB", f"{bench.get('student_params_m', 0):.2f} M params")
+    b.metric("vs K1 teacher", f"{bench.get('size_reduction_factor_disk', 0):.1f}× smaller", f"teacher {bench.get('teacher_ckpt_mib', 0):.1f} MiB")
+    c.metric("+6h step (CPU)", f"{bench.get('mean_step_seconds', 0):.2f} s", f"{bench.get('omp_num_threads', '?')} threads")
+    d.metric("GPU required", "No" if not bench.get("gpu_required") else "Yes", "free-run: No")
+    st.markdown(
+        f"- AF 4-lead inference-only package ≈ **{bench.get('af_package_4leads_infer_only_seconds', 0):.1f} s** "
+        "(IC build not included)\n"
+        f"- Peak RSS (proxy host) ≈ **{bench.get('rss_peak_mib', 0):.0f} MiB**\n"
+        f"- Free-run supported: **{bench.get('free_run_supported')}**"
+    )
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                name="Disk size (MiB)",
+                x=["Student v5", "K1 teacher"],
+                y=[bench.get("student_ckpt_mib"), bench.get("teacher_ckpt_mib")],
+                marker_color=["#ffb74d", "#64b5f6"],
+            )
+        ]
+    )
+    st.plotly_chart(_layout(fig, title="Checkpoint disk size", height=320), use_container_width=True)
+    if md:
+        with st.expander("Full laptop benchmark notes"):
+            st.markdown(md)
 
 
 def main() -> None:
@@ -582,34 +1003,71 @@ def main() -> None:
     track_a_sc = _load_json("TRACKA_COARSEN_SCORECARD.json")
     phase0_sc = _load_json("PHASE0_BASELINE_SCORECARD.json")
     passed, total, gate_ok = _gate_summary(gate)
+    gate_b = _load_json("TRACKB_GATE_V5.json") or _load_json("TRACKB_GATE.json")
+    bench = _load_json("MVULA_LAPTOP_BENCHMARK.json")
+    expanded_ready = (REPORTS / "TRACKB_T2M_EXPANDED.json").is_file()
 
-    st.title("LapAI-Forecast — project status")
-    st.caption("Code for Earth · African Stream · Track A coarsening on Lengau")
+    st.title("Mvula / LapAI-Forecast — project status")
+    st.caption("Code for Earth · African Stream · dual close-out: AF t2m skill + laptop demo (→ 23 Sep 2026)")
 
     st.info(
-        "We got the coarsened weather model working end-to-end on Lengau — train, "
-        "forecast offline, score — and we are aligning with Sh on GPU split and IC handling for 2024–2025."
+        "Freeze **v5** as the Code for Earth student artefact: analysis-forced **t2m** skill vs K1, "
+        "plus CPU size/speed evidence. **No** free-running 10-day claim from Cout=3."
     )
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Phase 0", "Closed", "N320 teacher · Jan 2023")
-    c2.metric("Track A pipeline", "Green", "train → forecast → score")
-    c3.metric("A1 gate (smoke)", "Failed" if gate_ok is False else ("Passed" if gate_ok else "N/A"),
-              f"{passed}/{total} checks" if total else "no gate JSON")
-    c4.metric("Forecasts scored", "5 inits", "20230101–20230129")
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Phase 0 / Track A", "Done", "K1 teacher accepted")
+    c2.metric("Student", "v5 freeze", "65→3 · Case A")
+    if gate_b:
+        checks = gate_b.get("checks") or []
+        pc = sum(1 for c in checks if c.get("passed"))
+        c3.metric("Cache gate", f"{pc}/{len(checks)}", "tp soft-fail")
+    else:
+        c3.metric("Cache gate", "—", "no JSON")
+    c4.metric(
+        "AF t2m campaign",
+        "Ready" if expanded_ready else "Running / pending",
+        "expanded JSON" if expanded_ready else "see Track B tab",
+    )
+    if bench:
+        c5.metric("Laptop proxy", f"{bench.get('student_ckpt_mib', 0):.1f} MiB", f"~{bench.get('mean_step_seconds', 0):.1f}s/step CPU")
+    else:
+        c5.metric("Laptop proxy", "—", "bench JSON missing")
 
-    tab_overview, tab_figures, tab_spatial, tab_pipe, tab_ic, tab_team, tab_gate, tab_todo = st.tabs(
+    (
+        tab_mvula,
+        tab_trackb,
+        tab_laptop,
+        tab_overview,
+        tab_figures,
+        tab_spatial,
+        tab_pipe,
+        tab_ic,
+        tab_team,
+        tab_gate,
+        tab_todo,
+    ) = st.tabs(
         [
-            "Overview",
-            "Analysis figures",
+            "Mvula matrix",
+            "Track B skill",
+            "Laptop demo",
+            "Track A overview",
+            "Track A figures",
             "Spatial maps",
             "Pipelines",
             "IC regridding",
             "2024–2025 split",
-            "Gate details",
+            "A1 gate",
             "Checklist",
         ]
     )
+
+    with tab_mvula:
+        _render_mvula_tab()
+    with tab_trackb:
+        _render_trackb_tab()
+    with tab_laptop:
+        _render_laptop_tab()
 
     base_long = _scorecard_long(phase0_sc, "teacher")
     cand_long = _scorecard_long(track_a_sc, "coarsened")
@@ -801,11 +1259,15 @@ def main() -> None:
     with st.sidebar:
         st.header("Reports")
         for name in (
-            "PHASE0_BASELINE_SCORECARD.json",
-            "TRACKA_COARSEN_SCORECARD.json",
+            "MVULA_CODE4EARTH_STATUS_MATRIX.md",
+            "MVULA_LAPTOP_BENCHMARK.json",
+            "TRACKB_STATE_CLOSURE.md",
+            "TRACKB_GATE_V5.json",
+            "TRACKB_HELD_OUT_JAN2023_V5.json",
+            "TRACKB_T2M_EXPANDED.json",
             "TRACKA_A1_GATE.json",
-            "PHASE0_CLOSURE.md",
-            "LAPAI_STATUS_DECK.pdf",
+            "TRACKA_COARSEN_SCORECARD.json",
+            "PHASE0_BASELINE_SCORECARD.json",
         ):
             p = REPORTS / name
             st.write(f"{'OK' if p.is_file() else '—'} `{name}`")
@@ -813,6 +1275,7 @@ def main() -> None:
         st.markdown("**Run locally**")
         st.code("streamlit run streamlit_status.py", language="bash")
         st.caption(f"Repo: `{REPO}`")
+        st.caption("Close-out: freeze v5 · AF t2m · laptop demo · no free-run claim")
 
 
 if __name__ == "__main__":
