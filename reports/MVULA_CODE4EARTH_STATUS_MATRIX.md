@@ -14,7 +14,7 @@
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
 | Forecast skill (AF t2m, frozen v5) | **DONE** | Production multi-season campaign packaged (`TRACKB_T2M_EXPANDED.*`; 61 inits × leads 6/12/18/24). |
-| Laptop / deployment demonstration | **PARTIAL** | CPU-only timed demo + size shrink documented (`MVULA_LAPTOP_BENCHMARK.md`). ONNX + consumer-laptop parity **TO COMPLETE**. |
+| Laptop / deployment demonstration | **DONE** (consumer laptop measured) | i7-11800H / 32 GB Windows laptop CPU-only bench (`MVULA_LAPTOP_BENCHMARK.md`). ONNX still optional. |
 
 ---
 
@@ -30,9 +30,9 @@
 | 6 | **t2m retention** (skill vs teacher / ERA5) | **DONE** | Expanded AF campaign: 61 inits × seasons DJF/MAM/JJA/SON × leads 6/12/18/24 (`TRACKB_T2M_EXPANDED.*`). +6h RMSE≈1.38 (~+17% vs K1); +24h RMSE≈3.23 (~+103% vs K1). |
 | 7 | **Multi-lead evaluation** | **DONE** (AF only) | Student analysis-forced leads {6,12,18,24} packaged. Not free-run multi-day. |
 | 8 | **African evaluation** | **PARTIAL** | Africa box scoring throughout Track A/B gates and held-out. Extremes suite (`eval_africa_extremes.py` / ≤20% extremes budget) **not** closed as a formal gate. |
-| 9 | **Laptop inference** | **PARTIAL** | v5 runs **CPU-only** (~2 s / +6h step, ~9 MiB ckpt) — see `MVULA_LAPTOP_BENCHMARK.md`. Consumer i7/16 GB end-to-end + ONNX package **TO COMPLETE**. |
+| 9 | **Laptop inference** | **DONE** | Measured on **i7-11800H / 32 GB** Windows laptop: ~**2.53 s**/+6h step, peak RSS ~**1.2 GiB**, GPU not required (`MVULA_LAPTOP_BENCHMARK.*`). ONNX package still optional. |
 | 10 | **Model size reduction** | **DONE** (student vs K1 teacher) | Student **8.8 MiB** / **2.17 M** params vs K1 teacher **52.8 MiB** (~**6×** smaller on disk). Full AIFS public ckpt shrink not re-benchmarked here. |
-| 11 | **Inference speed-up** | **PARTIAL** | Small CNN head is fast on CPU (~2 s/step proxy). No formal AIFS/K1 vs student wall-clock table on identical hardware for 10-day free-run (student free-run N/A). |
+| 11 | **Inference speed-up** | **PARTIAL** | Small CNN head is fast on laptop CPU (~2.53 s/step, i7-11800H). No formal AIFS/K1 vs student wall-clock table on identical hardware for 10-day free-run (student free-run N/A). |
 | 12 | **10-day forecast** | **NOT POSSIBLE** (v5 student) | PLAN 40×6h free-run requires full atmospheric state. v5 **Cout=3** cannot close Cin=65 — see `TRACKB_STATE_CLOSURE.md`. Teacher (K1) can free-run; student cannot. |
 | 13 | **Free-running v5** | **NOT POSSIBLE** | Intentional Case A (`TRACKB_STATE_CLOSURE.md`). Do not claim free-run. |
 | 14 | **tp prediction** | **FAILED** / out-of-scope | Held-out all-dry (ACC≈0, POD₁ₘₘ=0) after v5 recovery attempt. Declared out-of-scope for Cout=3 MVP (`TRACKB_REPORT.md`). |
@@ -54,10 +54,9 @@
 
 ### Remains (do not over-claim)
 
-- Consumer-laptop / ONNX packaging and 16 GB RAM demonstration.
-- LoRA, quantisation, full PLAN Week-9 variable table (`z500`/`t850`), free-run 10-day student.
+- ONNX / INT8 packaging (optional).
+- LoRA, full PLAN Week-9 variable table (`z500`/`t850`), free-run 10-day student.
 - Formal African extremes ≤20% gate.
-- Annotated GitHub release tag `trackb-v5-c4e` (after FINAL_REPORT merge).
 
 ### Explicit non-goals for close-out
 

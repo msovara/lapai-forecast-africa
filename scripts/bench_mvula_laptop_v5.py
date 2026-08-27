@@ -102,16 +102,68 @@ def main() -> int:
     teach_b = _fsize(teacher_real)
 
     host = os.environ.get("HOSTNAME") or os.environ.get("COMPUTERNAME") or "unknown"
-    result = {
-        "host": host,
-        "host_class": "cassava_cpu_proxy"
-        if "cassava" in host.lower() or host.startswith("gpu")
-        else "local",
-        "caveat": (
+    is_proxy = "cassava" in host.lower() or host.lower().startswith("gpu") or host.lower().startswith("cpt-")
+    # Detect Windows consumer laptop class from env override or non-proxy host.
+    host_class = os.environ.get("MVULA_HOST_CLASS") or (
+        "cassava_cpu_proxy" if is_proxy else "consumer_laptop"
+    )
+
+    hw: dict = {
+        "platform": sys.platform,
+        "cpu_count_logical": os.cpu_count(),
+    }
+    try:
+        import platform as _platform
+
+        hw["machine"] = _platform.machine()
+        hw["processor"] = _platform.processor()
+        hw["platform_release"] = _platform.platform()
+    except Exception:  # noqa: BLE001
+        pass
+    if proc is not None:
+        try:
+            import psutil as _psutil
+
+            vm = _psutil.virtual_memory()
+            hw["ram_total_bytes"] = int(vm.total)
+            hw["ram_total_gib"] = round(vm.total / (1024**3), 1)
+            hw["ram_available_gib"] = round(vm.available / (1024**3), 1)
+        except Exception:  # noqa: BLE001
+            pass
+    # Optional explicit labels from the runner (preferred for release notes).
+    for key in ("MVULA_CPU_MODEL", "MVULA_RAM_GIB", "MVULA_HOST_NOTES"):
+        if os.environ.get(key):
+            hw[key.removeprefix("MVULA_").lower()] = os.environ[key]
+
+    if host_class == "consumer_laptop":
+        caveat = (
+            "CPU-only timed demo on a consumer Windows laptop "
+            f"(host={host}). CUDA_VISIBLE_DEVICES empty. "
+            "Inference-only timing (synthetic IC); ERA5 IC fetch/build not included. "
+            "Peak RSS is this Python process."
+        )
+        laptop_est = (
+            "Measured on this laptop: student head runs on CPU without a discrete GPU. "
+            "See mean_step_seconds / rss_peak_mib / hardware fields."
+        )
+    else:
+        caveat = (
             "CPU-only timed demo (CUDA_VISIBLE_DEVICES empty). "
             "On Cassava this is a proxy for laptop inference, not a consumer i7/16GB machine. "
             "Peak RSS is process memory on this host."
-        ),
+        )
+        laptop_est = (
+            "Likely yes for torch CPU inference of the ~9 MiB student head "
+            "(params ~2M; step time typically seconds on a mid-range CPU). "
+            "Full AF package also needs ERA5 IC access (ARCO/CDS) and Python deps; "
+            "ONNX packaging still optional."
+        )
+
+    result = {
+        "host": host,
+        "host_class": host_class,
+        "hardware": hw,
+        "caveat": caveat,
         "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "omp_num_threads": int(os.environ.get("OMP_NUM_THREADS", "0") or 0),
         "mkl_num_threads": int(os.environ.get("MKL_NUM_THREADS", "0") or 0),
@@ -152,12 +204,7 @@ def main() -> int:
             "(IC fetch/build not timed here). Free-run 10-day rollout is NOT supported."
         ),
         "pred_shape": list(out.shape),
-        "can_run_on_normal_laptop_estimate": (
-            "Likely yes for torch CPU inference of the ~9 MiB student head "
-            "(params ~2M; step time typically seconds on a mid-range CPU). "
-            "Full AF package also needs ERA5 IC access (ARCO/CDS) and Python deps; "
-            "ONNX packaging / 16 GB end-to-end demo still TO COMPLETE."
-        ),
+        "can_run_on_normal_laptop_estimate": laptop_est,
     }
 
     out_json = _REPO / "reports/MVULA_LAPTOP_BENCHMARK.json"
