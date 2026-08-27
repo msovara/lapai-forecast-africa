@@ -106,12 +106,10 @@ tp remains out-of-scope for Track B promotion. Samples:
 
 ## Figures
 
-- `bias_L6h`: `reports/figures/trackb_t2m_v5_bias_L006h.png`
-- `rmse_L6h`: `reports/figures/trackb_t2m_v5_rmse_L006h.png`
-- `spatial_npz_L6h`: `reports/figures/trackb_t2m_v5_spatial_L006h.npz`
-- `bias_L24h`: `reports/figures/trackb_t2m_v5_bias_L024h.png`
-- `rmse_L24h`: `reports/figures/trackb_t2m_v5_rmse_L024h.png`
-- `spatial_npz_L24h`: `reports/figures/trackb_t2m_v5_spatial_L024h.npz`
+| Lead | RMSE | Bias | Spatial arrays |
+|------|------|------|----------------|
+| +6 h | [rmse_L006h.png](figures/trackb_t2m_v5_rmse_L006h.png) | [bias_L006h.png](figures/trackb_t2m_v5_bias_L006h.png) | [spatial_L006h.npz](figures/trackb_t2m_v5_spatial_L006h.npz) |
+| +24 h | [rmse_L024h.png](figures/trackb_t2m_v5_rmse_L024h.png) | [bias_L024h.png](figures/trackb_t2m_v5_bias_L024h.png) | [spatial_L024h.npz](figures/trackb_t2m_v5_spatial_L024h.npz) |
 
 ## Reproduce
 

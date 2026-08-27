@@ -8,6 +8,8 @@ The same project often lives under `tiny-media-analysis/lapai-forecast/` on loca
 
 > **Close-out (Aug 2026):** Frozen student **`student_global_stable_v5.ckpt`** delivers analysis-forced African **t2m** skill and ~**6×** compression vs the K1 teacher. It does **not** deliver a free-running 10-day forecast. Full claim boundary: [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md).
 
+**Mentors — start here:** [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) · [`reports/MVULA_CODE4EARTH_STATUS_MATRIX.md`](reports/MVULA_CODE4EARTH_STATUS_MATRIX.md) · tag [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) · quickstart below.
+
 ## Close-out quickstart
 
 ```text
@@ -18,7 +20,7 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
    ```bash
    git clone https://github.com/msovara/lapai-forecast-africa.git
    cd lapai-forecast-africa
-   git checkout trackb-v5-c4e   # preferred freeze tag when published; else main
+   git checkout trackb-v5-c4e   # freeze tag (includes AF t2m package + laptop bench)
    ```
 
 2. **Install** (Track B / student inference)
@@ -35,9 +37,12 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
    - Copy to `models/student_global_stable_v5.ckpt` locally if needed
 
 4. **Results already packaged** (no re-run required to inspect skill)
+   - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — full close-out narrative (**start here**)
+   - [`reports/MVULA_CODE4EARTH_STATUS_MATRIX.md`](reports/MVULA_CODE4EARTH_STATUS_MATRIX.md) — objective → status table
    - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — 61 inits × leads 6/12/18/24
+   - Figures: [+6h RMSE](reports/figures/trackb_t2m_v5_rmse_L006h.png) · [+6h bias](reports/figures/trackb_t2m_v5_bias_L006h.png) · [+24h RMSE](reports/figures/trackb_t2m_v5_rmse_L024h.png) · [+24h bias](reports/figures/trackb_t2m_v5_bias_L024h.png)
    - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / laptop CPU (i7-11800H)
-   - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — full close-out narrative
+   - Case A limit: [`reports/TRACKB_STATE_CLOSURE.md`](reports/TRACKB_STATE_CLOSURE.md)
 
 5. **Re-run AF t2m eval** (optional; needs ARCO/network + GPU recommended)
    ```bash
