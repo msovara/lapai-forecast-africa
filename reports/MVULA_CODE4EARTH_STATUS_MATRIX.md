@@ -38,7 +38,7 @@
 | 14 | **tp prediction** | **FAILED** / out-of-scope | Held-out all-dry (ACC≈0, POD₁ₘₘ=0) after v5 recovery attempt. Declared out-of-scope for Cout=3 MVP (`TRACKB_REPORT.md`). |
 | 15 | **Open-source repository** | **DONE** | Public GitHub: `msovara/lapai-forecast-africa`. |
 | 16 | **Reproducibility** | **PARTIAL** | Scripts, configs, scorecards, methodology handover (`TRACKB_METHODOLOGY_HANDOVER.md`). Full one-command laptop repro + IC caches packaging still hardening. |
-| 17 | **Documentation** | **PARTIAL** | PLAN, Track A/B reports, state closure, methodology, this matrix, laptop bench. Final `FINAL_REPORT.md` / polished NMHS README **TO COMPLETE**. |
+| 17 | **Documentation** | **DONE** (close-out) | [`FINAL_REPORT.md`](FINAL_REPORT.md) + status matrix + Track B reports + polished README quickstart. |
 | 18 | **Community / local relevance** | **PARTIAL** (honest) | Africa-domain eval + NMHS laptop goal are real. No LoRA/ENACTS country adapters shipped; no operational NMHS pilot completed in this window. Relevance = open method + Africa-scored AF t2m demo, not a finished ops product. |
 
 ---
@@ -57,13 +57,13 @@
 - Consumer-laptop / ONNX packaging and 16 GB RAM demonstration.
 - LoRA, quantisation, full PLAN Week-9 variable table (`z500`/`t850`), free-run 10-day student.
 - Formal African extremes ≤20% gate.
-- `FINAL_REPORT.md` + release tag by 23 Sep.
+- Annotated GitHub release tag `trackb-v5-c4e` (after FINAL_REPORT merge).
 
 ### Explicit non-goals for close-out
 
 - Do **not** reopen free-run / Cout=65 v6 training unless a realistic existing route appears (none for Cout=3).
 - Do **not** chase tp on this head.
-- Do **not** disrupt the running GPU1 AF t2m campaign.
+- Do **not** launch additional AF skill campaigns for close-out (evidence already packaged).
 
 ---
 
@@ -71,6 +71,8 @@
 
 | Doc | Role |
 |-----|------|
+| [`FINAL_REPORT.md`](FINAL_REPORT.md) | Code for Earth close-out control document |
+| [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) | Packaged AF t2m campaign |
 | [`TRACKB_STATE_CLOSURE.md`](TRACKB_STATE_CLOSURE.md) | Why free-run / 10-day student is impossible |
 | [`TRACKB_METHODOLOGY_HANDOVER.md`](TRACKB_METHODOLOGY_HANDOVER.md) | AF protocol + scoring lock |
 | [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) | Size / CPU timing |
