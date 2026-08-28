@@ -573,12 +573,12 @@ TODOS = [
     ("Phase 0 closed — N320 teacher baseline + scorecard", True),
     ("Track A A1 coarsening gate passed; K1 prune accepted as teacher", True),
     ("Track B student v5 frozen (Cout=3: tp/msl/2t; Case A — no free-run)", True),
-    ("Laptop CPU proxy bench (~9 MiB, ~2 s/step) documented", True),
+    ("Laptop CPU bench on consumer i7 (measured; ~9 MiB, ~2.5 s/step)", True),
     ("Mvula status matrix + state closure docs on GitHub", True),
     ("AF t2m production campaign (multi-season × 6/12/18/24h)", True),
     ("Package TRACKB_T2M_EXPANDED + Dueben-style skill scorecard", True),
-    ("FINAL_REPORT + README freeze/tag by 23 Sep 2026", False),
-    ("Real consumer i7/16 GB laptop re-bench (optional ONNX smoke)", False),
+    ("FINAL_REPORT + README freeze + tag trackb-v5-c4e", True),
+    ("Optional ONNX smoke (not required for v5 close-out)", False),
     ("Do not reopen free-run / Cout=65 / tp recovery before close-out", True),
 ]
 
@@ -592,7 +592,7 @@ MVULA_MATRIX_ROWS = [
     ("t2m retention", "DONE (expanded AF)"),
     ("Multi-lead evaluation", "DONE (AF 6–24h)"),
     ("African evaluation", "PARTIAL"),
-    ("Laptop inference", "PARTIAL"),
+    ("Laptop inference", "DONE"),
     ("Model size reduction", "DONE"),
     ("Inference speed-up", "PARTIAL"),
     ("10-day forecast", "NOT POSSIBLE"),
@@ -600,7 +600,7 @@ MVULA_MATRIX_ROWS = [
     ("tp prediction", "FAILED"),
     ("Open-source repository", "DONE"),
     ("Reproducibility", "PARTIAL"),
-    ("Documentation", "PARTIAL"),
+    ("Documentation", "DONE"),
     ("Community / local relevance", "PARTIAL"),
 ]
 
@@ -811,7 +811,7 @@ Do **not** claim 10-day free-run from v5 (Case A: Cin=65 → Cout=3, no decoder)
                 ("10-day free-run laptop AIFS", "AF t2m skill + CPU size/speed demo"),
                 ("Full-state student", "Cout=3 partial-state MVP"),
                 ("Week-9 multi-var 24–240h ≤15%", "t2m @ 6–24h AF vs K1"),
-                ("LoRA + ONNX product", "Docs + proxy bench; ONNX/real laptop TO COMPLETE"),
+                ("LoRA + ONNX product", "Docs + measured laptop CPU; ONNX optional"),
                 ("tp in skill budget", "tp FAILED / out-of-scope"),
             ],
             columns=["Original PLAN", "New close-out"],
@@ -972,16 +972,29 @@ def _render_laptop_tab() -> None:
         if md:
             st.markdown(md)
         return
-    st.warning(bench.get("caveat") or "CPU proxy bench — not yet a consumer i7/16 GB measurement.")
+    host_class = bench.get("host_class") or ""
+    if host_class == "consumer_laptop":
+        st.success(
+            bench.get("caveat")
+            or "Measured on a consumer laptop (CPU-only)."
+        )
+    else:
+        st.warning(
+            bench.get("caveat")
+            or "CPU proxy bench — re-run on a consumer laptop for close-out claims."
+        )
     a, b, c, d = st.columns(4)
     a.metric("Student ckpt", f"{bench.get('student_ckpt_mib', 0):.1f} MiB", f"{bench.get('student_params_m', 0):.2f} M params")
     b.metric("vs K1 teacher", f"{bench.get('size_reduction_factor_disk', 0):.1f}× smaller", f"teacher {bench.get('teacher_ckpt_mib', 0):.1f} MiB")
     c.metric("+6h step (CPU)", f"{bench.get('mean_step_seconds', 0):.2f} s", f"{bench.get('omp_num_threads', '?')} threads")
     d.metric("GPU required", "No" if not bench.get("gpu_required") else "Yes", "free-run: No")
+    hw = bench.get("hardware") or {}
+    cpu_label = hw.get("cpu_model") or hw.get("processor") or "CPU"
     st.markdown(
+        f"- Host class: **{host_class or 'unknown'}** · {cpu_label}\n"
         f"- AF 4-lead inference-only package ≈ **{bench.get('af_package_4leads_infer_only_seconds', 0):.1f} s** "
         "(IC build not included)\n"
-        f"- Peak RSS (proxy host) ≈ **{bench.get('rss_peak_mib', 0):.0f} MiB**\n"
+        f"- Peak RSS ≈ **{bench.get('rss_peak_mib', 0):.0f} MiB**\n"
         f"- Free-run supported: **{bench.get('free_run_supported')}**"
     )
     fig = go.Figure(
@@ -1032,9 +1045,13 @@ def main() -> None:
         "expanded JSON" if expanded_ready else "see Track B tab",
     )
     if bench:
-        c5.metric("Laptop proxy", f"{bench.get('student_ckpt_mib', 0):.1f} MiB", f"~{bench.get('mean_step_seconds', 0):.1f}s/step CPU")
+        c5.metric(
+            "Laptop CPU",
+            f"{bench.get('student_ckpt_mib', 0):.1f} MiB",
+            f"~{bench.get('mean_step_seconds', 0):.1f}s/step",
+        )
     else:
-        c5.metric("Laptop proxy", "—", "bench JSON missing")
+        c5.metric("Laptop CPU", "—", "bench JSON missing")
 
     (
         tab_mvula,
