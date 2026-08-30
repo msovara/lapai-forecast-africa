@@ -413,13 +413,13 @@ def write_quad_spatial_figure(
         (rmse_24, "YlOrRd", 0.0, rmse_vmax, "d", "RMSE · +24 h"),
     )
 
-    fig_w, fig_h = 10.5, 9.4
+    fig_w, fig_h = 10.4, 8.6
     fig = plt.figure(figsize=(fig_w, fig_h), dpi=200)
 
-    # Tight 2×2 map grid; room on the right for two vertical colorbars
+    # Compact 2×2: modest gaps so panels read as one figure without crowding
     left, right = 0.08, 0.82
-    bottom, top = 0.06, 0.92
-    wspace, hspace = 0.08, 0.14
+    bottom, top = 0.055, 0.935
+    wspace, hspace = 0.032, 0.055
     cell_w = (right - left - wspace) / 2
     cell_h = (top - bottom - hspace) / 2
 
