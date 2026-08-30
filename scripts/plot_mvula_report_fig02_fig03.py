@@ -204,14 +204,16 @@ def fig1_pipeline_publication() -> None:
         linespacing=1.35,
     )
 
-    # Panel bottoms (y) and heights — leave clear gap under subtitle
-    # Subtitle occupies ~8.7–9.4; first panel top at 8.35
-    layout = [
-        # (y, h, phase_y, phase, title, lines, edge, face)
+    # Fixed geometry: same title→body gap in every panel; height from line count
+    x0, w = 0.85, 5.5
+    title_gap = 0.48  # data units from title baseline to first body line
+    line_h = 0.28
+    top_pad = 0.22
+    bot_pad = 0.28
+    gap_between = 0.38  # arrow gap between panels
+
+    specs = [
         (
-            7.05,
-            1.20,
-            7.65,
             "LEARN",
             "A. Teacher model",
             [
@@ -223,9 +225,6 @@ def fig1_pipeline_publication() -> None:
             "#FBF3EB",
         ),
         (
-            4.95,
-            1.60,
-            5.75,
             "COMPRESS",
             "B. Distilled student (Mvula v5)",
             [
@@ -238,9 +237,6 @@ def fig1_pipeline_publication() -> None:
             "#EEF3F8",
         ),
         (
-            2.55,
-            1.90,
-            3.50,
             "VERIFY",
             "C. Analysis-forced African t2m verification",
             [
@@ -253,9 +249,6 @@ def fig1_pipeline_publication() -> None:
             "#F1F6ED",
         ),
         (
-            0.55,
-            1.55,
-            1.32,
             "ACCESS",
             "D. Accessibility contribution",
             [
@@ -268,6 +261,16 @@ def fig1_pipeline_publication() -> None:
         ),
     ]
 
+    heights = [top_pad + title_gap + len(lines) * line_h + bot_pad for _, _, lines, _, _ in specs]
+    # Stack from top: first panel top below subtitle
+    y_top = 8.35
+    ys = []
+    cursor = y_top
+    for h in heights:
+        y = cursor - h
+        ys.append(y)
+        cursor = y - gap_between
+
     def panel(x, y, w, h, title, lines, edge, face):
         box = FancyBboxPatch(
             (x, y),
@@ -279,9 +282,8 @@ def fig1_pipeline_publication() -> None:
             facecolor=face,
         )
         ax.add_patch(box)
-        # Fixed title → body gap for all panels (do not centre body in full height)
-        title_y = y + h - 0.20
-        body_y = title_y - 0.38
+        title_y = y + h - top_pad
+        body_y = title_y - title_gap
         ax.text(x + 0.18, title_y, title, ha="left", va="top", fontsize=9, fontweight="bold", color=edge)
         ax.text(
             x + 0.18,
@@ -294,11 +296,10 @@ def fig1_pipeline_publication() -> None:
             linespacing=1.35,
         )
 
-    x0, w = 0.85, 5.5
-    for i, (y, h, phase_y, phase, title, lines, edge, face) in enumerate(layout):
+    for i, ((phase, title, lines, edge, face), y, h) in enumerate(zip(specs, ys, heights)):
         ax.text(
             0.28,
-            phase_y,
+            y + h / 2,
             phase,
             ha="left",
             va="center",
@@ -308,9 +309,8 @@ def fig1_pipeline_publication() -> None:
             rotation=90,
         )
         panel(x0, y, w, h, title, lines, edge, face)
-        if i < len(layout) - 1:
-            y_next, h_next = layout[i + 1][0], layout[i + 1][1]
-            # arrow from bottom of this panel to top of next
+        if i < len(specs) - 1:
+            y_next, h_next = ys[i + 1], heights[i + 1]
             arr = FancyArrowPatch(
                 (3.6, y),
                 (3.6, y_next + h_next),
