@@ -2,7 +2,9 @@
 
 # --- Data and model artefacts (large, regenerable) ---
 data/
-models/
+# Ignore model weights by default; ship frozen v5 student for Path A/B end users.
+models/*
+!models/student_global_stable_v5.ckpt
 logs/
 *.zarr/
 *.nc
@@ -10,6 +12,7 @@ logs/
 *.grib2
 *.idx
 *.ckpt
+!models/student_global_stable_v5.ckpt
 *.pt
 *.pth
 *.safetensors
