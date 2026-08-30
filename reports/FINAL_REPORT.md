@@ -160,21 +160,20 @@ African AF t2m skill + CPU size/speed evidence
 |----------|------|
 | Frozen student (Cassava) | `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt` |
 | Size | 8.9 MiB on disk (`sha256` prefix `5cf7080054bff60e…`) |
-| Repo symlink / local name | `models/student_global_stable_v5.ckpt` |
+| Repo path (tracked) | `models/student_global_stable_v5.ckpt` on `main` |
 | Teacher (Cassava) | `models/teacher_pruned.ckpt` → K1 `inference-last.ckpt` under `trackA_prune_k1_from_a1bplus_runs/...` |
 | Packaged eval + laptop commits | `3b7cde4` (AF t2m) · `aa0b218` (laptop) on `main` |
 
-Checkpoints are **not** stored in git (by design). Document the Cassava path in release notes when tagging.
+Frozen **student** v5 is stored in git (~9 MiB). Teacher and other `models/*` weights remain gitignored / Cassava-only.
 
 ---
 
 ## 7. Reproducibility (minimum path)
 
 ```text
-Clone repo (tag trackb-v5-c4e)
-  → obtain student_global_stable_v5.ckpt (Cassava path above or scp)
+Clone repo (main; includes models/student_global_stable_v5.ckpt)
   → Path B: conda env from environment-mvula-enduser.yml + pip -e ".[dev,data,ort]"
-       OR Path A: apptainer build containers/Apptainer.def (bind-mount models/)
+       OR Path A: apptainer build containers/Apptainer.def (bind-mount models/ from clone)
   → python run_mvula.py info | bench | dashboard
   → view packaged TRACKB_T2M_EXPANDED.*  (optional: re-run AF t2m eval with ARCO)
 ```

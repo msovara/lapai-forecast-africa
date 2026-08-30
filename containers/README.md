@@ -9,11 +9,11 @@ This is **Path A** (research / HPC / paper repro). Laptop demos without a contai
 
 | Included | Not included |
 |----------|----------------|
-| Repo code, `reports/` artefacts, Streamlit + CPU PyTorch stack | `models/*.ckpt` (bind-mount) |
+| Repo code, `reports/` artefacts, Streamlit + CPU PyTorch stack | Weights baked into `.sif` (bind-mount host `models/` from git clone) |
 | `run_mvula.py` entry (`info` / `bench` / `dashboard`) | ARCO / ERA5 IC caches |
 | Case A claim boundary in `%help` | Free-run / 10-day forecast |
 
-Checkpoint stays external (~9 MiB): `models/student_global_stable_v5.ckpt`.
+Frozen v5 student is tracked in git as `models/student_global_stable_v5.ckpt` (~9 MiB). Bind-mount that directory into the container at run time (weights stay out of the image for reuse/flexibility).
 
 ## Files
 

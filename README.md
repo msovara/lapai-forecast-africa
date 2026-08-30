@@ -27,12 +27,12 @@ The released student model is approximately **8.8 MiB** and was benchmarked at
 | Developer | **Path B** |
 | Streamlit demonstration | Either |
 
-Apptainer is **not** required for everyone. Packaging (Path A) is a separate deliverable from the scientific v5 result; the checkpoint stays external (~9 MiB bind-mount). Details: [`containers/README.md`](containers/README.md).
+Apptainer is **not** required for everyone. Packaging (Path A) is a separate deliverable from the scientific v5 result. The frozen v5 student (~9 MiB) is tracked in git; the Apptainer image still does **not** bake weights (bind-mount `models/` at run time). Details: [`containers/README.md`](containers/README.md).
 
 ## Close-out quickstart
 
 ```text
-Clone → get v5 ckpt → Path A (Apptainer) or Path B (conda/pip) → view results / run_mvula
+Clone (includes v5 ckpt) → Path A (Apptainer) or Path B (conda/pip) → view results / run_mvula
 ```
 
 Laptop accessibility leads with **Path B**. Apptainer is the **reproducibility** path for mentors/HPC.
@@ -44,9 +44,10 @@ Laptop accessibility leads with **Path B**. Apptainer is the **reproducibility**
    git checkout trackb-v5-c4e   # freeze tag (includes AF t2m package + laptop bench)
    ```
 
-2. **Checkpoint** (not in git; ~9 MiB)
-   - Cassava: `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt`
-   - Copy to `models/student_global_stable_v5.ckpt` locally if needed
+2. **Checkpoint** (~9 MiB; tracked in git as `models/student_global_stable_v5.ckpt`)
+   - Clone of `main` / `trackb-v5-c4e` includes the frozen student weights
+   - Cassava mirror (if needed): `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt`
+   - Other weights under `models/` remain gitignored (teachers, etc.)
 
 3. **Path B — conda / pip (laptop)**
    ```bash
