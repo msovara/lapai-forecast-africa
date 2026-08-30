@@ -204,11 +204,12 @@ def fig1_pipeline_publication() -> None:
         linespacing=1.35,
     )
 
-    # Uniform box geometry modelled on panel A (tight title→body spacing)
+    # Uniform title→body gap; box height fits content (no empty space below text)
     x0, w = 0.85, 5.5
-    box_h = 1.55  # same height for A–D
     title_pad = 0.18
-    title_to_body = 0.28  # same for every panel
+    title_to_body = 0.28
+    line_h = 0.27
+    bot_pad = 0.14  # minimal padding under last line
     arrow_gap = 0.32
 
     specs = [
@@ -260,12 +261,16 @@ def fig1_pipeline_publication() -> None:
         ),
     ]
 
+    heights = [
+        title_pad + title_to_body + len(lines) * line_h + bot_pad for _, _, lines, _, _ in specs
+    ]
+
     # Stack from top (clear of subtitle)
     y_top = 8.30
     ys = []
     cursor = y_top
-    for _ in specs:
-        y = cursor - box_h
+    for h in heights:
+        y = cursor - h
         ys.append(y)
         cursor = y - arrow_gap
 
@@ -294,10 +299,10 @@ def fig1_pipeline_publication() -> None:
             linespacing=1.35,
         )
 
-    for i, ((phase, title, lines, edge, face), y) in enumerate(zip(specs, ys)):
+    for i, ((phase, title, lines, edge, face), y, h) in enumerate(zip(specs, ys, heights)):
         ax.text(
             0.28,
-            y + box_h / 2,
+            y + h / 2,
             phase,
             ha="left",
             va="center",
@@ -306,12 +311,12 @@ def fig1_pipeline_publication() -> None:
             color="#888888",
             rotation=90,
         )
-        panel(x0, y, w, box_h, title, lines, edge, face)
+        panel(x0, y, w, h, title, lines, edge, face)
         if i < len(specs) - 1:
-            y_next = ys[i + 1]
+            y_next, h_next = ys[i + 1], heights[i + 1]
             arr = FancyArrowPatch(
                 (3.6, y),
-                (3.6, y_next + box_h),
+                (3.6, y_next + h_next),
                 arrowstyle="-|>",
                 mutation_scale=12,
                 linewidth=1.2,
