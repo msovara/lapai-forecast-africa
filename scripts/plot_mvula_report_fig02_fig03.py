@@ -342,10 +342,17 @@ def fig1_pipeline_publication() -> None:
         prev_box_bot = box_bot
         y_cursor = box_bot - arrow_gap
 
-    ax.add_patch(Rectangle((0.35, 0.08), 6.5, 0.36, facecolor="#f0f0f0", edgecolor="none", zorder=0))
+    # Footer sits just under panel D (not pinned to the axes origin)
+    footer_gap = 0.20
+    footer_h = 0.38
+    footer_top = prev_box_bot - footer_gap
+    footer_bot = footer_top - footer_h
+    ax.add_patch(
+        Rectangle((0.35, footer_bot), 6.5, footer_h, facecolor="#f0f0f0", edgecolor="none", zorder=0)
+    )
     ax.text(
         3.6,
-        0.26,
+        footer_bot + footer_h / 2,
         "Primary scientific question: can an AIFS-derived model be compressed into something\n"
         "accessible while retaining useful African short-range t2m skill?",
         ha="center",
@@ -356,6 +363,7 @@ def fig1_pipeline_publication() -> None:
         linespacing=1.25,
         zorder=1,
     )
+    ax.set_ylim(footer_bot - 0.12, 8.6)
 
     fig.savefig(OUT1_PUB, dpi=300, bbox_inches="tight", facecolor="white")
     plt.close(fig)
