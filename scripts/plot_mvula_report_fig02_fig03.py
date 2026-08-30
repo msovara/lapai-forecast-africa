@@ -170,11 +170,10 @@ def fig1_pipeline() -> None:
 def fig1_pipeline_publication() -> None:
     """Journal-style vertical pathway (Learn → Verify → Accessibility).
 
-    AnnotationBbox frames hug the packed text so there is no empty space
-    under the last line inside each panel.
+    Place text → measure glyphs → draw a box that hugs the text (no empty
+    interior space below the last line).
     """
-    from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
-    from matplotlib.patches import FancyArrowPatch, Rectangle
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
     fig, ax = plt.subplots(figsize=(7.2, 10.0))
     ax.set_xlim(0, 7.2)
@@ -253,59 +252,66 @@ def fig1_pipeline_publication() -> None:
         ),
     ]
 
-    arrow_gap = 0.22
-    title_body_sep_pts = 8
+    x0, box_w = 0.85, 5.5
+    text_x = x0 + 0.18
+    pad = 0.04
+    title_body_gap = 0.10
+    arrow_gap = 0.20
 
-    # Build content packs (frame will hug these — no spare interior bottom space)
-    items = []
-    for phase, title, lines, edge, face in specs:
-        title_ta = TextArea(
-            title,
-            textprops=dict(color=edge, fontsize=9, fontweight="bold", family="sans-serif"),
-        )
-        body_ta = TextArea(
-            "\n".join(lines),
-            textprops=dict(color="#222222", fontsize=8, family="sans-serif", linespacing=1.3),
-        )
-        pack = VPacker(children=[title_ta, body_ta], align="left", pad=0, sep=title_body_sep_pts)
-        items.append((phase, edge, face, pack))
-
-    # Measure each framed box height in data coords
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     inv = ax.transData.inverted()
-    heights = []
-    for phase, edge, face, pack in items:
-        ab = AnnotationBbox(
-            pack,
-            (3.6, 5.0),
-            xycoords="data",
-            box_alignment=(0.5, 0.5),
-            frameon=True,
-            pad=0.15,
-            bboxprops=dict(boxstyle="round,pad=0.2", facecolor=face, edgecolor=edge, linewidth=1.2),
+
+    y_cursor = 8.30
+    prev_box_bot = None
+
+    for phase, title, lines, edge, face in specs:
+        t_artist = ax.text(
+            text_x,
+            y_cursor,
+            title,
+            ha="left",
+            va="top",
+            fontsize=9,
+            fontweight="bold",
+            color=edge,
+            zorder=3,
         )
-        ax.add_artist(ab)
         fig.canvas.draw()
-        bbox = ab.get_window_extent(renderer=renderer)
-        p0 = inv.transform((bbox.x0, bbox.y0))
-        p1 = inv.transform((bbox.x1, bbox.y1))
-        heights.append(abs(p1[1] - p0[1]))
-        ab.remove()
+        tb = t_artist.get_window_extent(renderer=renderer).transformed(inv)
 
-    # Stack from top; top-align each box
-    y_top = 8.30
-    ys_top = []
-    cursor = y_top
-    for h in heights:
-        ys_top.append(cursor)
-        cursor = cursor - h - arrow_gap
+        b_artist = ax.text(
+            text_x,
+            tb.y0 - title_body_gap,
+            "\n".join(lines),
+            ha="left",
+            va="top",
+            fontsize=8,
+            color="#222222",
+            linespacing=1.3,
+            zorder=3,
+        )
+        fig.canvas.draw()
+        bb = b_artist.get_window_extent(renderer=renderer).transformed(inv)
 
-    artists = []
-    for i, ((phase, edge, face, pack), y_top_i, h) in enumerate(zip(items, ys_top, heights)):
+        box_top = max(tb.y1, bb.y1) + pad
+        box_bot = min(tb.y0, bb.y0) - pad
+        ax.add_patch(
+            FancyBboxPatch(
+                (x0, box_bot),
+                box_w,
+                box_top - box_bot,
+                boxstyle="round,pad=0.015,rounding_size=0.05",
+                linewidth=1.2,
+                edgecolor=edge,
+                facecolor=face,
+                zorder=1,
+            )
+        )
+
         ax.text(
             0.28,
-            y_top_i - h / 2,
+            (box_top + box_bot) / 2,
             phase,
             ha="left",
             va="center",
@@ -313,31 +319,24 @@ def fig1_pipeline_publication() -> None:
             fontweight="bold",
             color="#888888",
             rotation=90,
+            zorder=3,
         )
-        ab = AnnotationBbox(
-            pack,
-            (3.6, y_top_i),
-            xycoords="data",
-            box_alignment=(0.5, 1.0),  # top-align: frame hugs text, no empty belly under last line
-            frameon=True,
-            pad=0.15,
-            bboxprops=dict(boxstyle="round,pad=0.2", facecolor=face, edgecolor=edge, linewidth=1.2),
-        )
-        ax.add_artist(ab)
-        artists.append((ab, y_top_i, h))
-        if i < len(items) - 1:
-            y_bot = y_top_i - h
-            y_next_top = ys_top[i + 1]
+
+        if prev_box_bot is not None:
             ax.add_patch(
                 FancyArrowPatch(
-                    (3.6, y_bot - 0.02),
-                    (3.6, y_next_top + 0.02),
+                    (3.6, prev_box_bot - 0.01),
+                    (3.6, box_top + 0.01),
                     arrowstyle="-|>",
                     mutation_scale=12,
                     linewidth=1.2,
                     color="#555555",
+                    zorder=2,
                 )
             )
+
+        prev_box_bot = box_bot
+        y_cursor = box_bot - arrow_gap
 
     ax.add_patch(Rectangle((0.35, 0.08), 6.5, 0.36, facecolor="#f0f0f0", edgecolor="none", zorder=0))
     ax.text(
@@ -357,7 +356,6 @@ def fig1_pipeline_publication() -> None:
     fig.savefig(OUT1_PUB, dpi=300, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"wrote {OUT1_PUB}")
-
 
 def load_rows():
     blob = json.loads(JSON_PATH.read_text(encoding="utf-8"))
