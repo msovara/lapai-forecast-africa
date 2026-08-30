@@ -170,11 +170,11 @@ def fig1_pipeline() -> None:
 def fig1_pipeline_publication() -> None:
     """Journal-style vertical pathway (Learn → Verify → Accessibility).
 
-    Uses VPacker so title→body separation is identical (in points) for every panel,
-    and each box hugs its text (no empty bottom padding).
+    AnnotationBbox frames hug the packed text so there is no empty space
+    under the last line inside each panel.
     """
     from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
-    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
+    from matplotlib.patches import FancyArrowPatch, Rectangle
 
     fig, ax = plt.subplots(figsize=(7.2, 10.0))
     ax.set_xlim(0, 7.2)
@@ -253,13 +253,11 @@ def fig1_pipeline_publication() -> None:
         ),
     ]
 
-    x0, box_w = 0.85, 5.5
-    arrow_gap = 0.28
-    pad_pts = 8  # inner padding around packed text
-    title_body_sep_pts = 10  # identical open gap under every title
+    arrow_gap = 0.22
+    title_body_sep_pts = 8
 
-    # Build packed content; measure heights in display coords → data coords
-    packs = []
+    # Build content packs (frame will hug these — no spare interior bottom space)
+    items = []
     for phase, title, lines, edge, face in specs:
         title_ta = TextArea(
             title,
@@ -267,49 +265,47 @@ def fig1_pipeline_publication() -> None:
         )
         body_ta = TextArea(
             "\n".join(lines),
-            textprops=dict(color="#222222", fontsize=8, family="sans-serif", linespacing=1.35),
+            textprops=dict(color="#222222", fontsize=8, family="sans-serif", linespacing=1.3),
         )
         pack = VPacker(children=[title_ta, body_ta], align="left", pad=0, sep=title_body_sep_pts)
-        packs.append((phase, edge, face, pack))
+        items.append((phase, edge, face, pack))
 
+    # Measure each framed box height in data coords
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
-    # Convert pack pixel height → data height
     inv = ax.transData.inverted()
-    data_heights = []
-    for _, _, _, pack in packs:
-        # Temporary draw to measure
-        ab = AnnotationBbox(pack, (3.6, 5.0), frameon=False, box_alignment=(0.5, 0.5))
+    heights = []
+    for phase, edge, face, pack in items:
+        ab = AnnotationBbox(
+            pack,
+            (3.6, 5.0),
+            xycoords="data",
+            box_alignment=(0.5, 0.5),
+            frameon=True,
+            pad=0.15,
+            bboxprops=dict(boxstyle="round,pad=0.2", facecolor=face, edgecolor=edge, linewidth=1.2),
+        )
         ax.add_artist(ab)
         fig.canvas.draw()
         bbox = ab.get_window_extent(renderer=renderer)
         p0 = inv.transform((bbox.x0, bbox.y0))
         p1 = inv.transform((bbox.x1, bbox.y1))
-        content_h = abs(p1[1] - p0[1])
-        # box height = content + vertical padding (pad_pts top+bottom ≈ convert)
-        pad_data = abs(inv.transform((0, pad_pts))[1] - inv.transform((0, 0))[1])
-        # pad_pts is in points; convert points → pixels → data
-        fig_dpi = fig.dpi
-        pad_px = pad_pts * fig_dpi / 72.0
-        p_lo = inv.transform((0, 0))
-        p_hi = inv.transform((0, pad_px))
-        pad_data = abs(p_hi[1] - p_lo[1])
-        data_heights.append(content_h + 2 * pad_data)
+        heights.append(abs(p1[1] - p0[1]))
         ab.remove()
 
-    # Stack boxes from top
+    # Stack from top; top-align each box
     y_top = 8.30
-    ys = []
+    ys_top = []
     cursor = y_top
-    for h in data_heights:
-        y = cursor - h
-        ys.append(y)
-        cursor = y - arrow_gap
+    for h in heights:
+        ys_top.append(cursor)
+        cursor = cursor - h - arrow_gap
 
-    for i, ((phase, edge, face, pack), y, h) in enumerate(zip(packs, ys, data_heights)):
+    artists = []
+    for i, ((phase, edge, face, pack), y_top_i, h) in enumerate(zip(items, ys_top, heights)):
         ax.text(
             0.28,
-            y + h / 2,
+            y_top_i - h / 2,
             phase,
             ha="left",
             va="center",
@@ -318,32 +314,24 @@ def fig1_pipeline_publication() -> None:
             color="#888888",
             rotation=90,
         )
-        ax.add_patch(
-            FancyBboxPatch(
-                (x0, y),
-                box_w,
-                h,
-                boxstyle="round,pad=0.02,rounding_size=0.04",
-                linewidth=1.2,
-                edgecolor=edge,
-                facecolor=face,
-            )
-        )
-        # Pack centered in box
         ab = AnnotationBbox(
             pack,
-            (x0 + 0.22, y + h / 2),
+            (3.6, y_top_i),
             xycoords="data",
-            box_alignment=(0.0, 0.5),
-            frameon=False,
-            pad=0.0,
+            box_alignment=(0.5, 1.0),  # top-align: frame hugs text, no empty belly under last line
+            frameon=True,
+            pad=0.15,
+            bboxprops=dict(boxstyle="round,pad=0.2", facecolor=face, edgecolor=edge, linewidth=1.2),
         )
         ax.add_artist(ab)
-        if i < len(packs) - 1:
+        artists.append((ab, y_top_i, h))
+        if i < len(items) - 1:
+            y_bot = y_top_i - h
+            y_next_top = ys_top[i + 1]
             ax.add_patch(
                 FancyArrowPatch(
-                    (3.6, y),
-                    (3.6, ys[i + 1] + data_heights[i + 1]),
+                    (3.6, y_bot - 0.02),
+                    (3.6, y_next_top + 0.02),
                     arrowstyle="-|>",
                     mutation_scale=12,
                     linewidth=1.2,
