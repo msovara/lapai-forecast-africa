@@ -154,8 +154,11 @@ Already packaged under `reports/figures/`:
 - `trackb_t2m_v5_rmse_L024h.png`, `…_bias_L024h.png`  
 - **`mvula_fig02_t2m_lead_curves.png`** — RMSE/ACC vs lead (±1 std across inits; K1 overlay)  
 - **`mvula_fig03_t2m_init_lead_heatmap.png`** — init × lead RMSE scorecard (shows +12 h ridge)  
+- **`mvula_fig06_t2m_plus12h_pathology.png`** — +12 h bias histogram + seasonal boxplots  
+- **`mvula_fig07_t2m_seasonal.png`** — +6 h vs +24 h RMSE/ACC by season  
+- **`mvula_fig08_compute_panel.png`** — laptop size / step time / RSS  
 
-Regenerate Fig. 2–3: `python scripts/plot_mvula_report_fig02_fig03.py`  
+Regenerate report figures: `python scripts/plot_mvula_report_fig02_fig03.py`  
 
 **Qualitative read**
 
@@ -171,7 +174,7 @@ Regenerate Fig. 2–3: `python scripts/plot_mvula_report_fig02_fig03.py`
 3. **K1 comparison n=3** for degradation % — student-vs-ERA5 is the statistically broader result.  
 4. **Laptop timing excludes IC I/O.**  
 5. **No extremes gate, no station verification, no SAWS ops pilot yet.**  
-6. **v6-lite continue-train** (`v5_t2mRMSE`) trained; **smoke eval blocked** on Cassava by missing NetCDF/h5netcdf deps when reading teacher files — gate pending (§9).
+6. **v6-lite continue-train** (`v5_t2mRMSE`) smoke-evalled and **REJECT**ed at the predefined gate — frozen v5 remains the packaged artefact (§9).
 
 ---
 
@@ -187,7 +190,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 4** | Spatial +6 h | *Mean bias and RMSE at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals.* | **Exists** (bias/rmse maps) |
 | **Fig. 5** | Spatial +24 h | *Mean bias and RMSE at +24 h (n=61). Regional warm/cold dipole emerges.* | **Exists** |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
-| **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON.* | Table ready → figure |
+| **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON (±1 std across inits).* | **Done** — `figures/mvula_fig07_t2m_seasonal.png` |
 | **Fig. 8** | Compute panel | *Disk size, CPU step time, peak RSS on measured i7 laptop (student vs K1 size).* | **Done** — `figures/mvula_fig08_compute_panel.png` |
 
 **Optional Fig. 9 (only if v6 accepted):** v5 vs v6 lead curves + ΔRMSE maps at +6 h.
@@ -261,4 +264,4 @@ Machine-readable aggregates: `reports/TRACKB_T2M_EXPANDED.json` (`student_result
 
 ---
 
-*End of internal report draft.* Figs 2–3, 6, and 8 generated. v6-lite smoke gate **REJECT** — paper numbers remain on frozen v5 (`trackb-v5-c4e`).
+*End of internal report draft.* Figs 2–3, 6–8 generated. v6-lite smoke gate **REJECT** — paper numbers remain on frozen v5 (`trackb-v5-c4e`).

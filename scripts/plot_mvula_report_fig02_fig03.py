@@ -18,6 +18,7 @@ FIG_DIR = REPO / "reports" / "figures"
 OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"
 OUT3 = FIG_DIR / "mvula_fig03_t2m_init_lead_heatmap.png"
 OUT6 = FIG_DIR / "mvula_fig06_t2m_plus12h_pathology.png"
+OUT7 = FIG_DIR / "mvula_fig07_t2m_seasonal.png"
 OUT8 = FIG_DIR / "mvula_fig08_compute_panel.png"
 BENCH_JSON = REPO / "reports" / "MVULA_LAPTOP_BENCHMARK.json"
 
@@ -208,6 +209,87 @@ def fig6_plus12_pathology(student) -> None:
     print(f"wrote {OUT6}")
 
 
+def fig7_seasonal(student) -> None:
+    """+6 h / +24 h RMSE and ACC by season (means ±1 std across inits)."""
+    seasons = ["DJF", "MAM", "JJA", "SON"]
+    leads = [6, 24]
+    metrics = {
+        (sea, L): {"rmse": [], "acc": [], "bias": []}
+        for sea in seasons
+        for L in leads
+    }
+    for r in student:
+        L = r["lead_hours"]
+        if L not in leads:
+            continue
+        sea = r["season"]
+        if (sea, L) not in metrics:
+            continue
+        t = r["variables"]["t2m"]
+        metrics[(sea, L)]["rmse"].append(float(t["student_rmse_vs_era5"]))
+        metrics[(sea, L)]["acc"].append(float(t["student_acc"]))
+        metrics[(sea, L)]["bias"].append(float(t["student_bias"]))
+
+    def _mean_std(vals: list[float]) -> tuple[float, float]:
+        arr = np.asarray(vals, dtype=float)
+        if arr.size == 0:
+            return float("nan"), float("nan")
+        if arr.size == 1:
+            return float(arr[0]), 0.0
+        return float(arr.mean()), float(arr.std(ddof=1))
+
+    x = np.arange(len(seasons))
+    width = 0.35
+    c6, c24 = "#1f4e79", "#c45911"
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.2), constrained_layout=True)
+
+    # RMSE panel
+    ax = axes[0]
+    m6, s6 = zip(*[_mean_std(metrics[(s, 6)]["rmse"]) for s in seasons])
+    m24, s24 = zip(*[_mean_std(metrics[(s, 24)]["rmse"]) for s in seasons])
+    n6 = [len(metrics[(s, 6)]["rmse"]) for s in seasons]
+    bars1 = ax.bar(x - width / 2, m6, width, yerr=s6, capsize=3, color=c6, label="+6 h", ecolor="#8faadc")
+    bars2 = ax.bar(x + width / 2, m24, width, yerr=s24, capsize=3, color=c24, label="+24 h", ecolor="#f4b183")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{s}\n(n={n})" for s, n in zip(seasons, n6)])
+    ax.set_ylabel("RMSE (K)")
+    ax.set_title("African t2m RMSE by season")
+    ax.legend(frameon=False, fontsize=8)
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.bar_label(bars1, fmt="%.2f", padding=2, fontsize=7)
+    ax.bar_label(bars2, fmt="%.2f", padding=2, fontsize=7)
+
+    # ACC panel
+    ax = axes[1]
+    a6, as6 = zip(*[_mean_std(metrics[(s, 6)]["acc"]) for s in seasons])
+    a24, as24 = zip(*[_mean_std(metrics[(s, 24)]["acc"]) for s in seasons])
+    ax.bar(x - width / 2, a6, width, yerr=as6, capsize=3, color=c6, label="+6 h", ecolor="#8faadc")
+    ax.bar(x + width / 2, a24, width, yerr=as24, capsize=3, color=c24, label="+24 h", ecolor="#f4b183")
+    ax.set_xticks(x)
+    ax.set_xticklabels(seasons)
+    ax.set_ylabel("ACC")
+    ax.set_ylim(0.6, 1.02)
+    ax.set_title("African t2m ACC by season")
+    ax.legend(frameon=False, fontsize=8)
+    ax.grid(True, axis="y", alpha=0.3)
+    for i, (v6, v24) in enumerate(zip(a6, a24)):
+        ax.text(i - width / 2, v6 + 0.01, f"{v6:.3f}", ha="center", fontsize=7)
+        ax.text(i + width / 2, v24 + 0.01, f"{v24:.3f}", ha="center", fontsize=7)
+
+    growth = [100.0 * (m24[i] / m6[i] - 1.0) for i in range(len(seasons))]
+    growth_txt = ", ".join(f"{s} +{g:.0f}%" for s, g in zip(seasons, growth))
+    fig.suptitle(
+        "Fig. 7 — Seasonal African t2m skill at +6 h vs +24 h (student v5)\n"
+        f"+6 h stays strong in all seasons; +24 h RMSE growth: {growth_txt}. Error bars: ±1 std across inits.",
+        fontsize=9,
+        y=1.08,
+    )
+    fig.savefig(OUT7, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {OUT7}")
+
+
 def fig8_compute_panel() -> None:
     bench = json.loads(BENCH_JSON.read_text(encoding="utf-8"))
     student_mib = float(bench["student_ckpt_mib"])
@@ -259,6 +341,7 @@ def main() -> None:
     fig2_lead_curves(student, k1)
     fig3_heatmap(student)
     fig6_plus12_pathology(student)
+    fig7_seasonal(student)
     fig8_compute_panel()
 
 
