@@ -375,47 +375,46 @@ def fig8_baselines() -> None:
     ax.grid(True, axis="y", alpha=0.3, zorder=0)
     ax.bar_label(bars, fmt="%+.1f%%", padding=3, fontsize=8, zorder=3)
 
-    y_lo = min(skills) - 8
-    y_hi = max(skills) + 10
+    y_lo = min(skills) - 14
+    y_hi = max(skills) + 14
     ax.set_ylim(y_lo, y_hi)
-    # Labels outside bars (never behind fills)
+    # Labels outside bars (never behind fills); white backdrop beats grid lines
+    _lbl = dict(
+        fontsize=7.5,
+        fontweight="bold",
+        zorder=5,
+        clip_on=False,
+        bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor="none", alpha=0.92),
+    )
     ax.text(
         0,
-        skills[0] + 4.5,
+        skills[0] + 5.5,
         "useful prediction",
         ha="center",
         va="bottom",
-        fontsize=7.5,
         color="#1f4e79",
-        fontweight="bold",
-        zorder=4,
-        clip_on=False,
+        **_lbl,
     )
     if len(skills) >= 3 and skills[1] < 0 and skills[2] < 0:
+        fail_y = min(skills[1], skills[2]) - 6.0
         ax.text(
             1.5,
-            min(skills[1], skills[2]) - 3.5,
+            fail_y,
             "failure regime",
             ha="center",
             va="top",
-            fontsize=7.5,
             color="#c00000",
-            fontweight="bold",
-            zorder=4,
-            clip_on=False,
+            **_lbl,
         )
     if len(skills) >= 4 and skills[3] > 0:
         ax.text(
             3,
-            skills[3] + 4.5,
+            skills[3] + 5.5,
             "partial recovery",
             ha="center",
             va="bottom",
-            fontsize=7.5,
             color="#1f4e79",
-            fontweight="bold",
-            zorder=4,
-            clip_on=False,
+            **_lbl,
         )
 
     fig.suptitle(
