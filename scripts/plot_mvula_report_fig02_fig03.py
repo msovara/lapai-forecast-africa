@@ -279,13 +279,16 @@ def fig1_pipeline_publication() -> None:
             facecolor=face,
         )
         ax.add_patch(box)
-        ax.text(x + 0.18, y + h - 0.22, title, ha="left", va="top", fontsize=9, fontweight="bold", color=edge)
+        # Fixed title → body gap for all panels (do not centre body in full height)
+        title_y = y + h - 0.20
+        body_y = title_y - 0.38
+        ax.text(x + 0.18, title_y, title, ha="left", va="top", fontsize=9, fontweight="bold", color=edge)
         ax.text(
             x + 0.18,
-            y + h / 2 - 0.08,
+            body_y,
             "\n".join(lines),
             ha="left",
-            va="center",
+            va="top",
             fontsize=8,
             color="#222222",
             linespacing=1.35,
