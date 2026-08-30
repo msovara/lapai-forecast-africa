@@ -1,0 +1,24 @@
+# Path B — laptop / end-user conda env (CPU Track B v5).
+# Narrower than environment-credit-lengau.yml (no CUDA).
+#
+#   conda env create -f environment-mvula-enduser.yml
+#   conda activate mvula-enduser
+#   pip install -e ".[dev,data,ort]"
+#   pip install -r requirements_streamlit.txt
+#   python run_mvula.py info
+
+name: mvula-enduser
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy>=1.24
+  - pytorch::pytorch>=2.2
+  - cpuonly
+  - pip:
+      - psutil>=5.9
+      # After env create, from repo root also run:
+      #   pip install -e ".[dev,data,ort]"
+      #   pip install -r requirements_streamlit.txt

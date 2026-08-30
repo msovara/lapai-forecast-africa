@@ -6,15 +6,36 @@ The same project often lives under `tiny-media-analysis/lapai-forecast/` on loca
 
 **Mvula** (ECMWF Code for Earth 2026 — African Stream) shrinks advanced AI weather models toward laptop-scale use for African contexts.
 
-> **Close-out (Aug 2026):** Frozen student **`student_global_stable_v5.ckpt`** delivers analysis-forced African **t2m** skill and ~**6×** compression vs the K1 teacher. It does **not** deliver a free-running 10-day forecast. Full claim boundary: [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md).
+## Run Mvula locally — no HPC or GPU required
+
+Mvula v5 provides a lightweight AIFS-derived CNN for short-range African 2 m temperature experimentation. It can be run either through a reproducible Apptainer/Singularity container (**Path A**) or directly in a CPU-only Python/Conda environment (**Path B**).
+
+The released student model is approximately **8.8 MiB** and was benchmarked at approximately **2.5 seconds per +6 h** inference step on an Intel i7-11800H laptop.
+
+**Scientific scope:** The validated v5 result is an **analysis-forced African t2m** experiment. The released student has a **partial output state** (Cout=3) and does **not** support autonomous free-running 10-day forecasting. Full claim boundary: [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md).
 
 **Mentors — start here:** [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) · [`reports/MVULA_CODE4EARTH_STATUS_MATRIX.md`](reports/MVULA_CODE4EARTH_STATUS_MATRIX.md) · tag [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) · quickstart below.
+
+### Which path should I use?
+
+| User | Recommended path |
+|------|------------------|
+| Laptop user | **Path B** — Conda/Python |
+| Researcher | Path B or A |
+| CHPC / Lengau | **Path A** — Apptainer |
+| Reproducibility / paper | **Path A** — pinned container |
+| Developer | **Path B** |
+| Streamlit demonstration | Either |
+
+Apptainer is **not** required for everyone. Packaging (Path A) is a separate deliverable from the scientific v5 result; the checkpoint stays external (~9 MiB bind-mount). Details: [`containers/README.md`](containers/README.md).
 
 ## Close-out quickstart
 
 ```text
-Clone → install env → get v5 ckpt → view packaged AF t2m results → launch Streamlit
+Clone → get v5 ckpt → Path A (Apptainer) or Path B (conda/pip) → view results / run_mvula
 ```
+
+Laptop accessibility leads with **Path B**. Apptainer is the **reproducibility** path for mentors/HPC.
 
 1. **Clone**
    ```bash
@@ -23,20 +44,32 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
    git checkout trackb-v5-c4e   # freeze tag (includes AF t2m package + laptop bench)
    ```
 
-2. **Install** (Track B / student inference)
-   ```bash
-   # Option A — conda (Cassava / CHPC style)
-   # conda env from environment-credit.yml or environment-credit-lengau.yml
-   # Option B — editable pip
-   pip install -e ".[dev]"
-   pip install -r requirements_streamlit.txt   # for the dashboard
-   ```
-
-3. **Checkpoint** (not in git)
-   - Cassava: `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt` (~9 MiB)
+2. **Checkpoint** (not in git; ~9 MiB)
+   - Cassava: `/local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt`
    - Copy to `models/student_global_stable_v5.ckpt` locally if needed
 
-4. **Results already packaged** (no re-run required to inspect skill)
+3. **Path B — conda / pip (laptop)**
+   ```bash
+   conda env create -f environment-mvula-enduser.yml
+   conda activate mvula-enduser
+   pip install -e ".[dev,data,ort]"
+   pip install -r requirements_streamlit.txt
+   python run_mvula.py info
+   python run_mvula.py bench          # CPU timing → reports/MVULA_LAPTOP_BENCHMARK.json
+   python run_mvula.py dashboard      # or: run_mvula.bat / run_status_dashboard.bat
+   ```
+   CHPC GPU training envs remain [`environment-credit.yml`](environment-credit.yml) / [`environment-credit-lengau.yml`](environment-credit-lengau.yml).
+
+4. **Path A — Apptainer / Singularity (repro)**
+   ```bash
+   apptainer build mvula-v5.sif containers/Apptainer.def
+   apptainer run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif info
+   apptainer run -B "$PWD/models:/opt/lapai-forecast/models" \
+     -B "$PWD/reports:/opt/lapai-forecast/reports" mvula-v5.sif bench
+   ```
+   Full build/run notes: [`containers/README.md`](containers/README.md). Docker: `docker build -f containers/Dockerfile -t mvula-v5:cpu .`
+
+5. **Results already packaged** (no re-run required to inspect skill)
    - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — full close-out narrative (**start here**)
    - [`reports/MVULA_CODE4EARTH_STATUS_MATRIX.md`](reports/MVULA_CODE4EARTH_STATUS_MATRIX.md) — objective → status table
    - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — 61 inits × leads 6/12/18/24
@@ -44,16 +77,10 @@ Clone → install env → get v5 ckpt → view packaged AF t2m results → launc
    - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / laptop CPU (i7-11800H)
    - Case A limit: [`reports/TRACKB_STATE_CLOSURE.md`](reports/TRACKB_STATE_CLOSURE.md)
 
-5. **Re-run AF t2m eval** (optional; needs ARCO/network + GPU recommended)
+6. **Re-run AF t2m eval** (optional; needs ARCO/network + GPU recommended)
    ```bash
    # Cassava example
    bash scripts/run_trackB_t2m_expanded_cassava.sh
-   ```
-
-6. **Streamlit demo**
-   ```bash
-   streamlit run streamlit_status.py
-   # Windows: run_status_dashboard.bat
    ```
 
 ### What Mvula v5 achieves vs limitations
@@ -239,22 +266,24 @@ lapai-forecast/
 ├── README.md                This file
 ├── pyproject.toml           Package metadata (`lapai_inference`, utils, evaluation, training, inference)
 ├── requirements.txt
-├── environment-anemoi.yml   Track A conda sketch
-├── environment-credit.yml   Track B / ONNX conda sketch
-├── infer.py                 Laptop inference entry (delegates to CLI)
-├── dvc.yaml                 DVC stub stage (extend after `dvc init`)
-├── configs/                 YAML knobs for student, LoRA, eval, Track A
-├── recipes/                 Placeholders for Anemoi ERA5 recipes
-├── lapai_inference/         Model, cache schema, dataset, preprocess/postprocess, CLI
-├── utils/                   Losses, grid coarsen, LoRA, ONNX export
-├── evaluation/              Baseline gate, skill + Africa extremes helpers
-├── training/                train_student, build_demo_zarr_cache, train_trackA, train_lora, run_sensitivity
-├── inference/               PyTorch rollout + ONNX Runtime benchmark
-├── diagnostics/plot/        Callback config placeholder
-├── containers/              Dockerfile + Singularity sketch
-├── pbs/                     CHPC job scripts
-├── tests/                   Unit smoke tests
-├── data/, models/, logs/    Gitignored artefacts
+├── environment-anemoi.yml          Track A conda sketch
+├── environment-credit.yml          Track B / ONNX conda sketch
+├── environment-mvula-enduser.yml   Path B laptop CPU conda env
+├── run_mvula.py / run_mvula.bat    End-user entry (info / bench / dashboard)
+├── infer.py                        ONNX demo CLI (delegates to lapai_inference)
+├── dvc.yaml                        DVC stub stage (extend after `dvc init`)
+├── configs/                        YAML knobs for student, LoRA, eval, Track A
+├── recipes/                        Placeholders for Anemoi ERA5 recipes
+├── lapai_inference/                Model, cache schema, dataset, preprocess/postprocess, CLI
+├── utils/                          Losses, grid coarsen, LoRA, ONNX export
+├── evaluation/                     Baseline gate, skill + Africa extremes helpers
+├── training/                       train_student, build_demo_zarr_cache, train_trackA, train_lora, run_sensitivity
+├── inference/                      PyTorch rollout + ONNX Runtime benchmark
+├── diagnostics/plot/               Callback config placeholder
+├── containers/                     Apptainer.def + Dockerfile + README (Path A)
+├── pbs/                            CHPC job scripts
+├── tests/                          Unit smoke tests
+├── data/, models/, logs/           Gitignored artefacts
 └── reports/
 ```
 

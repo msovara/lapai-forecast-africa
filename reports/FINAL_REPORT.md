@@ -171,15 +171,15 @@ Checkpoints are **not** stored in git (by design). Document the Cassava path in 
 ## 7. Reproducibility (minimum path)
 
 ```text
-Clone repo
-  → create env (conda: environment-credit.yml / lapai-credit; or pip -e ".[dev]")
+Clone repo (tag trackb-v5-c4e)
   → obtain student_global_stable_v5.ckpt (Cassava path above or scp)
-  → run AF t2m eval (ARCO ICs) OR view packaged TRACKB_T2M_EXPANDED.*
-  → optional: CPU laptop bench
-  → streamlit run streamlit_status.py
+  → Path B: conda env from environment-mvula-enduser.yml + pip -e ".[dev,data,ort]"
+       OR Path A: apptainer build containers/Apptainer.def (bind-mount models/)
+  → python run_mvula.py info | bench | dashboard
+  → view packaged TRACKB_T2M_EXPANDED.*  (optional: re-run AF t2m eval with ARCO)
 ```
 
-See README § “Close-out quickstart” and [`TRACKB_METHODOLOGY_HANDOVER.md`](TRACKB_METHODOLOGY_HANDOVER.md).
+Dual-path details: root [README.md](../README.md) close-out quickstart and [`containers/README.md`](../containers/README.md). Methodology: [`TRACKB_METHODOLOGY_HANDOVER.md`](TRACKB_METHODOLOGY_HANDOVER.md).
 
 ---
 
@@ -201,6 +201,7 @@ Use this list to close gaps **without** new science campaigns:
 | FINAL_REPORT | **This file** | [`FINAL_REPORT.md`](FINAL_REPORT.md) |
 | Release tag | **Yes** | [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) |
 | Streamlit shows expanded results | Yes | [`streamlit_status.py`](../streamlit_status.py) |
+| Apptainer / end-user entry | Yes | [`containers/README.md`](../containers/README.md) · [`run_mvula.py`](../run_mvula.py) |
 
 ---
 

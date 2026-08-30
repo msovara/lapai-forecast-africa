@@ -53,20 +53,21 @@
 
 ## How to reproduce
 
+**Path B (recommended on a laptop):**
+
 ```bash
 cd /path/to/lapai-forecast
+# conda activate mvula-enduser   # from environment-mvula-enduser.yml
 export CUDA_VISIBLE_DEVICES=
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4
-# optional labels:
-# export MVULA_HOST_CLASS=consumer_laptop
-# export MVULA_CPU_MODEL="…"
-# export MVULA_RAM_GIB=16
-python -u scripts/bench_mvula_laptop_v5.py
+python run_mvula.py bench
+# same as: python -u scripts/bench_mvula_laptop_v5.py
 # → reports/MVULA_LAPTOP_BENCHMARK.json
 ```
 
-Windows (PowerShell) used for this measurement with conda env `lapai-anemoi` (CPU torch).
+**Path A (Apptainer):** bind-mount `models/` (and `reports/` to persist JSON) — see [`containers/README.md`](../containers/README.md).
 
+Windows (PowerShell) used for this measurement with conda env `lapai-anemoi` (CPU torch).
 ---
 
 ## Relation to Mvula dual deliverables

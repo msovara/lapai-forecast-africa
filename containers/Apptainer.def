@@ -1,37 +1,35 @@
-# Compatibility shim for sites that still say "Singularity".
-# Canonical recipe: containers/Apptainer.def
-#
-# Build either file the same way (from repo root):
-#   apptainer build mvula-v5.sif containers/Apptainer.def
-#   singularity build mvula-v5.sif containers/Apptainer.def
-#   singularity build mvula-v5.sif containers/Singularity.def
-#
-# This file duplicates the Apptainer recipe so older CHPC docs keep working.
-
 Bootstrap: docker
 From: ubuntu:22.04
+
+# Mvula / LapAI-Forecast Track B v5 CPU image (freeze tag trackb-v5-c4e).
+# Build from the repository root:
+#   apptainer build mvula-v5.sif containers/Apptainer.def
+# Run with checkpoint bind-mounted (weights are NOT baked into the image):
+#   apptainer run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif info
+# See containers/README.md.
 
 %labels
     Author msovara
     Project Mvula
     Freeze trackb-v5-c4e
     ClaimBoundary "Case A AF t2m only — no free-run 10-day claim"
-    CanonicalDef containers/Apptainer.def
 
 %help
     Mvula v5 - AIFS-derived lightweight CNN for African short-range t2m
-    Prefer containers/Apptainer.def in new docs - this file is an alias.
 
     Hardware: CPU supported; GPU not required.
-    Validated: analysis-forced African t2m (+6 h primary).
+    Validated: analysis-forced African t2m (+6 h primary; freeze trackb-v5-c4e).
     Not supported: free-running forecast, 10-day forecast, full 65-channel state.
 
     Checkpoint must be bind-mounted to /opt/lapai-forecast/models/
     (student_global_stable_v5.ckpt is not shipped inside the .sif).
 
     Examples:
-      singularity run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif info
-      singularity run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif bench
+      apptainer run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif info
+      apptainer run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif bench
+      apptainer run -B "$PWD/models:/opt/lapai-forecast/models" mvula-v5.sif dashboard
+
+    Path B (no container): conda/venv + python run_mvula.py - see README.md.
 
 %files
     pyproject.toml /opt/lapai-forecast/pyproject.toml
@@ -74,6 +72,7 @@ From: ubuntu:22.04
 
     mkdir -p /opt/lapai-forecast/models
 
+    # CPU torch first so editable extras do not pull a CUDA wheel.
     python3 -m pip install --no-cache-dir \
         torch --index-url https://download.pytorch.org/whl/cpu
 
