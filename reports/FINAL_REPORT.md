@@ -16,13 +16,13 @@
 
 Mvula set out to shrink advanced AI weather models so useful forecasting can run on ordinary computers, with an Africa focus. By Code for Earth close-out we deliver a **defensible scoped result**, not the full original 10-day free-running laptop AIFS:
 
-> **Mvula demonstrates substantial model compression (~6× smaller on disk than the accepted K1 teacher) while retaining useful short-range African t2m skill under an analysis-forced protocol. The +6 h result is relatively strong (~+17% RMSE vs K1; ACC≈0.97); skill degrades substantially by +24 h (~+103% vs K1). The project therefore supports a laptop-scale, short-range African forecasting use case rather than the originally envisioned 10-day free-running system.**
+> **Mvula demonstrates substantial model compression (≈6× smaller on disk than the accepted K1 teacher) while retaining useful short-range African t2m skill under an analysis-forced protocol. The +6 h result is relatively strong (≈+17% RMSE vs K1; ACC≈0.97); skill degrades substantially by +24 h (≈+103% vs K1). The project therefore supports a laptop-scale, short-range African forecasting use case rather than the originally envisioned 10-day free-running system.**
 
 **Claim boundary (read this first):**
 
 | We claim | We do **not** claim |
 |----------|---------------------|
-| Compressed student (~9 MiB, ~2.2 M params) vs K1 teacher | 10-day autonomous / free-running student forecasts |
+| Compressed student (≈9 MiB, ≈2.2 M params) vs K1 teacher | 10-day autonomous / free-running student forecasts |
 | Analysis-forced African **t2m** skill at +6…+24 h | PLAN Week-9 multi-var skill table (`z500`/`t850`/`tp` @ 24–240 h free-run) |
 | CPU inference of the student head (**measured** on i7-11800H / 32 GB laptop) | Finished ONNX / INT8 NMHS product |
 | Open code + reproducible AF eval artefacts | Operational NMHS pilot or LoRA country adapters |
@@ -34,7 +34,7 @@ Mvula set out to shrink advanced AI weather models so useful forecasting can run
 
 | Original Mvula / PLAN intent | Final close-out scope |
 |------------------------------|------------------------|
-| Shrink AIFS for laptop use | Track A coarsen + K1 prune → Track B CNN student (~6× vs K1) |
+| Shrink AIFS for laptop use | Track A coarsen + K1 prune → Track B CNN student (≈6× vs K1) |
 | 10-day free-running forecast | **Not demonstrated** (v5 cannot free-run) |
 | Full-state student I/O | **Cout=3** (`tp`, `msl`, `2t`); Cin=65 input |
 | Week-9 multi-var ≤15% skill table | **t2m-only** AF leads {6,12,18,24} vs K1/ERA5 |
@@ -102,15 +102,15 @@ Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) (**consumer lap
 
 | Metric | Student v5 | K1 teacher |
 |--------|------------|------------|
-| Disk size | **8.8 MiB** | 52.8 MiB (~**6×** larger) |
+| Disk size | **8.8 MiB** | 52.8 MiB (≈**6×** larger) |
 | Parameters | **2.17 M** | (Anemoi GT) |
 | Hardware | **i7-11800H** (8C/16T), **32 GB** RAM, Windows | — |
-| +6 h step (CPU, 4 threads) | **~2.53 s** | — |
-| AF 4-lead infer-only | **~10.1 s** | — |
-| Peak process RSS | **~1.19 GiB** | — |
+| +6 h step (CPU, 4 threads) | **≈2.53 s** | — |
+| AF 4-lead infer-only | **≈10.1 s** | — |
+| Peak process RSS | **≈1.19 GiB** | — |
 | GPU required for student forward | **No** | Typically yes |
 
-**Answer:** Mvula v5 **runs on a normal laptop CPU** without a discrete GPU. Timing excludes ERA5 IC fetch/build. Cassava CPU proxy (~2.0 s/step) is superseded by this measurement for close-out claims.
+**Answer:** Mvula v5 **runs on a normal laptop CPU** without a discrete GPU. Timing excludes ERA5 IC fetch/build. Cassava CPU proxy (≈2.0 s/step) is superseded by this measurement for close-out claims.
 
 ### 3.5 Open source & tooling
 
@@ -143,9 +143,9 @@ Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) (**consumer lap
 ```
 AIFS / Phase 0 teacher
         ↓  coarsen (A1) + prune (K1)
-K1 GraphTransformer teacher  (~53 MiB; free-run capable)
+K1 GraphTransformer teacher  (≈53 MiB; free-run capable)
         ↓  distill (Track B)
-Mvula student v5             (~9 MiB; Cout=3; AF only)
+Mvula student v5             (≈9 MiB; Cout=3; AF only)
         ↓  evaluate
 African AF t2m skill + CPU size/speed evidence
 ```
@@ -164,7 +164,7 @@ African AF t2m skill + CPU size/speed evidence
 | Teacher (Cassava) | `models/teacher_pruned.ckpt` → K1 `inference-last.ckpt` under `trackA_prune_k1_from_a1bplus_runs/...` |
 | Packaged eval + laptop commits | `3b7cde4` (AF t2m) · `aa0b218` (laptop) on `main` |
 
-Frozen **student** v5 is stored in git (~9 MiB). Teacher and other `models/*` weights remain gitignored / Cassava-only.
+Frozen **student** v5 is stored in git (≈9 MiB). Teacher and other `models/*` weights remain gitignored / Cassava-only.
 
 ---
 
