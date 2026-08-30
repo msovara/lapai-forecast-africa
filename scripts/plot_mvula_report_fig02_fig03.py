@@ -15,6 +15,7 @@ import numpy as np
 REPO = Path(__file__).resolve().parents[1]
 JSON_PATH = REPO / "reports" / "TRACKB_T2M_EXPANDED.json"
 FIG_DIR = REPO / "reports" / "figures"
+OUT1 = FIG_DIR / "mvula_fig01_pipeline.png"
 OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"
 OUT3 = FIG_DIR / "mvula_fig03_t2m_init_lead_heatmap.png"
 OUT6 = FIG_DIR / "mvula_fig06_t2m_plus12h_pathology.png"
@@ -27,6 +28,142 @@ BENCH_JSON = REPO / "reports" / "MVULA_LAPTOP_BENCHMARK.json"
 BASELINES_JSON = REPO / "reports" / "TRACKB_T2M_BASELINES.json"
 
 SEASON_ORDER = {"DJF": 0, "MAM": 1, "JJA": 2, "SON": 3}
+
+
+def fig1_pipeline() -> None:
+    """Scientific pathway schematic (not a CNN layer diagram)."""
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+
+    fig, ax = plt.subplots(figsize=(11.2, 3.8))
+    ax.set_xlim(0, 11.2)
+    ax.set_ylim(0, 3.8)
+    ax.axis("off")
+
+    stages = [
+        {
+            "x": 0.35,
+            "title": "Teacher",
+            "body": "K1 GraphTransformer\n(pruned Anemoi GT)",
+            "foot": "~52.8 MiB",
+            "fc": "#fce4d6",
+            "ec": "#c45911",
+        },
+        {
+            "x": 2.55,
+            "title": "Distillation",
+            "body": "Knowledge distill\nteacher → student",
+            "foot": "Track B train",
+            "fc": "#fff2cc",
+            "ec": "#bf8f00",
+        },
+        {
+            "x": 4.75,
+            "title": "Student v5",
+            "body": "InceptionNeXt CNN\nCin=65 → Cout=3\n(tp, msl, 2t)",
+            "foot": "8.8 MiB · Case A",
+            "fc": "#ddebf7",
+            "ec": "#1f4e79",
+        },
+        {
+            "x": 6.95,
+            "title": "Evaluation",
+            "body": "Analysis-forced\n+6 / +12 / +18 / +24 h\n(IC at init+L−6h)",
+            "foot": "no free-run",
+            "fc": "#e2efda",
+            "ec": "#548235",
+        },
+        {
+            "x": 9.15,
+            "title": "Verify",
+            "body": "African t2m\nvs ARCO ERA5\n+ persistence / K1",
+            "foot": "n=61 inits",
+            "fc": "#f4cccc",
+            "ec": "#990000",
+        },
+    ]
+
+    box_w, box_h = 1.85, 2.15
+    y0 = 0.95
+
+    for i, st in enumerate(stages):
+        box = FancyBboxPatch(
+            (st["x"], y0),
+            box_w,
+            box_h,
+            boxstyle="round,pad=0.03,rounding_size=0.08",
+            linewidth=1.6,
+            edgecolor=st["ec"],
+            facecolor=st["fc"],
+            mutation_aspect=0.8,
+        )
+        ax.add_patch(box)
+        ax.text(
+            st["x"] + box_w / 2,
+            y0 + box_h - 0.28,
+            st["title"],
+            ha="center",
+            va="top",
+            fontsize=10,
+            fontweight="bold",
+            color=st["ec"],
+        )
+        ax.text(
+            st["x"] + box_w / 2,
+            y0 + box_h / 2 - 0.05,
+            st["body"],
+            ha="center",
+            va="center",
+            fontsize=8,
+            color="#333333",
+            linespacing=1.25,
+        )
+        ax.text(
+            st["x"] + box_w / 2,
+            y0 + 0.18,
+            st["foot"],
+            ha="center",
+            va="bottom",
+            fontsize=7.5,
+            style="italic",
+            color="#555555",
+        )
+        if i < len(stages) - 1:
+            x1 = st["x"] + box_w + 0.05
+            x2 = stages[i + 1]["x"] - 0.05
+            arr = FancyArrowPatch(
+                (x1, y0 + box_h / 2),
+                (x2, y0 + box_h / 2),
+                arrowstyle="-|>",
+                mutation_scale=14,
+                linewidth=1.4,
+                color="#666666",
+            )
+            ax.add_patch(arr)
+
+    ax.text(
+        5.6,
+        3.45,
+        "Fig. 1 — Mvula scientific pipeline (learn → verify)",
+        ha="center",
+        va="center",
+        fontsize=11,
+        fontweight="bold",
+        color="#1f4e79",
+    )
+    ax.text(
+        5.6,
+        0.35,
+        "Free-run / 10-day rollout is architecturally excluded (Cout=3, no 3→65 decoder). "
+        "Primary science metric: AF African t2m.",
+        ha="center",
+        va="center",
+        fontsize=8,
+        color="#444444",
+    )
+
+    fig.savefig(OUT1, dpi=170, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"wrote {OUT1}")
 
 
 def load_rows():
@@ -457,6 +594,7 @@ def fig9_compute_panel() -> None:
 
 def main() -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
+    fig1_pipeline()
     _blob, student, k1 = load_rows()
     fig2_lead_curves(student, k1)
     fig3_heatmap(student)
