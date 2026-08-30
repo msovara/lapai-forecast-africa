@@ -96,6 +96,8 @@ Spatial maps (Africa t2m):
 | +6 h | [trackb_t2m_v5_rmse_L006h.png](figures/trackb_t2m_v5_rmse_L006h.png) | [trackb_t2m_v5_bias_L006h.png](figures/trackb_t2m_v5_bias_L006h.png) |
 | +24 h | [trackb_t2m_v5_rmse_L024h.png](figures/trackb_t2m_v5_rmse_L024h.png) | [trackb_t2m_v5_bias_L024h.png](figures/trackb_t2m_v5_bias_L024h.png) |
 
+Publication 2×2 (shared colour scales): [`mvula_fig10_t2m_spatial_6h_24h_quad.png`](figures/mvula_fig10_t2m_spatial_6h_24h_quad.png) — (a–b) mean bias +6/+24 h; (c–d) RMSE +6/+24 h. Also 1×2 panels: [Fig. 4 +6 h](figures/mvula_fig04_t2m_spatial_plus6h.png) · [Fig. 5 +24 h](figures/mvula_fig05_t2m_spatial_plus24h.png).
+
 ### 3.4 Model compression & laptop inference (deployment deliverable)
 
 Source: [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) (**consumer laptop**, 2026-08-27).
@@ -190,7 +192,7 @@ Use this list to close gaps **without** new science campaigns:
 |----------|----------|----------|
 | Status matrix | Yes | [`MVULA_CODE4EARTH_STATUS_MATRIX.md`](MVULA_CODE4EARTH_STATUS_MATRIX.md) |
 | Expanded AF t2m tables | Yes | [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) / [`.json`](TRACKB_T2M_EXPANDED.json) |
-| Spatial RMSE/bias maps | Yes | [figures/](figures/) (`trackb_t2m_v5_{rmse,bias}_L{006,024}h.png`) |
+| Spatial RMSE/bias maps | Yes | [figures/](figures/) (`trackb_t2m_v5_{rmse,bias}_L{006,024}h.png`; quad [`mvula_fig10_t2m_spatial_6h_24h_quad.png`](figures/mvula_fig10_t2m_spatial_6h_24h_quad.png)) |
 | K1 comparison at +6/+24 | Yes (n=3 for deg%) | same |
 | Seasonal breakdown | Yes | same |
 | Case A write-up | Yes | [`TRACKB_STATE_CLOSURE.md`](TRACKB_STATE_CLOSURE.md) |

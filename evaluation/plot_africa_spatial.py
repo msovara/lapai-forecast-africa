@@ -377,12 +377,122 @@ def write_lead_spatial_figures(
     return paths
 
 
+def write_quad_spatial_figure(
+    *,
+    lat: np.ndarray,
+    lon: np.ndarray,
+    bias_6: np.ndarray,
+    rmse_6: np.ndarray,
+    bias_24: np.ndarray,
+    rmse_24: np.ndarray,
+    n_inits: int,
+    figures_dir: Path,
+    out_name: str = "mvula_fig10_t2m_spatial_6h_24h_quad.png",
+) -> Path:
+    """Publication 2×2: bias/RMSE at +6 h and +24 h with shared color scales."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    figures_dir = Path(figures_dir)
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    bias_vmax = float(
+        np.nanpercentile(np.abs(np.concatenate([bias_6.ravel(), bias_24.ravel()])), 98)
+    )
+    bias_vmax = max(0.5, float(np.ceil(bias_vmax * 2) / 2))
+    rmse_vmax = float(np.nanpercentile(np.concatenate([rmse_6.ravel(), rmse_24.ravel()]), 98))
+    rmse_vmax = max(0.5, float(np.ceil(rmse_vmax * 2) / 2))
+
+    # Rows = metric (bias, RMSE); columns = lead (+6 h, +24 h)
+    panels = (
+        (bias_6, "RdBu_r", -bias_vmax, bias_vmax, "a", "Mean bias · +6 h"),
+        (bias_24, "RdBu_r", -bias_vmax, bias_vmax, "b", "Mean bias · +24 h"),
+        (rmse_6, "YlOrRd", 0.0, rmse_vmax, "c", "RMSE · +6 h"),
+        (rmse_24, "YlOrRd", 0.0, rmse_vmax, "d", "RMSE · +24 h"),
+    )
+
+    fig_w, fig_h = 10.5, 9.4
+    fig = plt.figure(figsize=(fig_w, fig_h), dpi=200)
+
+    # Tight 2×2 map grid; room on the right for two vertical colorbars
+    left, right = 0.08, 0.82
+    bottom, top = 0.06, 0.92
+    wspace, hspace = 0.08, 0.14
+    cell_w = (right - left - wspace) / 2
+    cell_h = (top - bottom - hspace) / 2
+
+    positions = (
+        (left, bottom + cell_h + hspace, cell_w, cell_h),  # a
+        (left + cell_w + wspace, bottom + cell_h + hspace, cell_w, cell_h),  # b
+        (left, bottom, cell_w, cell_h),  # c
+        (left + cell_w + wspace, bottom, cell_w, cell_h),  # d
+    )
+
+    ims: list[Any] = []
+    axes = []
+    for (field, cmap, vmin, vmax, label, title), pos in zip(panels, positions):
+        if HAS_CARTOPY:
+            ax = fig.add_axes(pos, projection=ccrs.PlateCarree())
+        else:
+            ax = fig.add_axes(pos)
+        axes.append(ax)
+        col = 0 if label in ("a", "c") else 1
+        row = 0 if label in ("a", "b") else 1
+        im = plot_africa_field(
+            ax,
+            lon,
+            lat,
+            field,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            title=title,
+            panel_label=label,
+            add_colorbar=False,
+            left_labels=(col == 0),
+            bottom_labels=(row == 1),
+        )
+        ims.append(im)
+        if row == 0:
+            ax.set_xlabel("")
+        if col == 1:
+            ax.set_ylabel("")
+
+    # Shared vertical colorbars (bias top row, RMSE bottom row)
+    cax_bias = fig.add_axes([0.855, bottom + cell_h + hspace + 0.02, 0.022, cell_h - 0.04])
+    cbar_b = fig.colorbar(ims[0], cax=cax_bias, orientation="vertical")
+    cbar_b.set_label("Mean bias (°C)", fontsize=10, fontweight="bold")
+    cbar_b.ax.tick_params(labelsize=8)
+
+    cax_rmse = fig.add_axes([0.855, bottom + 0.02, 0.022, cell_h - 0.04])
+    cbar_r = fig.colorbar(ims[2], cax=cax_rmse, orientation="vertical")
+    cbar_r.set_label("RMSE (°C)", fontsize=10, fontweight="bold")
+    cbar_r.ax.tick_params(labelsize=8)
+
+    fig.suptitle(
+        f"African t2m spatial verification · student v5 · +6 h / +24 h "
+        f"(n={n_inits} inits, 2023)",
+        fontsize=12,
+        fontweight="bold",
+        y=0.975,
+    )
+
+    out = figures_dir / out_name
+    fig.savefig(out, dpi=300, bbox_inches="tight", facecolor="white", pad_inches=0.05)
+    plt.close(fig)
+    print(f"[figures] wrote {out}", flush=True)
+    return out
+
+
 def replot_from_npz(figures_dir: Path | None = None) -> dict[str, Any]:
     """Regenerate PNGs from saved ``trackb_t2m_v5_spatial_L*.npz`` grids."""
     _LAND_MASK_CACHE.clear()
     root = Path(__file__).resolve().parents[1]
     figures_dir = Path(figures_dir) if figures_dir else root / "reports" / "figures"
     written: dict[str, Any] = {}
+    by_lead: dict[int, dict[str, np.ndarray]] = {}
     for npz_path in sorted(figures_dir.glob("trackb_t2m_v5_spatial_L*h.npz")):
         lead = int(npz_path.stem.split("_L")[-1].replace("h", ""))
         blob = np.load(npz_path)
@@ -397,6 +507,27 @@ def replot_from_npz(figures_dir: Path | None = None) -> dict[str, Any]:
             also_combined=True,
         )
         written[str(lead)] = paths
+        by_lead[lead] = {
+            "lat": blob["lat"],
+            "lon": blob["lon"],
+            "mean_bias": blob["mean_bias"],
+            "mean_rmse": blob["mean_rmse"],
+            "n": int(blob["n"][0]),
+        }
+
+    if 6 in by_lead and 24 in by_lead:
+        n_inits = min(by_lead[6]["n"], by_lead[24]["n"])
+        quad = write_quad_spatial_figure(
+            lat=by_lead[6]["lat"],
+            lon=by_lead[6]["lon"],
+            bias_6=by_lead[6]["mean_bias"],
+            rmse_6=by_lead[6]["mean_rmse"],
+            bias_24=by_lead[24]["mean_bias"],
+            rmse_24=by_lead[24]["mean_rmse"],
+            n_inits=n_inits,
+            figures_dir=figures_dir,
+        )
+        written["quad_6_24"] = str(quad)
     return written
 
 
