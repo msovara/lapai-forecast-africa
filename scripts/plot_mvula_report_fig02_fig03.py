@@ -19,8 +19,12 @@ OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"
 OUT3 = FIG_DIR / "mvula_fig03_t2m_init_lead_heatmap.png"
 OUT6 = FIG_DIR / "mvula_fig06_t2m_plus12h_pathology.png"
 OUT7 = FIG_DIR / "mvula_fig07_t2m_seasonal.png"
-OUT8 = FIG_DIR / "mvula_fig08_compute_panel.png"
+OUT8 = FIG_DIR / "mvula_fig08_t2m_baselines.png"
+OUT9 = FIG_DIR / "mvula_fig09_compute_panel.png"
+# Keep legacy filename as a copy target for mentors already linking fig08 compute
+OUT8_COMPUTE_LEGACY = FIG_DIR / "mvula_fig08_compute_panel.png"
 BENCH_JSON = REPO / "reports" / "MVULA_LAPTOP_BENCHMARK.json"
+BASELINES_JSON = REPO / "reports" / "TRACKB_T2M_BASELINES.json"
 
 SEASON_ORDER = {"DJF": 0, "MAM": 1, "JJA": 2, "SON": 3}
 
@@ -290,7 +294,94 @@ def fig7_seasonal(student) -> None:
     print(f"wrote {OUT7}")
 
 
-def fig8_compute_panel() -> None:
+def fig8_baselines() -> None:
+    """Student vs AF-persistence vs init-persistence vs K1 (RMSE + skill)."""
+    if not BASELINES_JSON.is_file():
+        print(f"skip Fig.8 baselines — missing {BASELINES_JSON}")
+        return
+    blob = json.loads(BASELINES_JSON.read_text(encoding="utf-8"))
+    agg = blob["aggregate"]
+    skill = blob["skill_vs_persistence_af"]
+    leads = sorted(int(L) for L in agg["student"])
+
+    def series(model: str, key: str = "rmse_mean") -> list[float]:
+        return [float(agg[model][str(L)][key]) for L in leads]
+
+    def series_std(model: str) -> list[float]:
+        return [float(agg[model][str(L)].get("rmse_std", 0.0)) for L in leads]
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.2), constrained_layout=True)
+
+    ax = axes[0]
+    ax.errorbar(
+        leads,
+        series("persistence_af"),
+        yerr=series_std("persistence_af"),
+        fmt=":^",
+        color="#7f7f7f",
+        capsize=3,
+        label="Persistence (AF IC)",
+    )
+    ax.errorbar(
+        leads,
+        series("persistence_init"),
+        yerr=series_std("persistence_init"),
+        fmt=":s",
+        color="#a6a6a6",
+        capsize=3,
+        label="Persistence (init 00Z)",
+    )
+    ax.errorbar(
+        leads,
+        series("student"),
+        yerr=series_std("student"),
+        fmt="-o",
+        color="#1f4e79",
+        capsize=3,
+        label="Student v5",
+    )
+    if "k1" in agg and agg["k1"]:
+        k1_leads = sorted(int(L) for L in agg["k1"])
+        ax.plot(
+            k1_leads,
+            [float(agg["k1"][str(L)]["rmse_mean"]) for L in k1_leads],
+            "s--",
+            color="#c45911",
+            label=f"K1 teacher (n={agg['k1'][str(k1_leads[0])]['n']})",
+        )
+    if "climatology" in agg and agg["climatology"]:
+        ax.plot(leads, series("climatology"), "D-.", color="#548235", label="Climatology (MM-DD HH)")
+    ax.set_xlabel("Lead time (h)")
+    ax.set_ylabel("RMSE (K)")
+    ax.set_xticks(leads)
+    ax.set_title("African t2m RMSE vs baselines")
+    ax.grid(True, alpha=0.3)
+    ax.legend(frameon=False, fontsize=7.5)
+
+    ax = axes[1]
+    skills = [100.0 * float(skill[str(L)]["student_skill_vs_persistence_af"]) for L in leads]
+    colors = ["#1f4e79" if s > 0 else "#c00000" for s in skills]
+    bars = ax.bar([str(L) for L in leads], skills, color=colors, width=0.55)
+    ax.axhline(0.0, color="black", lw=0.8)
+    ax.set_xlabel("Lead time (h)")
+    ax.set_ylabel("Skill vs AF persistence (%)")
+    ax.set_title("Student skill score  1 − RMSE_stu / RMSE_pers")
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.bar_label(bars, fmt="%.1f%%", padding=2, fontsize=8)
+
+    fig.suptitle(
+        "Fig. 8 — Baseline comparison (analysis-forced African t2m)\n"
+        "AF persistence: T̂(valid)=T(IC) with IC=init+(L−6)h — matched to the student protocol. "
+        "Positive skill ⇒ student beats copying the analysis.",
+        fontsize=9,
+        y=1.08,
+    )
+    fig.savefig(OUT8, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {OUT8}")
+
+
+def fig9_compute_panel() -> None:
     bench = json.loads(BENCH_JSON.read_text(encoding="utf-8"))
     student_mib = float(bench["student_ckpt_mib"])
     teacher_mib = float(bench["teacher_ckpt_mib"])
@@ -325,14 +416,20 @@ def fig8_compute_panel() -> None:
     ax.grid(True, axis="y", alpha=0.3)
 
     fig.suptitle(
-        "Fig. 8 — Laptop compute panel (Mvula student v5)\n"
+        "Fig. 9 — Laptop compute / accessibility panel (Mvula student v5)\n"
         f"{cpu}; {params_m:.2f} M params; GPU not required; IC fetch/build excluded from timing.",
         fontsize=9,
         y=1.08,
     )
-    fig.savefig(OUT8, dpi=160, bbox_inches="tight")
+    fig.savefig(OUT9, dpi=160, bbox_inches="tight")
     plt.close(fig)
-    print(f"wrote {OUT8}")
+    try:
+        import shutil
+
+        shutil.copyfile(OUT9, OUT8_COMPUTE_LEGACY)
+    except OSError:
+        pass
+    print(f"wrote {OUT9}")
 
 
 def main() -> None:
@@ -342,7 +439,8 @@ def main() -> None:
     fig3_heatmap(student)
     fig6_plus12_pathology(student)
     fig7_seasonal(student)
-    fig8_compute_panel()
+    fig8_baselines()
+    fig9_compute_panel()
 
 
 if __name__ == "__main__":

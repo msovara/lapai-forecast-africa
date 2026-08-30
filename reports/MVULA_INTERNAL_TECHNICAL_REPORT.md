@@ -90,6 +90,7 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 | Truth / ICs | Public ARCO ERA5 |
 | Metrics | Cosine-latitude **RMSE**, anomaly **ACC**, mean **bias** (student − ERA5) |
 | Teacher compare | Same metrics vs ERA5; degradation % vs K1 where K1 NetCDFs exist (**n=3** Jan-2023 weekly) |
+| Simple baselines | **AF persistence** T̂=T(IC); **init persistence** T̂=T(init 00Z) — `TRACKB_T2M_BASELINES.*` / Fig. 8 |
 | Inits | **61** × 00Z dates in 2023 across DJF/MAM/JJA/SON (`step_days=5`) |
 
 ### 3.4 Laptop benchmark protocol
@@ -142,9 +143,9 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 
 **Findings**
 
-- **+6 h is the scientific success region:** low bias, high ACC, stable across seasons (non-DJF mean RMSE ≈ 1.37).  
-- **Skill collapses by midday lead (+12 h):** universal cold bias (−5.3 K) — treat as a **process/diurnal failure mode**, not a small RMSE gap.  
-- **+24 h** partially recovers vs +12 h but remains far from K1; warm bias appears regionally.
+- **+6 h is the scientific success region:** beats AF persistence (+42% skill), low bias, high ACC, stable across seasons (non-DJF mean RMSE ≈ 1.37).  
+- **Skill collapses by midday lead (+12 h):** universal cold bias (−5.3 K) and **worse than persistence** — treat as a **process/diurnal failure mode**, not a small RMSE gap.  
+- **+24 h** partially recovers vs +12 h and again beats AF persistence (+17%), but remains far from K1; warm bias appears regionally.
 
 ### 5.2 Spatial structure (existing figures)
 
@@ -156,9 +157,11 @@ Already packaged under `reports/figures/`:
 - **`mvula_fig03_t2m_init_lead_heatmap.png`** — init × lead RMSE scorecard (shows +12 h ridge)  
 - **`mvula_fig06_t2m_plus12h_pathology.png`** — +12 h bias histogram + seasonal boxplots  
 - **`mvula_fig07_t2m_seasonal.png`** — +6 h vs +24 h RMSE/ACC by season  
-- **`mvula_fig08_compute_panel.png`** — laptop size / step time / RSS  
+- **`mvula_fig08_t2m_baselines.png`** — persistence / student / K1 + skill score  
+- **`mvula_fig09_compute_panel.png`** — laptop size / step time / RSS  
 
 Regenerate report figures: `python scripts/plot_mvula_report_fig02_fig03.py`  
+Baselines (Cassava ARCO): `python -u evaluation/score_t2m_baselines.py`
 
 **Qualitative read**
 
@@ -191,9 +194,10 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 5** | Spatial +24 h | *Mean bias and RMSE at +24 h (n=61). Regional warm/cold dipole emerges.* | **Exists** |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
 | **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON (±1 std across inits).* | **Done** — `figures/mvula_fig07_t2m_seasonal.png` |
-| **Fig. 8** | Compute panel | *Disk size, CPU step time, peak RSS on measured i7 laptop (student vs K1 size).* | **Done** — `figures/mvula_fig08_compute_panel.png` |
+| **Fig. 8** | Baseline comparison | *Student vs AF-persistence vs init-persistence vs K1; skill score vs AF persistence.* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |
+| **Fig. 9** | Compute / accessibility | *Disk size, CPU step time, peak RSS on measured i7 laptop (student vs K1 size).* | **Done** — `figures/mvula_fig09_compute_panel.png` |
 
-**Optional Fig. 9 (only if v6 accepted):** v5 vs v6 lead curves + ΔRMSE maps at +6 h.
+**Baseline finding (essential):** At **+6 h** the student beats AF persistence by **+41.8%** skill (RMSE 1.38 vs 2.37 K) — evidence of short-range dynamics, not analysis copy. At **+12 h / +18 h** the student is **worse** than persistence (−18%); at **+24 h** it recovers modestly (+17% vs AF persist). See `TRACKB_T2M_BASELINES.md`.
 
 ---
 
@@ -228,7 +232,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **B. Figure pack** | Figs 1–8 as PDF/PNG set + captions | 3–7 days |
 | **C. Methods freeze** | Cite tag `trackb-v5-c4e` + JSON hashes | With B |
 | **D. Preprint draft** | ~4–6 figures, 3–4k words, GMD/AIES-style | After B (+ optional v6) |
-| **E. External verify** | Optional SAWS stations / persistence baseline | Stretch |
+| **E. External verify** | Optional SAWS stations / multi-year climatology baseline | Stretch |
 
 **Working paper title (when upgrading):**  
 *Making AIFS-derived weather AI accessible for African short-range temperature forecasting: compression, analysis-forced verification, and laptop-scale inference*
@@ -264,4 +268,4 @@ Machine-readable aggregates: `reports/TRACKB_T2M_EXPANDED.json` (`student_result
 
 ---
 
-*End of internal report draft.* Figs 2–3, 6–8 generated. v6-lite smoke gate **REJECT** — paper numbers remain on frozen v5 (`trackb-v5-c4e`).
+*End of internal report draft.* Figs 2–3, 6–9 generated (incl. **baselines**). v6-lite smoke gate **REJECT** — paper numbers remain on frozen v5 (`trackb-v5-c4e`).
