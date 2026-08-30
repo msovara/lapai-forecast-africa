@@ -367,31 +367,55 @@ def fig8_baselines() -> None:
     ax = axes[1]
     skills = [100.0 * float(skill[str(L)]["student_skill_vs_persistence_af"]) for L in leads]
     colors = ["#1f4e79" if s > 0 else "#c00000" for s in skills]
-    bars = ax.bar([f"+{L}" for L in leads], skills, color=colors, width=0.55)
-    ax.axhline(0.0, color="black", lw=0.8)
+    bars = ax.bar([f"+{L}" for L in leads], skills, color=colors, width=0.55, zorder=2)
+    ax.axhline(0.0, color="black", lw=0.8, zorder=1)
     ax.set_xlabel("Lead time (h)")
     ax.set_ylabel("Skill vs AF persistence (%)")
     ax.set_title("Relative skill  1 − RMSE$_\\mathrm{stu}$ / RMSE$_\\mathrm{pers}$")
-    ax.grid(True, axis="y", alpha=0.3)
-    ax.bar_label(bars, fmt="%+.1f%%", padding=2, fontsize=8)
+    ax.grid(True, axis="y", alpha=0.3, zorder=0)
+    ax.bar_label(bars, fmt="%+.1f%%", padding=3, fontsize=8, zorder=3)
 
-    # Annotate the non-monotonic regime in the skill panel
-    ax.annotate(
-        "useful",
-        xy=(0, skills[0]),
-        xytext=(0.15, max(skills) * 0.72),
-        fontsize=7,
+    y_lo = min(skills) - 8
+    y_hi = max(skills) + 10
+    ax.set_ylim(y_lo, y_hi)
+    # Labels outside bars (never behind fills)
+    ax.text(
+        0,
+        skills[0] + 4.5,
+        "useful prediction",
+        ha="center",
+        va="bottom",
+        fontsize=7.5,
         color="#1f4e79",
-        arrowprops=dict(arrowstyle="-", color="#1f4e79", lw=0.6),
+        fontweight="bold",
+        zorder=4,
+        clip_on=False,
     )
-    if len(skills) >= 2 and skills[1] < 0:
-        ax.annotate(
+    if len(skills) >= 3 and skills[1] < 0 and skills[2] < 0:
+        ax.text(
+            1.5,
+            min(skills[1], skills[2]) - 3.5,
             "failure regime",
-            xy=(1, skills[1]),
-            xytext=(1.2, min(skills) * 0.55),
-            fontsize=7,
+            ha="center",
+            va="top",
+            fontsize=7.5,
             color="#c00000",
-            arrowprops=dict(arrowstyle="-", color="#c00000", lw=0.6),
+            fontweight="bold",
+            zorder=4,
+            clip_on=False,
+        )
+    if len(skills) >= 4 and skills[3] > 0:
+        ax.text(
+            3,
+            skills[3] + 4.5,
+            "partial recovery",
+            ha="center",
+            va="bottom",
+            fontsize=7.5,
+            color="#1f4e79",
+            fontweight="bold",
+            zorder=4,
+            clip_on=False,
         )
 
     fig.suptitle(
