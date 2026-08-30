@@ -132,6 +132,24 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 | +18 h | 4.377 | 0.749 | −1.115 | 1.468 | +204% |
 | +24 h | **3.231** | 0.835 | +1.299 | 1.467 | +103% |
 
+**Table 2b. Student vs analysis-forced persistence (Fig. 8).**
+
+| Lead | Pers(AF) RMSE | Student RMSE | Skill vs pers |
+|-----:|--------------:|-------------:|--------------:|
+| +6 h | 2.373 | **1.382** | **+41.8%** |
+| +12 h | 6.581 | 7.800 | **−18.5%** |
+| +18 h | 3.691 | 4.377 | **−18.6%** |
+| +24 h | 3.879 | **3.231** | **+16.7%** |
+
+**Findings**
+
+- **+6 h — useful prediction:** the student substantially outperforms AF persistence, reducing RMSE from 2.37 K to 1.38 K (**+41.8%** skill). This is evidence that the CNN extracts predictive information from the atmospheric state rather than copying the analysis. Low bias / high ACC hold across seasons (non-DJF mean RMSE ≈ 1.37).  
+- **+12 h / +18 h — failure regime (central result, not an aside):** advantage reverses; the student is **worse than persistence** (−18.5% / −18.6%). Combined with the systematic **−5.33 K** mean bias at +12 h on **61/61** inits, this is a **lead-dependent failure regime**, not simple monotonic degradation with lead.  
+- **+24 h — partial recovery:** student again beats AF persistence (+16.7%) but remains far from K1; regional warm/cold dipole emerges spatially.
+
+**Results claim (paper-ready):**  
+*At +6 h, the student substantially outperforms an analysis-forced persistence baseline, reducing RMSE from 2.37 K to 1.38 K (41.8% improvement). This advantage reverses at +12 h and +18 h, where the student performs worse than persistence, before recovering at +24 h. Combined with the systematic −5.33 K mean bias at +12 h across all 61 initialisations, this indicates a distinct lead-dependent failure regime rather than simple monotonic degradation with forecast lead.*
+
 **Table 3. Seasonal +6 h / +24 h (student vs ERA5).**
 
 | Season | +6 RMSE | +6 ACC | +6 bias | +24 RMSE | +24 ACC | +24 bias |
@@ -140,12 +158,6 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 | MAM | 1.376 | 0.957 | −0.056 | 3.371 | 0.780 | +1.483 |
 | JJA | 1.327 | 0.977 | −0.169 | 3.280 | 0.878 | +1.213 |
 | SON | 1.415 | 0.949 | −0.246 | 3.318 | 0.777 | +1.428 |
-
-**Findings**
-
-- **+6 h is the scientific success region:** beats AF persistence (+42% skill), low bias, high ACC, stable across seasons (non-DJF mean RMSE ≈ 1.37).  
-- **Skill collapses by midday lead (+12 h):** universal cold bias (−5.3 K) and **worse than persistence** — treat as a **process/diurnal failure mode**, not a small RMSE gap.  
-- **+24 h** partially recovers vs +12 h and again beats AF persistence (+17%), but remains far from K1; warm bias appears regionally.
 
 ### 5.2 Spatial structure (existing figures)
 
@@ -194,10 +206,10 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 5** | Spatial +24 h | *Mean bias and RMSE at +24 h (n=61). Regional warm/cold dipole emerges.* | **Exists** |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
 | **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON (±1 std across inits).* | **Done** — `figures/mvula_fig07_t2m_seasonal.png` |
-| **Fig. 8** | Baseline comparison | *Student vs AF-persistence vs init-persistence vs K1; skill score vs AF persistence.* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |
+| **Fig. 8** | Skill vs AF persistence | *RMSE: AF persistence / Mvula v5 / K1; relative skill % (non-monotonic +42/−18/−19/+17).* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |
 | **Fig. 9** | Compute / accessibility | *Disk size, CPU step time, peak RSS on measured i7 laptop (student vs K1 size).* | **Done** — `figures/mvula_fig09_compute_panel.png` |
 
-**Baseline finding (essential):** At **+6 h** the student beats AF persistence by **+41.8%** skill (RMSE 1.38 vs 2.37 K) — evidence of short-range dynamics, not analysis copy. At **+12 h / +18 h** the student is **worse** than persistence (−18%); at **+24 h** it recovers modestly (+17% vs AF persist). See `TRACKB_T2M_BASELINES.md`.
+**Baseline finding (central, not embarrassing):** The student does **not** degrade monotonically. Useful prediction at +6 h (+41.8% vs pers) → failure regime at +12/+18 h (worse than pers; −5.33 K bias on 61/61) → partial recovery at +24 h (+16.7%). Climatology scoring running on Cassava (does not block report). See `TRACKB_T2M_BASELINES.md`.
 
 ---
 

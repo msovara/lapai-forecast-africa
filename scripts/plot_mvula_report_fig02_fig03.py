@@ -295,7 +295,11 @@ def fig7_seasonal(student) -> None:
 
 
 def fig8_baselines() -> None:
-    """Student vs AF-persistence vs init-persistence vs K1 (RMSE + skill)."""
+    """Fig. 8 — student skill relative to AF persistence (RMSE + skill %).
+
+    Main panel: AF persistence, Mvula v5, K1 (and climatology if present).
+    Side panel: relative skill vs AF persistence (%).
+    """
     if not BASELINES_JSON.is_file():
         print(f"skip Fig.8 baselines — missing {BASELINES_JSON}")
         return
@@ -313,6 +317,7 @@ def fig8_baselines() -> None:
     fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.2), constrained_layout=True)
 
     ax = axes[0]
+    # Core three-line story; init-persistence kept in JSON but not plotted (dilutes message).
     ax.errorbar(
         leads,
         series("persistence_af"),
@@ -320,16 +325,8 @@ def fig8_baselines() -> None:
         fmt=":^",
         color="#7f7f7f",
         capsize=3,
-        label="Persistence (AF IC)",
-    )
-    ax.errorbar(
-        leads,
-        series("persistence_init"),
-        yerr=series_std("persistence_init"),
-        fmt=":s",
-        color="#a6a6a6",
-        capsize=3,
-        label="Persistence (init 00Z)",
+        lw=1.8,
+        label="AF persistence",
     )
     ax.errorbar(
         leads,
@@ -338,7 +335,8 @@ def fig8_baselines() -> None:
         fmt="-o",
         color="#1f4e79",
         capsize=3,
-        label="Student v5",
+        lw=2.0,
+        label="Mvula v5",
     )
     if "k1" in agg and agg["k1"]:
         k1_leads = sorted(int(L) for L in agg["k1"])
@@ -347,32 +345,59 @@ def fig8_baselines() -> None:
             [float(agg["k1"][str(L)]["rmse_mean"]) for L in k1_leads],
             "s--",
             color="#c45911",
-            label=f"K1 teacher (n={agg['k1'][str(k1_leads[0])]['n']})",
+            lw=1.6,
+            label=f"K1 (n={agg['k1'][str(k1_leads[0])]['n']})",
         )
     if "climatology" in agg and agg["climatology"]:
-        ax.plot(leads, series("climatology"), "D-.", color="#548235", label="Climatology (MM-DD HH)")
+        ax.plot(
+            leads,
+            series("climatology"),
+            "D-.",
+            color="#548235",
+            lw=1.4,
+            label="Climatology (MM–DD HH)",
+        )
     ax.set_xlabel("Lead time (h)")
     ax.set_ylabel("RMSE (K)")
     ax.set_xticks(leads)
-    ax.set_title("African t2m RMSE vs baselines")
+    ax.set_title("RMSE: persistence → Mvula → K1")
     ax.grid(True, alpha=0.3)
-    ax.legend(frameon=False, fontsize=7.5)
+    ax.legend(frameon=False, fontsize=8)
 
     ax = axes[1]
     skills = [100.0 * float(skill[str(L)]["student_skill_vs_persistence_af"]) for L in leads]
     colors = ["#1f4e79" if s > 0 else "#c00000" for s in skills]
-    bars = ax.bar([str(L) for L in leads], skills, color=colors, width=0.55)
+    bars = ax.bar([f"+{L}" for L in leads], skills, color=colors, width=0.55)
     ax.axhline(0.0, color="black", lw=0.8)
     ax.set_xlabel("Lead time (h)")
     ax.set_ylabel("Skill vs AF persistence (%)")
-    ax.set_title("Student skill score  1 − RMSE_stu / RMSE_pers")
+    ax.set_title("Relative skill  1 − RMSE$_\\mathrm{stu}$ / RMSE$_\\mathrm{pers}$")
     ax.grid(True, axis="y", alpha=0.3)
-    ax.bar_label(bars, fmt="%.1f%%", padding=2, fontsize=8)
+    ax.bar_label(bars, fmt="%+.1f%%", padding=2, fontsize=8)
+
+    # Annotate the non-monotonic regime in the skill panel
+    ax.annotate(
+        "useful",
+        xy=(0, skills[0]),
+        xytext=(0.15, max(skills) * 0.72),
+        fontsize=7,
+        color="#1f4e79",
+        arrowprops=dict(arrowstyle="-", color="#1f4e79", lw=0.6),
+    )
+    if len(skills) >= 2 and skills[1] < 0:
+        ax.annotate(
+            "failure regime",
+            xy=(1, skills[1]),
+            xytext=(1.2, min(skills) * 0.55),
+            fontsize=7,
+            color="#c00000",
+            arrowprops=dict(arrowstyle="-", color="#c00000", lw=0.6),
+        )
 
     fig.suptitle(
-        "Fig. 8 — Baseline comparison (analysis-forced African t2m)\n"
-        "AF persistence: T̂(valid)=T(IC) with IC=init+(L−6)h — matched to the student protocol. "
-        "Positive skill ⇒ student beats copying the analysis.",
+        "Fig. 8 — Student skill relative to analysis-forced persistence\n"
+        "AF persistence: T̂(valid)=T(IC), IC=init+(L−6)h (matched to student protocol). "
+        "Positive % ⇒ student extracts useful state information beyond copying the analysis.",
         fontsize=9,
         y=1.08,
     )
