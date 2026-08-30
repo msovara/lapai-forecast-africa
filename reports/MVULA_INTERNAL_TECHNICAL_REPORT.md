@@ -35,10 +35,10 @@ Mvula asks whether advanced AI weather models can be **compressed** enough to su
 1. **Compression:** Distilled CNN student is **8.8 MiB / 2.17 M params**, ~**6×** smaller on disk than the accepted K1 pruned GraphTransformer teacher (52.8 MiB).  
 2. **Accessibility:** On a consumer Windows laptop (**i7-11800H**, ~32 GB RAM), CPU-only inference runs in **~2.53 s** per +6 h step; peak process RSS ~**1.19 GiB**; **no GPU required**.  
 3. **Skill (analysis-forced African t2m, n=61 inits, 2023 seasons):**  
-   - **+6 h:** RMSE **1.382 K**, ACC **0.965**, bias ≈ **−0.12 K** (~**+16.6%** RMSE vs K1 on n=3 shared inits).  
-   - **+24 h:** RMSE **3.231 K**, ACC **0.835**, bias ≈ **+1.30 K** (~**+103%** vs K1).  
+   - **+6 h:** RMSE **1.382 °C**, ACC **0.965**, bias ≈ **−0.12 °C** (~**+16.6%** RMSE vs K1 on n=3 shared inits).  
+   - **+24 h:** RMSE **3.231 °C**, ACC **0.835**, bias ≈ **+1.30 °C** (~**+103%** vs K1).  
    - RMSE growth +6→+24 h ≈ **+134%**, persistent across DJF/MAM/JJA/SON.  
-4. **Failure mode:** **+12 h** is pathological (RMSE **7.80 K**, bias **−5.33 K** on **61/61** inits) — systematic cold bias, not random noise.  
+4. **Failure mode:** **+12 h** is pathological (RMSE **7.80 °C**, bias **−5.33 °C** on **61/61** inits) — systematic cold bias, not random noise.  
 5. **Architecture limit (Case A):** Outputs are Cout=3 (`tp`,`msl`,`2t`) with **no** 3→65 decoder ⇒ **free-run impossible**. Precipitation on this head collapsed and is **out-of-scope**.
 
 **One-sentence takeaway:** Mvula v5 is a successful **compression + short-range AF t2m + laptop inference** demonstration — not a finished 10-day free-running laptop AIFS.
@@ -88,7 +88,7 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 |------|--------|
 | Domain | Africa box (lat [−40, 40], lon [−20, 55] in packaged campaign) |
 | Truth / ICs | Public ARCO ERA5 |
-| Metrics | Cosine-latitude **RMSE**, anomaly **ACC**, mean **bias** (student − ERA5) |
+| Metrics | Cosine-latitude **RMSE**, anomaly **ACC**, mean **bias** (student − ERA5). Reported in **°C** for RMSE/bias (interval-identical to K; absolute fields remain Kelvin internally) |
 | Teacher compare | Same metrics vs ERA5; degradation % vs K1 where K1 NetCDFs exist (**n=3** Jan-2023 weekly) |
 | Simple baselines | **AF persistence** T̂=T(IC); **init persistence** T̂=T(init 00Z) — `TRACKB_T2M_BASELINES.*` / Fig. 8 |
 | Inits | **61** × 00Z dates in 2023 across DJF/MAM/JJA/SON (`step_days=5`) |
@@ -125,8 +125,8 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 
 **Table 2. Africa t2m, all inits (n=61).**
 
-| Lead | RMSE (K) | ACC | Bias (K) | K1 RMSE | Deg. vs K1 |
-|-----:|---------:|----:|---------:|--------:|-----------:|
+| Lead | RMSE (°C) | ACC | Bias (°C) | K1 RMSE | Deg. vs K1 |
+|-----:|----------:|----:|----------:|--------:|-----------:|
 | +6 h | **1.382** | **0.965** | −0.115 | 1.216 | +16.6% |
 | +12 h | **7.800** | 0.446 | **−5.330** | 1.698 | +360% |
 | +18 h | 4.377 | 0.749 | −1.115 | 1.468 | +204% |
@@ -134,8 +134,8 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 
 **Table 2b. Student vs analysis-forced persistence (Fig. 8).**
 
-| Lead | Pers(AF) RMSE | Student RMSE | Skill vs pers |
-|-----:|--------------:|-------------:|--------------:|
+| Lead | Pers(AF) RMSE (°C) | Student RMSE (°C) | Skill vs pers |
+|-----:|-------------------:|------------------:|--------------:|
 | +6 h | 2.373 | **1.382** | **+41.8%** |
 | +12 h | 6.581 | 7.800 | **−18.5%** |
 | +18 h | 3.691 | 4.377 | **−18.6%** |
@@ -143,14 +143,14 @@ Multi-lead tables are therefore **re-IC’d one-step skill**, not autonomous day
 
 **Findings**
 
-- **+6 h — useful prediction:** the student substantially outperforms AF persistence, reducing RMSE from 2.37 K to 1.38 K (**+41.8%** skill). This is evidence that the CNN extracts predictive information from the atmospheric state rather than copying the analysis. Low bias / high ACC hold across seasons (non-DJF mean RMSE ≈ 1.37).  
-- **+12 h / +18 h — failure regime (central result, not an aside):** advantage reverses; the student is **worse than persistence** (−18.5% / −18.6%). Combined with the systematic **−5.33 K** mean bias at +12 h on **61/61** inits, this is a **lead-dependent failure regime**, not simple monotonic degradation with lead.  
+- **+6 h — useful prediction:** the student substantially outperforms AF persistence, reducing RMSE from 2.37 °C to 1.38 °C (**+41.8%** skill). This is evidence that the CNN extracts predictive information from the atmospheric state rather than copying the analysis. Low bias / high ACC hold across seasons (non-DJF mean RMSE ≈ 1.37 °C).  
+- **+12 h / +18 h — failure regime (central result, not an aside):** advantage reverses; the student is **worse than persistence** (−18.5% / −18.6%). Combined with the systematic **−5.33 °C** mean bias at +12 h on **61/61** inits, this is a **lead-dependent failure regime**, not simple monotonic degradation with lead.  
 - **+24 h — partial recovery:** student again beats AF persistence (+16.7%) but remains far from K1; regional warm/cold dipole emerges spatially.
 
 **Results claim (paper-ready):**  
-*At +6 h, the student substantially outperforms an analysis-forced persistence baseline, reducing RMSE from 2.37 K to 1.38 K (41.8% improvement). This advantage reverses at +12 h and +18 h, where the student performs worse than persistence, before recovering at +24 h. Combined with the systematic −5.33 K mean bias at +12 h across all 61 initialisations, this indicates a distinct lead-dependent failure regime rather than simple monotonic degradation with forecast lead.*
+*At +6 h, the student substantially outperforms an analysis-forced persistence baseline, reducing RMSE from 2.37 °C to 1.38 °C (41.8% improvement). This advantage reverses at +12 h and +18 h, where the student performs worse than persistence, before recovering at +24 h. Combined with the systematic −5.33 °C mean bias at +12 h across all 61 initialisations, this indicates a distinct lead-dependent failure regime rather than simple monotonic degradation with forecast lead.*
 
-**Table 3. Seasonal +6 h / +24 h (student vs ERA5).**
+**Table 3. Seasonal +6 h / +24 h (student vs ERA5; RMSE/bias in °C).**
 
 | Season | +6 RMSE | +6 ACC | +6 bias | +24 RMSE | +24 ACC | +24 bias |
 |--------|--------:|-------:|--------:|---------:|--------:|---------:|
@@ -201,7 +201,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 |----|--------|-----------------|--------|
 | **Fig. 1** | Pipeline schematic | *Mvula pathway: K1 → distillation → Cout=3 student → AF verify → accessibility. Free-run excluded (Case A).* | **Done** — internal: `mvula_fig01_pipeline.png` · **publication:** `mvula_fig01_pipeline_publication.png` |
 | **Fig. 2** | Lead curves | *Cosine-latitude RMSE and ACC for African t2m versus lead time for student v5 (n=61). K1 shown where available (n=3). Error bars: ±1 std across inits.* | **Done** — `figures/mvula_fig02_t2m_lead_curves.png` |
-| **Fig. 3** | Scorecard heatmap | *Init × lead RMSE (K) for African t2m (student v5). Rows ordered by season. Highlights the +12 h cold-bias ridge.* | **Done** — `figures/mvula_fig03_t2m_init_lead_heatmap.png` |
+| **Fig. 3** | Scorecard heatmap | *Init × lead RMSE (°C) for African t2m (student v5). Rows ordered by season. Highlights the +12 h cold-bias ridge.* | **Done** — `figures/mvula_fig03_t2m_init_lead_heatmap.png` |
 | **Fig. 4** | Spatial +6 h | *Mean bias and RMSE at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals.* | **Exists** (bias/rmse maps) |
 | **Fig. 5** | Spatial +24 h | *Mean bias and RMSE at +24 h (n=61). Regional warm/cold dipole emerges.* | **Exists** |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
@@ -209,7 +209,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 8** | Skill vs AF persistence | *RMSE: AF persistence / Mvula v5 / K1; relative skill % (non-monotonic +42/−18/−19/+17).* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |
 | **Fig. 9** | Compute / accessibility | *Disk size, CPU step time, peak RSS on measured i7 laptop (student vs K1 size).* | **Done** — `figures/mvula_fig09_compute_panel.png` |
 
-**Baseline finding (central, not embarrassing):** The student does **not** degrade monotonically. Useful prediction at +6 h (+41.8% vs pers) → failure regime at +12/+18 h (worse than pers; −5.33 K bias on 61/61) → partial recovery at +24 h (+16.7%). Climatology scoring running on Cassava (does not block report). See `TRACKB_T2M_BASELINES.md`.
+**Baseline finding (central, not embarrassing):** The student does **not** degrade monotonically. Useful prediction at +6 h (+41.8% vs pers) → failure regime at +12/+18 h (worse than pers; −5.33 °C bias on 61/61) → partial recovery at +24 h (+16.7%). Climatology scoring running on Cassava (does not block report). See `TRACKB_T2M_BASELINES.md`.
 
 ---
 

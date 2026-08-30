@@ -11,7 +11,9 @@
 - **student:** from TRACKB_T2M_EXPANDED.json (v5 AF)
 - **k1:** from expanded JSON where available (n≈3 inits)
 
-## Aggregate RMSE (K)
+## Aggregate RMSE (°C)
+
+*Same magnitude as Kelvin for temperature differences (1 °C ≡ 1 K interval).*
 
 | Lead | Pers(AF) | Pers(init) | Student | Clim | K1 | Student skill vs Pers(AF) |
 |-----:|---------:|-----------:|--------:|-----:|---:|--------------------------:|

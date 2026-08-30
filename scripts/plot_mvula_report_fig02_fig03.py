@@ -170,12 +170,11 @@ def fig1_pipeline() -> None:
 def fig1_pipeline_publication() -> None:
     """Journal-style vertical pathway (Learn → Compress → Verify → Access).
 
-    Each panel is a framed AnnotationBbox so the border pad is applied by
-    matplotlib symmetrically around the packed title+body (no empty interior
-    below the last line from mismatched FancyBbox heights).
+    Equal-width FancyBbox panels; text packed with OffsetBoxes and measured so
+    top/bottom interior pad stays tight and uniform.
     """
     from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
-    from matplotlib.patches import FancyArrowPatch, Rectangle
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
     fig, ax = plt.subplots(figsize=(7.2, 8.6), dpi=300)
     ax.set_xlim(0, 7.2)
@@ -235,7 +234,7 @@ def fig1_pipeline_publication() -> None:
             [
                 "Protocol: IC at init+(L−6) h → one +6 h step; leads L ∈ {6, 12, 18, 24} h",
                 "Domain: Africa · truth/IC: public ARCO ERA5 · n = 61 × 00Z inits (2023)",
-                "Metrics: cosine-latitude RMSE, ACC, bias; baselines: AF persistence, K1",
+                "Metrics: cosine-latitude RMSE / ACC / bias (°C); baselines: AF persistence, K1",
                 "Headline: +6 h beats persistence (+41.8%); +12/+18 h failure regime",
             ],
             "#2E5A1C",
@@ -253,6 +252,12 @@ def fig1_pipeline_publication() -> None:
             "#F7EFF4",
         ),
     ]
+
+    # Fixed equal panel width (data coords), left-aligned text inside
+    x0, box_w = 0.72, 5.85
+    text_x = x0 + 0.18
+    pad_y = 0.07
+    arrow_gap = 0.22
 
     y_cursor = 7.15
     prev_box_bot = None
@@ -278,28 +283,39 @@ def fig1_pipeline_publication() -> None:
             },
         )
         pack = VPacker(children=[title_ta, body_ta], align="left", pad=0, sep=5)
+
+        # Text top just below pad; measure pack, then draw equal-width frame around it
         ab = AnnotationBbox(
             pack,
-            (3.6, y_cursor),
+            (text_x, y_cursor - pad_y),
             xycoords="data",
-            box_alignment=(0.5, 1.0),
-            frameon=True,
-            pad=0.45,
-            bboxprops={
-                "boxstyle": "round,pad=0.4",
-                "linewidth": 1.2,
-                "edgecolor": edge,
-                "facecolor": face,
-            },
-            zorder=2,
+            box_alignment=(0.0, 1.0),
+            frameon=False,
+            pad=0.0,
+            zorder=3,
         )
         ax.add_artist(ab)
         fig.canvas.draw()
-        bb = ab.get_window_extent(renderer=fig.canvas.get_renderer()).transformed(inv)
+        tb = ab.get_window_extent(renderer=fig.canvas.get_renderer()).transformed(inv)
+
+        box_top = y_cursor
+        box_bot = tb.y0 - pad_y
+        ax.add_patch(
+            FancyBboxPatch(
+                (x0, box_bot),
+                box_w,
+                box_top - box_bot,
+                boxstyle="round,pad=0.0,rounding_size=0.05",
+                linewidth=1.2,
+                edgecolor=edge,
+                facecolor=face,
+                zorder=1,
+            )
+        )
 
         ax.text(
             0.28,
-            (bb.y0 + bb.y1) / 2,
+            (box_top + box_bot) / 2,
             phase,
             ha="left",
             va="center",
@@ -314,17 +330,17 @@ def fig1_pipeline_publication() -> None:
             ax.add_patch(
                 FancyArrowPatch(
                     (3.6, prev_box_bot - 0.02),
-                    (3.6, bb.y1 + 0.02),
+                    (3.6, box_top + 0.02),
                     arrowstyle="-|>",
                     mutation_scale=18,
                     linewidth=1.5,
                     color="#555555",
-                    zorder=1,
+                    zorder=2,
                 )
             )
 
-        prev_box_bot = bb.y0
-        y_cursor = bb.y0 - 0.22
+        prev_box_bot = box_bot
+        y_cursor = box_bot - arrow_gap
 
     ax.add_patch(Rectangle((0.35, 0.08), 6.5, 0.36, facecolor="#f0f0f0", edgecolor="none", zorder=0))
     ax.text(
@@ -389,7 +405,7 @@ def fig2_lead_curves(student, k1) -> None:
     if k1_leads:
         ax.plot(k1_leads, k1_rmse, "s--", color="#c45911", label=f"K1 teacher (n={len(k1_by[k1_leads[0]])})")
     ax.set_xlabel("Lead time (h)")
-    ax.set_ylabel("RMSE (K)")
+    ax.set_ylabel("RMSE (°C)")
     ax.set_title("African t2m RMSE vs lead")
     ax.set_xticks(leads)
     ax.grid(True, alpha=0.3)
@@ -462,7 +478,7 @@ def fig3_heatmap(student) -> None:
     ax.set_xlabel("Lead time")
     ax.set_ylabel("Initialisation (MM-DD, season)")
     cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
-    cbar.set_label("RMSE (K)")
+    cbar.set_label("RMSE (°C)")
 
     # Mark season boundaries
     seasons = [season_of[i] for i in inits]
@@ -472,7 +488,7 @@ def fig3_heatmap(student) -> None:
 
     ax.set_title(
         "Fig. 3 — Init × lead African t2m RMSE scorecard (student v5, n=61)\n"
-        "Bright column at +12 h = systematic cold-bias failure mode (RMSE≈7.8 K).",
+        "Bright column at +12 h = systematic cold-bias failure mode (RMSE≈7.8 °C).",
         fontsize=9,
     )
     fig.savefig(OUT3, dpi=160, bbox_inches="tight")
@@ -498,8 +514,8 @@ def fig6_plus12_pathology(student) -> None:
 
     ax = axes[0]
     ax.hist(biases, bins=12, color="#1f4e79", edgecolor="white", alpha=0.9)
-    ax.axvline(biases.mean(), color="#c45911", ls="--", lw=1.5, label=f"mean={biases.mean():.2f} K")
-    ax.set_xlabel("Bias (K)  (student − ERA5)")
+    ax.axvline(biases.mean(), color="#c45911", ls="--", lw=1.5, label=f"mean={biases.mean():.2f} °C")
+    ax.set_xlabel("Bias (°C)  (student − ERA5)")
     ax.set_ylabel("Count of inits")
     ax.set_title("+12 h bias distribution (n=61)")
     ax.legend(frameon=False, fontsize=8)
@@ -513,14 +529,14 @@ def fig6_plus12_pathology(student) -> None:
         patch.set_facecolor("#8faadc")
         patch.set_alpha(0.85)
     ax.axhline(0.0, color="black", lw=0.8, alpha=0.5)
-    ax.set_ylabel("Bias (K)")
+    ax.set_ylabel("Bias (°C)")
     ax.set_title("+12 h bias by season")
     ax.grid(True, alpha=0.3, axis="y")
 
     fig.suptitle(
         "Fig. 6 — +12 h African t2m cold-bias pathology (student v5)\n"
         f"All {len(biases)} inits are cold (bias ∈ [{biases.min():.2f}, {biases.max():.2f}] K); "
-        f"mean RMSE={rmses.mean():.2f} K. Likely diurnal / lead-conditioned AF failure, not random noise.",
+        f"mean RMSE={rmses.mean():.2f} °C. Likely diurnal / lead-conditioned AF failure, not random noise.",
         fontsize=9,
         y=1.06,
     )
@@ -573,7 +589,7 @@ def fig7_seasonal(student) -> None:
     bars2 = ax.bar(x + width / 2, m24, width, yerr=s24, capsize=3, color=c24, label="+24 h", ecolor="#f4b183")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{s}\n(n={n})" for s, n in zip(seasons, n6)])
-    ax.set_ylabel("RMSE (K)")
+    ax.set_ylabel("RMSE (°C)")
     ax.set_title("African t2m RMSE by season")
     ax.legend(frameon=False, fontsize=8)
     ax.grid(True, axis="y", alpha=0.3)
@@ -674,7 +690,7 @@ def fig8_baselines() -> None:
             label="Climatology (MM–DD HH)",
         )
     ax.set_xlabel("Lead time (h)")
-    ax.set_ylabel("RMSE (K)")
+    ax.set_ylabel("RMSE (°C)")
     ax.set_xticks(leads)
     ax.set_title("RMSE: persistence → Mvula → K1")
     ax.grid(True, alpha=0.3)
