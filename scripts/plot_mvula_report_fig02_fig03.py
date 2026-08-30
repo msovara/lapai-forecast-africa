@@ -168,21 +168,23 @@ def fig1_pipeline() -> None:
 
 
 def fig1_pipeline_publication() -> None:
-    """Journal-style vertical pathway (Learn → Verify → Accessibility).
+    """Journal-style vertical pathway (Learn → Compress → Verify → Access).
 
-    Place text → measure glyphs → draw a box that hugs the text (no empty
-    interior space below the last line).
+    Each panel is a framed AnnotationBbox so the border pad is applied by
+    matplotlib symmetrically around the packed title+body (no empty interior
+    below the last line from mismatched FancyBbox heights).
     """
-    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
+    from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
+    from matplotlib.patches import FancyArrowPatch, Rectangle
 
-    fig, ax = plt.subplots(figsize=(7.2, 10.0))
+    fig, ax = plt.subplots(figsize=(7.2, 8.6), dpi=300)
     ax.set_xlim(0, 7.2)
-    ax.set_ylim(0, 10.0)
+    ax.set_ylim(0, 8.6)
     ax.axis("off")
 
     ax.text(
         3.6,
-        9.65,
+        8.35,
         "Figure 1. Overview of the Mvula compressed student pathway",
         ha="center",
         va="center",
@@ -192,7 +194,7 @@ def fig1_pipeline_publication() -> None:
     )
     ax.text(
         3.6,
-        9.15,
+        7.88,
         "Distillation of an AIFS-derived GraphTransformer teacher into an\n"
         "analysis-forced African 2 m temperature student\n"
         "(Case A: Cout = 3; free-run not supported).",
@@ -252,66 +254,52 @@ def fig1_pipeline_publication() -> None:
         ),
     ]
 
-    x0, box_w = 0.85, 5.5
-    text_x = x0 + 0.18
-    pad = 0.02
-    title_body_gap = 0.10
-    arrow_gap = 0.20
-
-    fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
+    y_cursor = 7.15
+    prev_box_bot = None
     inv = ax.transData.inverted()
 
-    y_cursor = 8.30
-    prev_box_bot = None
-
     for phase, title, lines, edge, face in specs:
-        t_artist = ax.text(
-            text_x,
-            y_cursor,
+        title_ta = TextArea(
             title,
-            ha="left",
-            va="top",
-            fontsize=9,
-            fontweight="bold",
-            color=edge,
-            zorder=3,
+            textprops={
+                "color": edge,
+                "fontsize": 9,
+                "fontweight": "bold",
+                "fontfamily": "sans-serif",
+            },
         )
-        fig.canvas.draw()
-        tb = t_artist.get_window_extent(renderer=renderer).transformed(inv)
-
-        b_artist = ax.text(
-            text_x,
-            tb.y0 - title_body_gap,
+        body_ta = TextArea(
             "\n".join(lines),
-            ha="left",
-            va="top",
-            fontsize=8,
-            color="#222222",
-            linespacing=1.3,
-            zorder=3,
+            textprops={
+                "color": "#222222",
+                "fontsize": 8,
+                "fontfamily": "sans-serif",
+                "linespacing": 1.25,
+            },
         )
+        pack = VPacker(children=[title_ta, body_ta], align="left", pad=0, sep=5)
+        ab = AnnotationBbox(
+            pack,
+            (3.6, y_cursor),
+            xycoords="data",
+            box_alignment=(0.5, 1.0),
+            frameon=True,
+            pad=0.45,
+            bboxprops={
+                "boxstyle": "round,pad=0.4",
+                "linewidth": 1.2,
+                "edgecolor": edge,
+                "facecolor": face,
+            },
+            zorder=2,
+        )
+        ax.add_artist(ab)
         fig.canvas.draw()
-        bb = b_artist.get_window_extent(renderer=renderer).transformed(inv)
-
-        box_top = max(tb.y1, bb.y1) + pad
-        box_bot = min(tb.y0, bb.y0) - pad
-        ax.add_patch(
-            FancyBboxPatch(
-                (x0, box_bot),
-                box_w,
-                box_top - box_bot,
-                boxstyle="round,pad=0.0,rounding_size=0.05",
-                linewidth=1.2,
-                edgecolor=edge,
-                facecolor=face,
-                zorder=1,
-            )
-        )
+        bb = ab.get_window_extent(renderer=fig.canvas.get_renderer()).transformed(inv)
 
         ax.text(
             0.28,
-            (box_top + box_bot) / 2,
+            (bb.y0 + bb.y1) / 2,
             phase,
             ha="left",
             va="center",
@@ -325,18 +313,18 @@ def fig1_pipeline_publication() -> None:
         if prev_box_bot is not None:
             ax.add_patch(
                 FancyArrowPatch(
-                    (3.6, prev_box_bot - 0.01),
-                    (3.6, box_top + 0.01),
+                    (3.6, prev_box_bot - 0.02),
+                    (3.6, bb.y1 + 0.02),
                     arrowstyle="-|>",
-                    mutation_scale=12,
-                    linewidth=1.2,
+                    mutation_scale=18,
+                    linewidth=1.5,
                     color="#555555",
-                    zorder=2,
+                    zorder=1,
                 )
             )
 
-        prev_box_bot = box_bot
-        y_cursor = box_bot - arrow_gap
+        prev_box_bot = bb.y0
+        y_cursor = bb.y0 - 0.22
 
     ax.add_patch(Rectangle((0.35, 0.08), 6.5, 0.36, facecolor="#f0f0f0", edgecolor="none", zorder=0))
     ax.text(
