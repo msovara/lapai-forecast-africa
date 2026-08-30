@@ -16,6 +16,7 @@ REPO = Path(__file__).resolve().parents[1]
 JSON_PATH = REPO / "reports" / "TRACKB_T2M_EXPANDED.json"
 FIG_DIR = REPO / "reports" / "figures"
 OUT1 = FIG_DIR / "mvula_fig01_pipeline.png"
+OUT1_PUB = FIG_DIR / "mvula_fig01_pipeline_publication.png"
 OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"
 OUT3 = FIG_DIR / "mvula_fig03_t2m_init_lead_heatmap.png"
 OUT6 = FIG_DIR / "mvula_fig06_t2m_plus12h_pathology.png"
@@ -164,6 +165,174 @@ def fig1_pipeline() -> None:
     fig.savefig(OUT1, dpi=170, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"wrote {OUT1}")
+
+
+def fig1_pipeline_publication() -> None:
+    """Journal-style vertical pathway (Learn → Verify → Accessibility).
+
+    Restrained greyscale-friendly palette; suitable for GMD/AIES single-column
+    or two-column width after resizing.
+    """
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
+
+    fig, ax = plt.subplots(figsize=(7.2, 9.0))
+    ax.set_xlim(0, 7.2)
+    ax.set_ylim(0, 9.0)
+    ax.axis("off")
+
+    # Header
+    ax.text(
+        3.6,
+        8.65,
+        "Figure 1. Overview of the Mvula compressed student pathway",
+        ha="center",
+        va="center",
+        fontsize=11,
+        fontweight="bold",
+        color="#1a1a1a",
+    )
+    ax.text(
+        3.6,
+        8.28,
+        "Distillation of an AIFS-derived GraphTransformer teacher into an analysis-forced\n"
+        "African 2 m temperature student (Case A: Cout = 3; free-run not supported).",
+        ha="center",
+        va="top",
+        fontsize=8,
+        color="#444444",
+        linespacing=1.3,
+    )
+
+    # Narrative spine labels on the left
+    phases = [
+        (7.55, "LEARN"),
+        (5.55, "COMPRESS"),
+        (3.55, "VERIFY"),
+        (1.55, "ACCESS"),
+    ]
+    for y, lab in phases:
+        ax.text(0.28, y, lab, ha="left", va="center", fontsize=7.5, fontweight="bold", color="#888888", rotation=90)
+
+    def panel(x, y, w, h, title, lines, edge="#333333", face="#f7f7f7"):
+        box = FancyBboxPatch(
+            (x, y),
+            w,
+            h,
+            boxstyle="round,pad=0.02,rounding_size=0.04",
+            linewidth=1.2,
+            edgecolor=edge,
+            facecolor=face,
+        )
+        ax.add_patch(box)
+        ax.text(x + 0.18, y + h - 0.22, title, ha="left", va="top", fontsize=9, fontweight="bold", color=edge)
+        ax.text(
+            x + 0.18,
+            y + h / 2 - 0.05,
+            "\n".join(lines),
+            ha="left",
+            va="center",
+            fontsize=8,
+            color="#222222",
+            linespacing=1.35,
+        )
+
+    def arrow(y1, y2):
+        arr = FancyArrowPatch(
+            (3.6, y1),
+            (3.6, y2),
+            arrowstyle="-|>",
+            mutation_scale=12,
+            linewidth=1.2,
+            color="#555555",
+        )
+        ax.add_patch(arr)
+
+    # LEARN
+    panel(
+        0.85,
+        6.85,
+        5.5,
+        1.15,
+        "A. Teacher model",
+        [
+            "K1 pruned Anemoi GraphTransformer (accepted Track A teacher)",
+            "Full atmospheric state capability; reference skill where available",
+            "Disk footprint ≈ 52.8 MiB",
+        ],
+        edge="#8B4513",
+        face="#FBF3EB",
+    )
+    arrow(6.85, 6.55)
+
+    # COMPRESS
+    panel(
+        0.85,
+        4.85,
+        5.5,
+        1.55,
+        "B. Distilled student (Mvula v5)",
+        [
+            "InceptionNeXt-style CNN · Cin = 65 → Cout = 3  (tp, msl, 2t)",
+            "Knowledge distillation from K1; Africa-weighted training mix",
+            "Disk footprint 8.8 MiB (~6× compression) · 2.17 M parameters",
+            "Architecture lock (Case A): no 3→65 decoder ⇒ no free-run / 10-day rollout",
+        ],
+        edge="#1f4e79",
+        face="#EEF3F8",
+    )
+    arrow(4.85, 4.55)
+
+    # VERIFY
+    panel(
+        0.85,
+        2.55,
+        5.5,
+        1.85,
+        "C. Analysis-forced African t2m verification",
+        [
+            "Protocol: IC at init+(L−6) h → one +6 h step; leads L ∈ {6, 12, 18, 24} h",
+            "Domain: Africa · truth/IC: public ARCO ERA5 · n = 61 × 00Z inits (2023)",
+            "Metrics: cosine-latitude RMSE, ACC, bias; baselines: AF persistence, K1",
+            "Headline: +6 h beats persistence (+41.8%); +12/+18 h failure regime",
+        ],
+        edge="#2E5A1C",
+        face="#F1F6ED",
+    )
+    arrow(2.55, 2.25)
+
+    # ACCESS
+    panel(
+        0.85,
+        0.55,
+        5.5,
+        1.55,
+        "D. Accessibility contribution",
+        [
+            "CPU inference on a consumer laptop (measured): ~2.53 s / +6 h step",
+            "Peak RSS ≈ 1.2 GiB · GPU not required for the student head",
+            "Intended use: experimental AF +6 h t2m research tool — not ops NWP",
+        ],
+        edge="#6B2D5C",
+        face="#F7EFF4",
+    )
+
+    # Side note strip
+    ax.add_patch(Rectangle((0.55, 0.12), 6.1, 0.28, facecolor="#f0f0f0", edgecolor="none"))
+    ax.text(
+        3.6,
+        0.26,
+        "Primary scientific question: can an AIFS-derived model be compressed into something accessible "
+        "while retaining useful African short-range t2m skill?",
+        ha="center",
+        va="center",
+        fontsize=7,
+        color="#333333",
+        style="italic",
+    )
+
+    fig.savefig(OUT1_PUB, dpi=300, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"wrote {OUT1_PUB}")
 
 
 def load_rows():
@@ -595,6 +764,7 @@ def fig9_compute_panel() -> None:
 def main() -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig1_pipeline()
+    fig1_pipeline_publication()
     _blob, student, k1 = load_rows()
     fig2_lead_curves(student, k1)
     fig3_heatmap(student)

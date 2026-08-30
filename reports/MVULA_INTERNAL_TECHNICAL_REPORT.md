@@ -199,7 +199,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 
 | ID | Figure | Caption (draft) | Status |
 |----|--------|-----------------|--------|
-| **Fig. 1** | Pipeline schematic | *Mvula pathway: K1 teacher → distillation → Cout=3 student → AF leads → African t2m (+ persistence/K1). Free-run excluded (Case A).* | **Done** — `figures/mvula_fig01_pipeline.png` |
+| **Fig. 1** | Pipeline schematic | *Mvula pathway: K1 → distillation → Cout=3 student → AF verify → accessibility. Free-run excluded (Case A).* | **Done** — internal: `mvula_fig01_pipeline.png` · **publication:** `mvula_fig01_pipeline_publication.png` |
 | **Fig. 2** | Lead curves | *Cosine-latitude RMSE and ACC for African t2m versus lead time for student v5 (n=61). K1 shown where available (n=3). Error bars: ±1 std across inits.* | **Done** — `figures/mvula_fig02_t2m_lead_curves.png` |
 | **Fig. 3** | Scorecard heatmap | *Init × lead RMSE (K) for African t2m (student v5). Rows ordered by season. Highlights the +12 h cold-bias ridge.* | **Done** — `figures/mvula_fig03_t2m_init_lead_heatmap.png` |
 | **Fig. 4** | Spatial +6 h | *Mean bias and RMSE at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals.* | **Exists** (bias/rmse maps) |
