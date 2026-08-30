@@ -165,6 +165,8 @@ Already packaged under `reports/figures/`:
 
 - `trackb_t2m_v5_rmse_L006h.png`, `…_bias_L006h.png`  
 - `trackb_t2m_v5_rmse_L024h.png`, `…_bias_L024h.png`  
+- **`mvula_fig04_t2m_spatial_plus6h.png`** — +6 h mean bias | RMSE (IOD-style Cartopy)  
+- **`mvula_fig05_t2m_spatial_plus24h.png`** — +24 h mean bias | RMSE (IOD-style Cartopy)  
 - **`mvula_fig02_t2m_lead_curves.png`** — RMSE/ACC vs lead (±1 std across inits; K1 overlay)  
 - **`mvula_fig03_t2m_init_lead_heatmap.png`** — init × lead RMSE scorecard (shows +12 h ridge)  
 - **`mvula_fig06_t2m_plus12h_pathology.png`** — +12 h bias histogram + seasonal boxplots  
@@ -202,8 +204,8 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 1** | Pipeline schematic | *Mvula pathway: K1 → distillation → Cout=3 student → AF verify → accessibility. Free-run excluded (Case A).* | **Done** — internal: `mvula_fig01_pipeline.png` · **publication:** `mvula_fig01_pipeline_publication.png` |
 | **Fig. 2** | Lead curves | *Cosine-latitude RMSE and ACC for African t2m versus lead time for student v5 (n=61). K1 shown where available (n=3). Error bars: ±1 std across inits.* | **Done** — `figures/mvula_fig02_t2m_lead_curves.png` |
 | **Fig. 3** | Scorecard heatmap | *Init × lead RMSE (°C) for African t2m (student v5). Rows ordered by season. Highlights the +12 h cold-bias ridge.* | **Done** — `figures/mvula_fig03_t2m_init_lead_heatmap.png` |
-| **Fig. 4** | Spatial +6 h | *Mean bias and RMSE at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals.* | **Exists** (bias/rmse maps) |
-| **Fig. 5** | Spatial +24 h | *Mean bias and RMSE at +24 h (n=61). Regional warm/cold dipole emerges.* | **Exists** |
+| **Fig. 4** | Spatial +6 h | *Mean bias and RMSE (°C) at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals. IOD-style Cartopy maps.* | **Done** — `figures/mvula_fig04_t2m_spatial_plus6h.png` |
+| **Fig. 5** | Spatial +24 h | *Mean bias and RMSE (°C) at +24 h (n=61). Regional warm/cold dipole emerges. IOD-style Cartopy maps.* | **Done** — `figures/mvula_fig05_t2m_spatial_plus24h.png` |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
 | **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON (±1 std across inits).* | **Done** — `figures/mvula_fig07_t2m_seasonal.png` |
 | **Fig. 8** | Skill vs AF persistence | *RMSE: AF persistence / Mvula v5 / K1; relative skill % (non-monotonic +42/−18/−19/+17).* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |

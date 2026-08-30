@@ -484,14 +484,12 @@ def run_expanded(
 def _write_spatial_figures(
     spatial: dict[int, dict[str, Any]], figures_dir: Path
 ) -> dict[str, str]:
+    """Write Africa t2m bias/RMSE maps in IOD-style Cartopy formatting."""
     paths: dict[str, str] = {}
     try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
+        from evaluation.plot_africa_spatial import write_lead_spatial_figures
     except Exception as exc:  # noqa: BLE001
-        print(f"[figures] matplotlib unavailable: {exc}", flush=True)
+        print(f"[figures] spatial plot helper unavailable: {exc}", flush=True)
         return paths
 
     for lead, accu in spatial.items():
@@ -503,30 +501,19 @@ def _write_spatial_figures(
         lat = accu["lat"]
         lon = accu["lon"]
 
-        for kind, field, cmap, label in (
-            ("bias", mean_bias, "RdBu_r", "Mean bias (K)"),
-            ("rmse", mean_rmse, "viridis", "RMSE (K)"),
-        ):
-            fig, ax = plt.subplots(figsize=(8, 5.5), dpi=140)
-            vmax = float(np.nanpercentile(np.abs(field), 98)) if kind == "bias" else float(
-                np.nanpercentile(field, 98)
+        paths.update(
+            write_lead_spatial_figures(
+                lead=int(lead),
+                lat=lat,
+                lon=lon,
+                mean_bias=mean_bias,
+                mean_rmse=mean_rmse,
+                n_inits=int(n),
+                figures_dir=figures_dir,
+                also_combined=True,
             )
-            vmin = -vmax if kind == "bias" else 0.0
-            im = ax.pcolormesh(
-                lon, lat, field, shading="auto", cmap=cmap, vmin=vmin, vmax=vmax
-            )
-            ax.set_title(f"Student v5 t2m {kind} Africa +{lead}h (n={int(n)} inits)")
-            ax.set_xlabel("longitude")
-            ax.set_ylabel("latitude")
-            fig.colorbar(im, ax=ax, label=label, fraction=0.046, pad=0.04)
-            fig.tight_layout()
-            out = figures_dir / f"trackb_t2m_v5_{kind}_L{lead:03d}h.png"
-            fig.savefig(out)
-            plt.close(fig)
-            paths[f"{kind}_L{lead}h"] = str(out)
-            print(f"[figures] wrote {out}", flush=True)
+        )
 
-        # Also dump numeric grids for reproducibility (small).
         npz = figures_dir / f"trackb_t2m_v5_spatial_L{lead:03d}h.npz"
         np.savez_compressed(
             npz,
