@@ -254,7 +254,7 @@ def fig1_pipeline_publication() -> None:
 
     x0, box_w = 0.85, 5.5
     text_x = x0 + 0.18
-    pad = 0.04
+    pad = 0.02
     title_body_gap = 0.10
     arrow_gap = 0.20
 
@@ -301,7 +301,7 @@ def fig1_pipeline_publication() -> None:
                 (x0, box_bot),
                 box_w,
                 box_top - box_bot,
-                boxstyle="round,pad=0.015,rounding_size=0.05",
+                boxstyle="round,pad=0.0,rounding_size=0.05",
                 linewidth=1.2,
                 edgecolor=edge,
                 facecolor=face,
