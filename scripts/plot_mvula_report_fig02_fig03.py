@@ -375,47 +375,22 @@ def fig8_baselines() -> None:
     ax.grid(True, axis="y", alpha=0.3, zorder=0)
     ax.bar_label(bars, fmt="%+.1f%%", padding=3, fontsize=8, zorder=3)
 
-    y_lo = min(skills) - 14
-    y_hi = max(skills) + 14
-    ax.set_ylim(y_lo, y_hi)
-    # Labels outside bars (never behind fills); white backdrop beats grid lines
-    _lbl = dict(
+    # Regime meaning in legend (avoids labels colliding with bars)
+    from matplotlib.patches import Patch
+
+    ax.legend(
+        handles=[
+            Patch(facecolor="#1f4e79", edgecolor="none", label="Beats persistence (useful / recovery)"),
+            Patch(facecolor="#c00000", edgecolor="none", label="Worse than persistence (failure regime)"),
+        ],
+        frameon=True,
+        fancybox=False,
         fontsize=7.5,
-        fontweight="bold",
-        zorder=5,
-        clip_on=False,
-        bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor="none", alpha=0.92),
+        loc="upper right",
+        framealpha=0.95,
     )
-    ax.text(
-        0,
-        skills[0] + 5.5,
-        "useful prediction",
-        ha="center",
-        va="bottom",
-        color="#1f4e79",
-        **_lbl,
-    )
-    if len(skills) >= 3 and skills[1] < 0 and skills[2] < 0:
-        fail_y = min(skills[1], skills[2]) - 6.0
-        ax.text(
-            1.5,
-            fail_y,
-            "failure regime",
-            ha="center",
-            va="top",
-            color="#c00000",
-            **_lbl,
-        )
-    if len(skills) >= 4 and skills[3] > 0:
-        ax.text(
-            3,
-            skills[3] + 5.5,
-            "partial recovery",
-            ha="center",
-            va="bottom",
-            color="#1f4e79",
-            **_lbl,
-        )
+    y_pad = max(8.0, 0.12 * (max(skills) - min(skills)))
+    ax.set_ylim(min(skills) - y_pad, max(skills) + y_pad)
 
     fig.suptitle(
         "Fig. 8 — Student skill relative to analysis-forced persistence\n"
