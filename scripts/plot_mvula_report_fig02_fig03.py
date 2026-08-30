@@ -127,7 +127,8 @@ def fig3_heatmap(student) -> None:
     fig, ax = plt.subplots(figsize=(7.2, fig_h), constrained_layout=True)
     # Clip colour scale so +12h ridge is visible without washing +6h
     vmax = float(np.nanpercentile(mat, 95))
-    im = ax.imshow(mat, aspect="auto", cmap="YlOrRd", vmin=0.0, vmax=vmax, interpolation="nearest")
+    # Low RMSE = blue, high RMSE = red (diverging blues/reds; +12 h failure lights up red).
+    im = ax.imshow(mat, aspect="auto", cmap="RdBu_r", vmin=0.0, vmax=vmax, interpolation="nearest")
     ax.set_xticks(range(len(leads)))
     ax.set_xticklabels([f"+{L}h" for L in leads])
     # Season separators + sparse y labels
