@@ -175,15 +175,15 @@ def fig1_pipeline_publication() -> None:
     """
     from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
-    fig, ax = plt.subplots(figsize=(7.2, 9.0))
+    # Extra headroom so title + subtitle never collide with panel A
+    fig, ax = plt.subplots(figsize=(7.2, 10.0))
     ax.set_xlim(0, 7.2)
-    ax.set_ylim(0, 9.0)
+    ax.set_ylim(0, 10.0)
     ax.axis("off")
 
-    # Header
     ax.text(
         3.6,
-        8.65,
+        9.65,
         "Figure 1. Overview of the Mvula compressed student pathway",
         ha="center",
         va="center",
@@ -193,27 +193,82 @@ def fig1_pipeline_publication() -> None:
     )
     ax.text(
         3.6,
-        8.28,
-        "Distillation of an AIFS-derived GraphTransformer teacher into an analysis-forced\n"
-        "African 2 m temperature student (Case A: Cout = 3; free-run not supported).",
+        9.15,
+        "Distillation of an AIFS-derived GraphTransformer teacher into an\n"
+        "analysis-forced African 2 m temperature student\n"
+        "(Case A: Cout = 3; free-run not supported).",
         ha="center",
-        va="top",
+        va="center",
         fontsize=8,
         color="#444444",
-        linespacing=1.3,
+        linespacing=1.35,
     )
 
-    # Narrative spine labels on the left
-    phases = [
-        (7.55, "LEARN"),
-        (5.55, "COMPRESS"),
-        (3.55, "VERIFY"),
-        (1.55, "ACCESS"),
+    # Panel bottoms (y) and heights — leave clear gap under subtitle
+    # Subtitle occupies ~8.7–9.4; first panel top at 8.35
+    layout = [
+        # (y, h, phase_y, phase, title, lines, edge, face)
+        (
+            7.05,
+            1.20,
+            7.65,
+            "LEARN",
+            "A. Teacher model",
+            [
+                "K1 pruned Anemoi GraphTransformer (accepted Track A teacher)",
+                "Full atmospheric state capability; reference skill where available",
+                "Disk footprint ≈ 52.8 MiB",
+            ],
+            "#8B4513",
+            "#FBF3EB",
+        ),
+        (
+            4.95,
+            1.60,
+            5.75,
+            "COMPRESS",
+            "B. Distilled student (Mvula v5)",
+            [
+                "InceptionNeXt-style CNN · Cin = 65 → Cout = 3  (tp, msl, 2t)",
+                "Knowledge distillation from K1; Africa-weighted training mix",
+                "Disk footprint 8.8 MiB (~6× compression) · 2.17 M parameters",
+                "Architecture lock (Case A): no 3→65 decoder ⇒ no free-run / 10-day rollout",
+            ],
+            "#1f4e79",
+            "#EEF3F8",
+        ),
+        (
+            2.55,
+            1.90,
+            3.50,
+            "VERIFY",
+            "C. Analysis-forced African t2m verification",
+            [
+                "Protocol: IC at init+(L−6) h → one +6 h step; leads L ∈ {6, 12, 18, 24} h",
+                "Domain: Africa · truth/IC: public ARCO ERA5 · n = 61 × 00Z inits (2023)",
+                "Metrics: cosine-latitude RMSE, ACC, bias; baselines: AF persistence, K1",
+                "Headline: +6 h beats persistence (+41.8%); +12/+18 h failure regime",
+            ],
+            "#2E5A1C",
+            "#F1F6ED",
+        ),
+        (
+            0.55,
+            1.55,
+            1.32,
+            "ACCESS",
+            "D. Accessibility contribution",
+            [
+                "CPU inference on a consumer laptop (measured): ~2.53 s / +6 h step",
+                "Peak RSS ≈ 1.2 GiB · GPU not required for the student head",
+                "Intended use: experimental AF +6 h t2m research tool — not ops NWP",
+            ],
+            "#6B2D5C",
+            "#F7EFF4",
+        ),
     ]
-    for y, lab in phases:
-        ax.text(0.28, y, lab, ha="left", va="center", fontsize=7.5, fontweight="bold", color="#888888", rotation=90)
 
-    def panel(x, y, w, h, title, lines, edge="#333333", face="#f7f7f7"):
+    def panel(x, y, w, h, title, lines, edge, face):
         box = FancyBboxPatch(
             (x, y),
             w,
@@ -227,7 +282,7 @@ def fig1_pipeline_publication() -> None:
         ax.text(x + 0.18, y + h - 0.22, title, ha="left", va="top", fontsize=9, fontweight="bold", color=edge)
         ax.text(
             x + 0.18,
-            y + h / 2 - 0.05,
+            y + h / 2 - 0.08,
             "\n".join(lines),
             ha="left",
             va="center",
@@ -236,98 +291,46 @@ def fig1_pipeline_publication() -> None:
             linespacing=1.35,
         )
 
-    def arrow(y1, y2):
-        arr = FancyArrowPatch(
-            (3.6, y1),
-            (3.6, y2),
-            arrowstyle="-|>",
-            mutation_scale=12,
-            linewidth=1.2,
-            color="#555555",
+    x0, w = 0.85, 5.5
+    for i, (y, h, phase_y, phase, title, lines, edge, face) in enumerate(layout):
+        ax.text(
+            0.28,
+            phase_y,
+            phase,
+            ha="left",
+            va="center",
+            fontsize=7.5,
+            fontweight="bold",
+            color="#888888",
+            rotation=90,
         )
-        ax.add_patch(arr)
+        panel(x0, y, w, h, title, lines, edge, face)
+        if i < len(layout) - 1:
+            y_next, h_next = layout[i + 1][0], layout[i + 1][1]
+            # arrow from bottom of this panel to top of next
+            arr = FancyArrowPatch(
+                (3.6, y),
+                (3.6, y_next + h_next),
+                arrowstyle="-|>",
+                mutation_scale=12,
+                linewidth=1.2,
+                color="#555555",
+            )
+            ax.add_patch(arr)
 
-    # LEARN
-    panel(
-        0.85,
-        6.85,
-        5.5,
-        1.15,
-        "A. Teacher model",
-        [
-            "K1 pruned Anemoi GraphTransformer (accepted Track A teacher)",
-            "Full atmospheric state capability; reference skill where available",
-            "Disk footprint ≈ 52.8 MiB",
-        ],
-        edge="#8B4513",
-        face="#FBF3EB",
-    )
-    arrow(6.85, 6.55)
-
-    # COMPRESS
-    panel(
-        0.85,
-        4.85,
-        5.5,
-        1.55,
-        "B. Distilled student (Mvula v5)",
-        [
-            "InceptionNeXt-style CNN · Cin = 65 → Cout = 3  (tp, msl, 2t)",
-            "Knowledge distillation from K1; Africa-weighted training mix",
-            "Disk footprint 8.8 MiB (~6× compression) · 2.17 M parameters",
-            "Architecture lock (Case A): no 3→65 decoder ⇒ no free-run / 10-day rollout",
-        ],
-        edge="#1f4e79",
-        face="#EEF3F8",
-    )
-    arrow(4.85, 4.55)
-
-    # VERIFY
-    panel(
-        0.85,
-        2.55,
-        5.5,
-        1.85,
-        "C. Analysis-forced African t2m verification",
-        [
-            "Protocol: IC at init+(L−6) h → one +6 h step; leads L ∈ {6, 12, 18, 24} h",
-            "Domain: Africa · truth/IC: public ARCO ERA5 · n = 61 × 00Z inits (2023)",
-            "Metrics: cosine-latitude RMSE, ACC, bias; baselines: AF persistence, K1",
-            "Headline: +6 h beats persistence (+41.8%); +12/+18 h failure regime",
-        ],
-        edge="#2E5A1C",
-        face="#F1F6ED",
-    )
-    arrow(2.55, 2.25)
-
-    # ACCESS
-    panel(
-        0.85,
-        0.55,
-        5.5,
-        1.55,
-        "D. Accessibility contribution",
-        [
-            "CPU inference on a consumer laptop (measured): ~2.53 s / +6 h step",
-            "Peak RSS ≈ 1.2 GiB · GPU not required for the student head",
-            "Intended use: experimental AF +6 h t2m research tool — not ops NWP",
-        ],
-        edge="#6B2D5C",
-        face="#F7EFF4",
-    )
-
-    # Side note strip
-    ax.add_patch(Rectangle((0.55, 0.12), 6.1, 0.28, facecolor="#f0f0f0", edgecolor="none"))
+    ax.add_patch(Rectangle((0.35, 0.08), 6.5, 0.36, facecolor="#f0f0f0", edgecolor="none", zorder=0))
     ax.text(
         3.6,
         0.26,
-        "Primary scientific question: can an AIFS-derived model be compressed into something accessible "
-        "while retaining useful African short-range t2m skill?",
+        "Primary scientific question: can an AIFS-derived model be compressed into something\n"
+        "accessible while retaining useful African short-range t2m skill?",
         ha="center",
         va="center",
         fontsize=7,
         color="#333333",
         style="italic",
+        linespacing=1.25,
+        zorder=1,
     )
 
     fig.savefig(OUT1_PUB, dpi=300, bbox_inches="tight", facecolor="white")
