@@ -112,6 +112,7 @@ def plot_africa_field(
     mask_ocean: bool = True,
     left_labels: bool = True,
     bottom_labels: bool = True,
+    draw_grid: bool = True,
 ):
     """Draw one Africa map in IOD publication style. Returns the pcolormesh mappable."""
     lon = np.asarray(lon)
@@ -153,17 +154,18 @@ def plot_africa_field(
         ax.add_feature(cfeature.BORDERS, linewidth=0.3, zorder=3)
         ax.add_feature(cfeature.COASTLINE, linewidth=0.8, edgecolor="black", zorder=4)
 
-        # Grid without labels (labels via set_xticks — more reliable than gridline labels)
-        ax.gridlines(
-            crs=ccrs.PlateCarree(),
-            draw_labels=False,
-            linewidth=0.5,
-            color="gray",
-            alpha=0.5,
-            linestyle="--",
-            xlocs=[-20, -10, 0, 10, 20, 30, 40, 50],
-            ylocs=[-40, -30, -20, -10, 0, 10, 20, 30, 40],
-        )
+        # Optional dashed lat/lon grid (off for compact publication quads)
+        if draw_grid:
+            ax.gridlines(
+                crs=ccrs.PlateCarree(),
+                draw_labels=False,
+                linewidth=0.5,
+                color="gray",
+                alpha=0.5,
+                linestyle="--",
+                xlocs=[-20, -10, 0, 10, 20, 30, 40, 50],
+                ylocs=[-40, -30, -20, -10, 0, 10, 20, 30, 40],
+            )
         xticks = [-20, -10, 0, 10, 20, 30, 40, 50]
         yticks = [-40, -30, -20, -10, 0, 10, 20, 30, 40]
         ax.set_xticks(xticks, crs=ccrs.PlateCarree())
@@ -196,7 +198,8 @@ def plot_africa_field(
         im = ax.pcolormesh(lon, lat, field_ma, cmap=cmap, vmin=vmin, vmax=vmax, shading="auto")
         ax.set_xlim(AFRICA_EXTENT["lon_min"], AFRICA_EXTENT["lon_max"])
         ax.set_ylim(AFRICA_EXTENT["lat_min"], AFRICA_EXTENT["lat_max"])
-        ax.grid(True, alpha=0.3, linestyle="--")
+        if draw_grid:
+            ax.grid(True, alpha=0.3, linestyle="--")
         # Titles applied once at end (after optional colorbar)
 
     if add_colorbar:
@@ -453,6 +456,7 @@ def write_quad_spatial_figure(
             add_colorbar=False,
             left_labels=(col == 0),
             bottom_labels=(row == 1),
+            draw_grid=False,
         )
         ims.append(im)
         if row == 0:
