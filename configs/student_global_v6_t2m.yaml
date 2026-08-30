@@ -1,0 +1,56 @@
+# Track B — v6-lite: t2m RMSE continue-train from frozen v5
+#
+# Goal: lower analysis-forced African t2m RMSE (primary +6 h) without
+# free-run / Cout redesign / tp recovery.
+#
+# Resume: student_global_stable_v5.ckpt
+# Output: student_global_stable_v5_t2mRMSE.ckpt  (promote to v6 only if criteria met)
+#
+# Locked accept criteria (promote to student_global_stable_v6.ckpt):
+#   +6 h Africa t2m RMSE <= 1.28  (~>=7% better than v5 1.382)
+#   +6 h ACC not worse than 0.96
+#   +24 h RMSE not worse than v5 3.231 by >10% (i.e. <= 3.55)
+# Soft stretch: +6 h RMSE <= 1.25
+# Reject: +6 h RMSE > 1.38 or ACC collapse or NaNs
+
+lat: 181
+lon: 360
+base_channels: 256
+stages: [2, 3, 3]
+
+# Short continue-train (Cassava ~few hours)
+epochs: 25
+epochs_stage_a_only: 25
+epoch_start_feature_loss: 999
+epoch_start_spectral_loss: 999
+beta_ramp_epochs: 1
+gamma_ramp_epochs: 1
+grad_clip: 1.0
+normalize_targets: true
+normalize_inputs: true
+physical_constraints: true
+tp_mode: softplus_soft
+
+# Cout order: tp, msl, 2t — push 2t; de-emphasise tp (out-of-scope)
+channel_weights: [1.0, 0.25, 5.0]
+africa_mix: 0.65
+
+# Keep precip terms tiny so they do not dominate (tp stays out-of-scope)
+precip_log1p_weight: 0.5
+precip_wet_boost: 2.0
+precip_underpred_weight: 0.0
+precip_pod_weight: 0.0
+precip_dry_collapse_weight: 0.0
+tp_logit_boost: 0.0
+
+resume: models/student_global_stable_v5.ckpt
+
+teacher_ckpt: models/teacher_pruned.ckpt
+distill_config: configs/student_distill.yaml
+
+output_ckpt: models/student_global_stable_v5_t2mRMSE.ckpt
+
+notes: >-
+  v6-lite continue-train from v5 freeze. Higher 2t channel weight + slightly
+  higher africa_mix; precip down-weighted. β/γ off. Promote to v6 only if
+  locked +6 h RMSE criteria are met on AF eval.
