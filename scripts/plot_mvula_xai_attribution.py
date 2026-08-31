@@ -38,11 +38,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from evaluation.masks import AFRICA_LAT, AFRICA_LON, africa_hw_mask
+from evaluation.masks import AFRICA_LAT, AFRICA_LON, africa_hw_mask, lon_to_180
 from evaluation.plot_africa_spatial import HAS_CARTOPY, plot_africa_field, AFRICA_EXTENT
 from evaluation.trackB_gate import _load_student
 from lapai_inference.cache_schema import lat_lon_mesh
 from utils.losses_distillation import normalize_channels
+
+
+def _to_africa_plot_grid(
+    field: np.ndarray, lat: np.ndarray, lon: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Map 0..360 global mesh → sorted −180..180 Africa crop for Cartopy extent."""
+    lat = np.asarray(lat, dtype=np.float64).reshape(-1)
+    lon = lon_to_180(np.asarray(lon, dtype=np.float64).reshape(-1))
+    order = np.argsort(lon)
+    lon = lon[order]
+    field = np.asarray(field, dtype=float)[:, order]
+    lat_ok = (lat >= AFRICA_EXTENT["lat_min"]) & (lat <= AFRICA_EXTENT["lat_max"])
+    lon_ok = (lon >= AFRICA_EXTENT["lon_min"]) & (lon <= AFRICA_EXTENT["lon_max"])
+    return field[np.ix_(lat_ok, lon_ok)], lat[lat_ok], lon[lon_ok]
 
 CKPT = _REPO / "models" / "student_global_stable_v5.ckpt"
 EXPANDED = _REPO / "reports" / "TRACKB_T2M_EXPANDED.json"
@@ -211,13 +225,13 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
         ax2 = fig.add_subplot(gs[1, 0], projection=ccrs.PlateCarree())
     else:
         ax2 = fig.add_subplot(gs[1, 0])
-    sp = spatial.copy()
-    # Robust scale
+    sp, lat_af, lon_af = _to_africa_plot_grid(spatial, lat, lon)
+    # Robust scale (land only after plot masks ocean; use positive cells here)
     vmax = float(np.nanpercentile(sp[sp > 0], 98)) if np.any(sp > 0) else 1.0
     plot_africa_field(
         ax2,
-        lon,
-        lat,
+        lon_af,
+        lat_af,
         sp,
         cmap="magma",
         vmin=0.0,

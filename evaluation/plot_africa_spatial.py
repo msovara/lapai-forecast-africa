@@ -11,8 +11,21 @@ from typing import Any
 
 import numpy as np
 
+from evaluation.masks import lon_to_180
+
 # Africa analysis box used in Track B / Mvula packaged campaign
 AFRICA_EXTENT = dict(lon_min=-20.0, lon_max=55.0, lat_min=-40.0, lat_max=40.0)
+
+
+def _lon180_sorted(lon: np.ndarray, field: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Convert 0..360 lon → [-180, 180) and reorder columns so lon is ascending.
+
+    Without this, West Africa (340–359°E ≡ −20–−1°) never appears in the
+    Africa extent (−20…55) under PlateCarree pcolormesh.
+    """
+    lon = lon_to_180(np.asarray(lon, dtype=np.float64).reshape(-1))
+    order = np.argsort(lon)
+    return lon[order], np.asarray(field)[:, order]
 
 try:
     import cartopy.crs as ccrs
@@ -118,6 +131,7 @@ def plot_africa_field(
     lon = np.asarray(lon)
     lat = np.asarray(lat)
     field = np.asarray(field, dtype=float).copy()
+    lon, field = _lon180_sorted(lon, field)
     if mask_ocean:
         land = _land_mask(lon, lat)
         field = np.where(land, field, np.nan)
