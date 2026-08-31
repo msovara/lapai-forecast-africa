@@ -1,6 +1,22 @@
 # Cross-platform text: normalize line endings on commit
 * text=auto eol=lf
 
+# Binary assets — never apply eol conversion (PNG signature contains 0D 0A)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.npz  binary
+*.ckpt binary
+*.pt   binary
+*.pth  binary
+*.onnx binary
+*.zarr binary
+*.sif  binary
+
 # Explicit text types
 *.md   text eol=lf
 *.yaml text eol=lf

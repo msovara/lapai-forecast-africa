@@ -1,7 +1,7 @@
 # LapAI-Forecast / Mvula
 
 <p align="center">
-  <img src="docs/branding/mvula_logo.png" alt="Mvula logo" width="280"/>
+  <img src="docs/branding/mvula_banner.jpg" alt="Mvula — Compressing ECMWF’s AIFS for Edge Deployment" width="720">
 </p>
 
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
