@@ -1,0 +1,27 @@
+cdsapi ok
+[heldout-L24] start 2026-08-26T16:55:04+02:00
+[heldout] scoring student analysis-forced leads=(24,) ckpt=models/student_global_stable_v5.ckpt
+[student] 20230101 +24h state fail: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc
+[student] 20230108 +24h state fail: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc
+[student] 20230115 +24h state fail: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc
+[student] 20230122 +24h state fail: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc
+[student] 20230129 +24h state fail: Missing/incomplete configuration file: /home/ubuntu/.cdsapirc
+wrote reports/TRACKB_HELD_OUT_JAN2023_V5_L24.json
+{
+  "student": {
+    "by_lead": {
+      "24": {
+        "tp": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        },
+        "t2m": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        }
+      }
+    }
+  },
+  "student_6h": {}
+}
+[heldout-L24] done 2026-08-26T16:55:08+02:00

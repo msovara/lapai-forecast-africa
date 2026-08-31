@@ -1,4 +1,4 @@
-﻿# Cassava node backup (laptop) — 2026-08-31
+# Cassava node backup (laptop) � 2026-08-31
 
 ## Already present locally (verified SHA256 match vs Cassava)
 - models/student_global_stable_v5.ckpt
@@ -7,7 +7,7 @@
   sha256: 5d1f805dbd546275c07b1a216c4ca500312ab9340cefb4f8071c50af20795ebe
 
 ## Copied here (small logs only)
-- reports/cassava_node_backup/logs/trackB_*v5*
+- reports/cassava_node_backup/v5_run_logs/trackB_*v5*
 
 ## NOT copied (rebuild on new node if needed; too large for laptop)
 - teacher_k1_cache_full2020_2021.zarr  (~79 GiB on Cassava)

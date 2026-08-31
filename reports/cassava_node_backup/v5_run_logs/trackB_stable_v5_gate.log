@@ -1,0 +1,82 @@
+[trackB-gate-v5] start 2026-08-26T15:28:08+02:00
+[trackB_gate] ckpt=models/student_global_stable_v5.ckpt cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr device=cuda domain=global
+{
+  "passed": false,
+  "pass_count": 2,
+  "total_checks": 3,
+  "checks": [
+    {
+      "variable": "tp",
+      "lead_hours": 6,
+      "passed": false,
+      "student_rmse_vs_era5": 0.0025016870349645615,
+      "teacher_rmse_vs_era5": 0.0020484328269958496,
+      "student_rmse_vs_teacher": 0.0019828560762107372,
+      "degradation_pct": 22.126876800419005,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "msl",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 207.21343994140625,
+      "teacher_rmse_vs_era5": 253.087646484375,
+      "student_rmse_vs_teacher": 344.6173400878906,
+      "degradation_pct": -18.12581814253068,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "2t",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 1.0596504211425781,
+      "teacher_rmse_vs_era5": 2.9066097736358643,
+      "student_rmse_vs_teacher": 3.034416913986206,
+      "degradation_pct": -63.543423312133626,
+      "max_allowed_pct": 15.0
+    }
+  ]
+}
+wrote reports/TRACKB_STUDENT_SCORECARD_V5.json
+wrote reports/TRACKB_GATE_V5.json
+[trackB_gate] ckpt=models/student_global_stable_v5.ckpt cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr device=cuda domain=africa
+{
+  "passed": false,
+  "pass_count": 2,
+  "total_checks": 3,
+  "checks": [
+    {
+      "variable": "tp",
+      "lead_hours": 6,
+      "passed": false,
+      "student_rmse_vs_era5": 0.0017796780448406935,
+      "teacher_rmse_vs_era5": 0.001533167203888297,
+      "student_rmse_vs_teacher": 0.0014807418920099735,
+      "degradation_pct": 16.07853600880681,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "msl",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 83.58894348144531,
+      "teacher_rmse_vs_era5": 290.1050720214844,
+      "student_rmse_vs_teacher": 300.7796630859375,
+      "degradation_pct": -71.18666595554905,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "2t",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 0.9563071131706238,
+      "teacher_rmse_vs_era5": 6.487402439117432,
+      "student_rmse_vs_teacher": 6.5421671867370605,
+      "degradation_pct": -85.25901357060373,
+      "max_allowed_pct": 15.0
+    }
+  ]
+}
+wrote reports/TRACKB_STUDENT_SCORECARD_V5_AFRICA.json
+wrote reports/TRACKB_GATE_V5_AFRICA.json
+[trackB-gate-v5] done 2026-08-26T15:29:43+02:00

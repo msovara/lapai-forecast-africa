@@ -1,0 +1,93 @@
+[heldout] start 2026-08-26T15:29:46+02:00
+[heldout] scoring student analysis-forced leads=(6, 24) ckpt=models/student_global_stable_v5.ckpt
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230101 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230101 +6h tp {'student_rmse_vs_teacher_field': 0.0010506743817610613, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230101 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230101 +6h t2m {'student_rmse_vs_teacher_field': 1.2779746879158427, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230101_00Z.nc
+[student] 20230101 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230108 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230108 +6h tp {'student_rmse_vs_teacher_field': 0.001717836858799743, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230108 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230108 +6h t2m {'student_rmse_vs_teacher_field': 1.3023692486071754, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230108_00Z.nc
+[student] 20230108 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230115 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230115 +6h tp {'student_rmse_vs_teacher_field': 0.0009918627742738007, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230115 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230115 +6h t2m {'student_rmse_vs_teacher_field': 1.219835032335121, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230115_00Z.nc
+[student] 20230115 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230122 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230122 +6h tp {'student_rmse_vs_teacher_field': 0.0019111470292369807, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230122 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230122 +6h t2m {'student_rmse_vs_teacher_field': 1.3834548750433824, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230122_00Z.nc
+[student] 20230122 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230129 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230129 +6h tp {'student_rmse_vs_teacher_field': 0.0018692936835450356, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230129 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230129 +6h t2m {'student_rmse_vs_teacher_field': 1.3536127796017319, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230129_00Z.nc
+[student] 20230129 +24h state fail: No module named 'cdsapi'
+wrote reports/TRACKB_HELD_OUT_JAN2023_V5.json
+{
+  "student": {
+    "by_lead": {
+      "6": {
+        "tp": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 5,
+          "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+        },
+        "t2m": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 5,
+          "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+        }
+      },
+      "24": {
+        "tp": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        },
+        "t2m": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        }
+      }
+    },
+    "tp": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+    },
+    "t2m": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+    }
+  },
+  "student_6h": {
+    "tp": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+    },
+    "t2m": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+    }
+  }
+}

@@ -1,0 +1,272 @@
+[pipeline-v5] start 2026-08-26T14:08:08+02:00
+[trackB-stable-v5] start 2026-08-26T14:08:08+02:00
+[trackB-stable-v5] cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr resume=models/student_global_stable_v4.ckpt cfg=configs/student_global_v5.yaml -> models/student_global_stable_v5.ckpt
+torch 2.5.1 cuda True dev NVIDIA H200
+[Track B] config=configs/student_global_v5.yaml teacher_ckpt=models/teacher_pruned.ckpt (exists=True)
+[Track B] target stats from cache c0:mean=0.000589/std=0.002058 c1:mean=1.009e+05/std=1394 c2:mean=278.9/std=21.1
+[Track B] input stats from cache c0:mean=211.6/std=10.28 c1:mean=207.9/std=12.08 c2:mean=213/std=8.718 c3:mean=217.9/std=7.402 c4:mean=222.9/std=8.931 ...
+[Track B] resumed model+heads from models/student_global_stable_v4.ckpt
+[Track B] tp_logit_boost=0.0002 applied to head bias[0]
+[Track B] channel_weights (tp,msl,2t)=[6.0, 0.25, 2.5]
+[Track B] africa_mix=0.5 mask_frac=0.0945 tp_mode=softplus_soft precip_log1p_weight=6.0 wet_boost=12.0 underpred=4.0 pod=2.0 dry_collapse=1.0 normalize_inputs=True
+[Track B] schedule feat@999 (β→0.0, ramp=1) spec@999 (γ→0.0, ramp=1) grad_clip=1.0 norm=True phys=True resume=models/student_global_stable_v4.ckpt
+epoch 1 loss=8.066418 L_A=0.250576 L_B=0.000000 L_C=0.000000 L_tp=1.302640 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 2 loss=8.081322 L_A=0.247700 L_B=0.000000 L_C=0.000000 L_tp=1.305604 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 3 loss=8.071395 L_A=0.247307 L_B=0.000000 L_C=0.000000 L_tp=1.304015 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 4 loss=8.088835 L_A=0.247897 L_B=0.000000 L_C=0.000000 L_tp=1.306823 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 5 loss=8.072474 L_A=0.247303 L_B=0.000000 L_C=0.000000 L_tp=1.304195 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 6 loss=8.063225 L_A=0.246335 L_B=0.000000 L_C=0.000000 L_tp=1.302815 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 7 loss=8.099098 L_A=0.248906 L_B=0.000000 L_C=0.000000 L_tp=1.308365 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 8 loss=8.066588 L_A=0.247368 L_B=0.000000 L_C=0.000000 L_tp=1.303203 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 9 loss=8.085162 L_A=0.247894 L_B=0.000000 L_C=0.000000 L_tp=1.306211 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 10 loss=8.084373 L_A=0.247950 L_B=0.000000 L_C=0.000000 L_tp=1.306071 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 11 loss=8.076797 L_A=0.247421 L_B=0.000000 L_C=0.000000 L_tp=1.304896 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 12 loss=8.080674 L_A=0.247187 L_B=0.000000 L_C=0.000000 L_tp=1.305581 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 13 loss=8.088286 L_A=0.248342 L_B=0.000000 L_C=0.000000 L_tp=1.306657 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 14 loss=8.060427 L_A=0.246406 L_B=0.000000 L_C=0.000000 L_tp=1.302337 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 15 loss=8.061281 L_A=0.246699 L_B=0.000000 L_C=0.000000 L_tp=1.302430 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 16 loss=8.076481 L_A=0.247527 L_B=0.000000 L_C=0.000000 L_tp=1.304826 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 17 loss=8.057318 L_A=0.246708 L_B=0.000000 L_C=0.000000 L_tp=1.301768 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 18 loss=8.081060 L_A=0.247654 L_B=0.000000 L_C=0.000000 L_tp=1.305568 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 19 loss=8.061664 L_A=0.246766 L_B=0.000000 L_C=0.000000 L_tp=1.302483 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 20 loss=8.044289 L_A=0.246442 L_B=0.000000 L_C=0.000000 L_tp=1.299641 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 21 loss=8.064741 L_A=0.246702 L_B=0.000000 L_C=0.000000 L_tp=1.303007 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 22 loss=8.074283 L_A=0.247015 L_B=0.000000 L_C=0.000000 L_tp=1.304545 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 23 loss=8.089778 L_A=0.247910 L_B=0.000000 L_C=0.000000 L_tp=1.306978 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 24 loss=8.053049 L_A=0.246255 L_B=0.000000 L_C=0.000000 L_tp=1.301132 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 25 loss=8.100367 L_A=0.247623 L_B=0.000000 L_C=0.000000 L_tp=1.308791 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 26 loss=8.097527 L_A=0.247998 L_B=0.000000 L_C=0.000000 L_tp=1.308255 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 27 loss=8.074689 L_A=0.246482 L_B=0.000000 L_C=0.000000 L_tp=1.304701 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 28 loss=8.066751 L_A=0.246975 L_B=0.000000 L_C=0.000000 L_tp=1.303296 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 29 loss=8.105354 L_A=0.247881 L_B=0.000000 L_C=0.000000 L_tp=1.309579 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 30 loss=8.098398 L_A=0.247826 L_B=0.000000 L_C=0.000000 L_tp=1.308429 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 31 loss=8.090080 L_A=0.246868 L_B=0.000000 L_C=0.000000 L_tp=1.307202 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 32 loss=8.093615 L_A=0.247609 L_B=0.000000 L_C=0.000000 L_tp=1.307668 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 33 loss=8.070772 L_A=0.247132 L_B=0.000000 L_C=0.000000 L_tp=1.303940 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 34 loss=8.057306 L_A=0.246418 L_B=0.000000 L_C=0.000000 L_tp=1.301815 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 35 loss=8.083706 L_A=0.246837 L_B=0.000000 L_C=0.000000 L_tp=1.306145 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 36 loss=8.088002 L_A=0.246623 L_B=0.000000 L_C=0.000000 L_tp=1.306896 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 37 loss=8.083790 L_A=0.246734 L_B=0.000000 L_C=0.000000 L_tp=1.306176 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 38 loss=8.076203 L_A=0.246990 L_B=0.000000 L_C=0.000000 L_tp=1.304869 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 39 loss=8.073060 L_A=0.246641 L_B=0.000000 L_C=0.000000 L_tp=1.304403 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 40 loss=8.068596 L_A=0.246097 L_B=0.000000 L_C=0.000000 L_tp=1.303750 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 41 loss=8.057759 L_A=0.245978 L_B=0.000000 L_C=0.000000 L_tp=1.301963 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 42 loss=8.081739 L_A=0.246953 L_B=0.000000 L_C=0.000000 L_tp=1.305798 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 43 loss=8.073612 L_A=0.246413 L_B=0.000000 L_C=0.000000 L_tp=1.304533 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 44 loss=8.057643 L_A=0.246594 L_B=0.000000 L_C=0.000000 L_tp=1.301842 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 45 loss=8.077264 L_A=0.246548 L_B=0.000000 L_C=0.000000 L_tp=1.305119 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 46 loss=8.094091 L_A=0.247248 L_B=0.000000 L_C=0.000000 L_tp=1.307807 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 47 loss=8.097379 L_A=0.247562 L_B=0.000000 L_C=0.000000 L_tp=1.308303 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 48 loss=8.078039 L_A=0.246692 L_B=0.000000 L_C=0.000000 L_tp=1.305224 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 49 loss=8.057620 L_A=0.245835 L_B=0.000000 L_C=0.000000 L_tp=1.301964 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 50 loss=8.088631 L_A=0.246671 L_B=0.000000 L_C=0.000000 L_tp=1.306993 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 51 loss=8.090469 L_A=0.247036 L_B=0.000000 L_C=0.000000 L_tp=1.307239 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 52 loss=8.078519 L_A=0.247275 L_B=0.000000 L_C=0.000000 L_tp=1.305207 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 53 loss=8.088550 L_A=0.247624 L_B=0.000000 L_C=0.000000 L_tp=1.306821 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 54 loss=8.082074 L_A=0.247216 L_B=0.000000 L_C=0.000000 L_tp=1.305810 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 55 loss=8.075646 L_A=0.246498 L_B=0.000000 L_C=0.000000 L_tp=1.304858 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 56 loss=8.094253 L_A=0.247300 L_B=0.000000 L_C=0.000000 L_tp=1.307826 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 57 loss=8.057307 L_A=0.246304 L_B=0.000000 L_C=0.000000 L_tp=1.301834 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 58 loss=8.059911 L_A=0.246392 L_B=0.000000 L_C=0.000000 L_tp=1.302253 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 59 loss=8.053091 L_A=0.245714 L_B=0.000000 L_C=0.000000 L_tp=1.301230 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 60 loss=8.102480 L_A=0.247142 L_B=0.000000 L_C=0.000000 L_tp=1.309223 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 61 loss=8.058807 L_A=0.246372 L_B=0.000000 L_C=0.000000 L_tp=1.302072 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 62 loss=8.080551 L_A=0.246968 L_B=0.000000 L_C=0.000000 L_tp=1.305597 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 63 loss=8.084477 L_A=0.247357 L_B=0.000000 L_C=0.000000 L_tp=1.306187 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 64 loss=8.076053 L_A=0.246643 L_B=0.000000 L_C=0.000000 L_tp=1.304902 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 65 loss=8.098693 L_A=0.248679 L_B=0.000000 L_C=0.000000 L_tp=1.308336 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 66 loss=8.071410 L_A=0.246887 L_B=0.000000 L_C=0.000000 L_tp=1.304087 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 67 loss=8.084843 L_A=0.246617 L_B=0.000000 L_C=0.000000 L_tp=1.306371 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 68 loss=8.069136 L_A=0.246518 L_B=0.000000 L_C=0.000000 L_tp=1.303770 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 69 loss=8.074058 L_A=0.245926 L_B=0.000000 L_C=0.000000 L_tp=1.304689 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 70 loss=8.067864 L_A=0.245306 L_B=0.000000 L_C=0.000000 L_tp=1.303760 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 71 loss=8.070669 L_A=0.245856 L_B=0.000000 L_C=0.000000 L_tp=1.304136 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 72 loss=8.083756 L_A=0.246948 L_B=0.000000 L_C=0.000000 L_tp=1.306135 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 73 loss=8.096424 L_A=0.246860 L_B=0.000000 L_C=0.000000 L_tp=1.308261 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 74 loss=8.075725 L_A=0.246635 L_B=0.000000 L_C=0.000000 L_tp=1.304848 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 75 loss=8.099414 L_A=0.246859 L_B=0.000000 L_C=0.000000 L_tp=1.308759 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 76 loss=8.077173 L_A=0.246417 L_B=0.000000 L_C=0.000000 L_tp=1.305126 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 77 loss=8.103034 L_A=0.247123 L_B=0.000000 L_C=0.000000 L_tp=1.309319 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 78 loss=8.072631 L_A=0.246016 L_B=0.000000 L_C=0.000000 L_tp=1.304436 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 79 loss=8.100113 L_A=0.246873 L_B=0.000000 L_C=0.000000 L_tp=1.308873 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+epoch 80 loss=8.059745 L_A=0.245869 L_B=0.000000 L_C=0.000000 L_tp=1.302313 beta_w=0.0000 gamma_w=0.0000 cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr teacher=models/teacher_pruned.ckpt
+saved /local/Mthetho/lapai-forecast/models/student_global_stable_v5.ckpt params 2169377
+[trackB-stable-v5] train done 2026-08-26T15:28:08+02:00
+[trackB-gate-v5] start 2026-08-26T15:28:08+02:00
+[trackB_gate] ckpt=models/student_global_stable_v5.ckpt cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr device=cuda domain=global
+{
+  "passed": false,
+  "pass_count": 2,
+  "total_checks": 3,
+  "checks": [
+    {
+      "variable": "tp",
+      "lead_hours": 6,
+      "passed": false,
+      "student_rmse_vs_era5": 0.0025016870349645615,
+      "teacher_rmse_vs_era5": 0.0020484328269958496,
+      "student_rmse_vs_teacher": 0.0019828560762107372,
+      "degradation_pct": 22.126876800419005,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "msl",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 207.21343994140625,
+      "teacher_rmse_vs_era5": 253.087646484375,
+      "student_rmse_vs_teacher": 344.6173400878906,
+      "degradation_pct": -18.12581814253068,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "2t",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 1.0596504211425781,
+      "teacher_rmse_vs_era5": 2.9066097736358643,
+      "student_rmse_vs_teacher": 3.034416913986206,
+      "degradation_pct": -63.543423312133626,
+      "max_allowed_pct": 15.0
+    }
+  ]
+}
+wrote reports/TRACKB_STUDENT_SCORECARD_V5.json
+wrote reports/TRACKB_GATE_V5.json
+[trackB_gate] ckpt=models/student_global_stable_v5.ckpt cache=data/processed/lapai/teacher_k1_cache_full2020_2021.zarr device=cuda domain=africa
+{
+  "passed": false,
+  "pass_count": 2,
+  "total_checks": 3,
+  "checks": [
+    {
+      "variable": "tp",
+      "lead_hours": 6,
+      "passed": false,
+      "student_rmse_vs_era5": 0.0017796780448406935,
+      "teacher_rmse_vs_era5": 0.001533167203888297,
+      "student_rmse_vs_teacher": 0.0014807418920099735,
+      "degradation_pct": 16.07853600880681,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "msl",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 83.58894348144531,
+      "teacher_rmse_vs_era5": 290.1050720214844,
+      "student_rmse_vs_teacher": 300.7796630859375,
+      "degradation_pct": -71.18666595554905,
+      "max_allowed_pct": 15.0
+    },
+    {
+      "variable": "2t",
+      "lead_hours": 6,
+      "passed": true,
+      "student_rmse_vs_era5": 0.9563071131706238,
+      "teacher_rmse_vs_era5": 6.487402439117432,
+      "student_rmse_vs_teacher": 6.5421671867370605,
+      "degradation_pct": -85.25901357060373,
+      "max_allowed_pct": 15.0
+    }
+  ]
+}
+wrote reports/TRACKB_STUDENT_SCORECARD_V5_AFRICA.json
+wrote reports/TRACKB_GATE_V5_AFRICA.json
+[trackB-gate-v5] done 2026-08-26T15:29:43+02:00
+[post-v5] start 2026-08-26T15:29:43+02:00 ckpt=models/student_global_stable_v5.ckpt leads=6,24
+[heldout] start 2026-08-26T15:29:46+02:00
+[heldout] scoring student analysis-forced leads=(6, 24) ckpt=models/student_global_stable_v5.ckpt
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230101 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230101 +6h tp {'student_rmse_vs_teacher_field': 0.0010506743817610613, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230101 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230101 +6h t2m {'student_rmse_vs_teacher_field': 1.2779746879158427, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230101_00Z.nc
+[student] 20230101 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230108 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230108 +6h tp {'student_rmse_vs_teacher_field': 0.001717836858799743, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230108 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230108 +6h t2m {'student_rmse_vs_teacher_field': 1.3023692486071754, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230108_00Z.nc
+[student] 20230108 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230115 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230115 +6h tp {'student_rmse_vs_teacher_field': 0.0009918627742738007, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230115 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230115 +6h t2m {'student_rmse_vs_teacher_field': 1.219835032335121, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230115_00Z.nc
+[student] 20230115 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230122 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230122 +6h tp {'student_rmse_vs_teacher_field': 0.0019111470292369807, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230122 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230122 +6h t2m {'student_rmse_vs_teacher_field': 1.3834548750433824, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230122_00Z.nc
+[student] 20230122 +24h state fail: No module named 'cdsapi'
+[truth] opening gs://code4earth/era5/total_precipitation_2023.zarr
+[student] 20230129 +6h tp ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230129 +6h tp {'student_rmse_vs_teacher_field': 0.0018692936835450356, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[truth] opening gs://code4earth/era5/2m_temperature_2023.zarr
+[student] 20230129 +6h t2m ERA5 score skipped: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+[student] 20230129 +6h t2m {'student_rmse_vs_teacher_field': 1.3536127796017319, 'era5_score_error': 'Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.'}
+[student] wrote data/processed/trackB_student_heldout_v5/forecasts/20230129_00Z.nc
+[student] 20230129 +24h state fail: No module named 'cdsapi'
+wrote reports/TRACKB_HELD_OUT_JAN2023_V5.json
+{
+  "student": {
+    "by_lead": {
+      "6": {
+        "tp": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 5,
+          "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+        },
+        "t2m": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 5,
+          "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+        }
+      },
+      "24": {
+        "tp": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        },
+        "t2m": {
+          "n_era5": 0,
+          "n_vs_teacher_field": 0
+        }
+      }
+    },
+    "tp": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+    },
+    "t2m": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+    }
+  },
+  "student_6h": {
+    "tp": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 0.0015081629455233243
+    },
+    "t2m": {
+      "n_era5": 0,
+      "n_vs_teacher_field": 5,
+      "student_rmse_vs_teacher_field_mean": 1.3074493247006507
+    }
+  }
+}
+[post-v5] done 2026-08-26T15:33:48+02:00
+[pipeline-v5] done 2026-08-26T15:33:48+02:00
