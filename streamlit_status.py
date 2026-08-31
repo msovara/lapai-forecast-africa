@@ -1014,6 +1014,22 @@ def _render_laptop_tab() -> None:
         with st.expander("Full laptop benchmark notes"):
             st.markdown(md)
 
+    st.divider()
+    st.subheader("Explainability (Fig. 11)")
+    st.caption(
+        "Gradient saliency: what input channels drive African 2t, plus why +12 h fails. "
+        "See reports/MVULA_XAI_ATTRIBUTION.md"
+    )
+    xai = REPORTS / "figures" / "mvula_fig11_t2m_xai_attribution.png"
+    if xai.is_file():
+        st.image(str(xai), caption="Fig. 11 — channel attribution + +12 h failure panel", use_container_width=True)
+    else:
+        st.info("Generate with: `python scripts/plot_mvula_xai_attribution.py`")
+    xai_md = _load_text("MVULA_XAI_ATTRIBUTION.md")
+    if xai_md:
+        with st.expander("MVULA_XAI_ATTRIBUTION.md"):
+            st.markdown(xai_md)
+
 
 def main() -> None:
     gate = _load_json("TRACKA_A1_GATE.json")

@@ -208,6 +208,7 @@ Produce / assemble these as a fixed figure set (Dueben scorecard DNA + science m
 | **Fig. 4** | Spatial +6 h | *Mean bias and RMSE (°C) at +6 h (n=61). Near-unbiased large-scale field with coastal/orographic residuals. IOD-style Cartopy maps.* | **Done** — `figures/mvula_fig04_t2m_spatial_plus6h.png` |
 | **Fig. 5** | Spatial +24 h | *Mean bias and RMSE (°C) at +24 h (n=61). Regional warm/cold dipole emerges. IOD-style Cartopy maps.* | **Done** — `figures/mvula_fig05_t2m_spatial_plus24h.png` |
 | **Fig. 10** | Spatial 2×2 | *Mean bias (a–b) and RMSE (c–d) at +6 h / +24 h with shared colour scales for lead comparison.* | **Done** — `figures/mvula_fig10_t2m_spatial_6h_24h_quad.png` |
+| **Fig. 11** | XAI / +12 h | *Channel saliency for African 2t + observed why-+12h-fails panel.* | **Done** — `figures/mvula_fig11_t2m_xai_attribution.png` · `MVULA_XAI_ATTRIBUTION.md` |
 | **Fig. 6** | +12 h pathology | *Histogram of +12 h bias across 61 inits (all cold) plus seasonal boxplots.* | **Done** — `figures/mvula_fig06_t2m_plus12h_pathology.png` |
 | **Fig. 7** | Seasonal small multiples | *+6 h and +24 h RMSE/ACC by DJF/MAM/JJA/SON (±1 std across inits).* | **Done** — `figures/mvula_fig07_t2m_seasonal.png` |
 | **Fig. 8** | Skill vs AF persistence | *RMSE: AF persistence / Mvula v5 / K1; relative skill % (non-monotonic +42/−18/−19/+17).* | **Done** — `figures/mvula_fig08_t2m_baselines.png` |
