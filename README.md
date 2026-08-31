@@ -4,7 +4,14 @@
   <img src="docs/branding/mvula_banner.jpg" alt="Mvula — Compressing ECMWF’s AIFS for Edge Deployment" width="720">
 </p>
 
+<p align="center">
+  <a href="https://github.com/msovara/lapai-forecast-africa"><img src="https://img.shields.io/badge/GitHub-msovara%2Flapai--forecast--africa-blue?logo=github" alt="GitHub"></a>
+  <a href="https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py"><img src="https://img.shields.io/badge/Live_app-Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Live app Streamlit"></a>
+</p>
+
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
+
+**Badges:** GitHub → this repo. **Live app** → opens [Streamlit Community Cloud deploy](https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py) (sign in with GitHub, then Deploy). After the first deploy you get a URL like `https://<name>.streamlit.app` — tell me that URL and we can point the red badge at it permanently. Local: `python run_mvula.py dashboard` or `streamlit run streamlit_status.py`.
 
 The same project often lives under `tiny-media-analysis/lapai-forecast/` on local machines; `origin` should point at the URL above.
 

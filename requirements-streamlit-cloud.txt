@@ -1,0 +1,10 @@
+# Lean deps for Streamlit Community Cloud / local dashboard.
+# Cloud install: prefer this file if the full root requirements.txt is too heavy
+# (Advanced settings → or symlink/copy as needed). Default Cloud also reads
+# pyproject.toml / requirements.txt at repo root.
+
+streamlit>=1.28.0
+pandas>=2.0.0
+plotly>=5.17.0
+numpy>=1.24
+pyyaml>=6
