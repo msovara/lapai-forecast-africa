@@ -1,6 +1,7 @@
 # LapAI-Forecast pins (relax locally if CUDA wheels differ).
 # On CHPC prefer conda: environment-anemoi.yml (Track A), environment-credit*.yml (Track B).
 # CI uses: pip install -e ".[dev,ort]" (see pyproject.toml).
+# Streamlit Community Cloud also reads this file — include dashboard deps here.
 
 numpy>=1.24
 torch>=2.2
@@ -10,3 +11,8 @@ zarr>=2.16
 h5py>=3.10
 xarray>=2024.1
 pytest>=8
+
+# Status dashboard (streamlit_status.py) — required on Streamlit Cloud
+streamlit>=1.28.0
+pandas>=2.0.0
+plotly>=5.17.0
