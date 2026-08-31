@@ -218,8 +218,18 @@ def plot_africa_field(
 
     if add_colorbar:
         import matplotlib.pyplot as plt
+        from matplotlib.ticker import MaxNLocator, ScalarFormatter
 
         cbar = plt.colorbar(im, ax=ax, orientation="horizontal", pad=0.12, shrink=0.8, aspect=30)
+        cbar.ax.tick_params(labelsize=8)
+        # Avoid overlapping 0.0000x tick strings on horizontal bars
+        cbar.locator = MaxNLocator(nbins=5)
+        span = abs(float(vmax) - float(vmin)) if vmax is not None and vmin is not None else 0.0
+        if span > 0 and span < 1e-2:
+            fmt = ScalarFormatter(useMathText=True)
+            fmt.set_powerlimits((-1, 1))
+            cbar.formatter = fmt
+        cbar.update_ticks()
         if cbar_label:
             cbar.set_label(cbar_label, fontsize=10, fontweight="bold")
 

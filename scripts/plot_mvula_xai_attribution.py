@@ -226,19 +226,21 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     else:
         ax2 = fig.add_subplot(gs[1, 0])
     sp, lat_af, lon_af = _to_africa_plot_grid(spatial, lat, lon)
-    # Robust scale (land only after plot masks ocean; use positive cells here)
-    vmax = float(np.nanpercentile(sp[sp > 0], 98)) if np.any(sp > 0) else 1.0
+    # Scale for a readable colorbar (raw |grad| ~ 1e-4); avoid 0.0000x tick clutter
+    grad_scale = 1.0e4
+    sp_plot = sp * grad_scale
+    vmax = float(np.nanpercentile(sp_plot[sp_plot > 0], 98)) if np.any(sp_plot > 0) else 1.0
     plot_africa_field(
         ax2,
         lon_af,
         lat_af,
-        sp,
+        sp_plot,
         cmap="magma",
         vmin=0.0,
         vmax=max(vmax, 1e-12),
         title="Spatial |grad| (channel-mean)",
         panel_label="c",
-        cbar_label="|∂2t / ∂x|",
+        cbar_label=r"|∂2t / ∂x| × 10$^{-4}$",
         add_colorbar=True,
         draw_grid=False,
     )
