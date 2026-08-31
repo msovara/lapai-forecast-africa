@@ -14,11 +14,13 @@ import streamlit as st
 
 REPO = Path(__file__).resolve().parent
 REPORTS = REPO / "reports"
+LOGO = REPO / "docs" / "branding" / "mvula_logo.png"
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 st.set_page_config(
     page_title="Mvula / LapAI Status",
+    page_icon=str(LOGO) if LOGO.is_file() else "🌧",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -1025,6 +1027,18 @@ def main() -> None:
     st.title("Mvula / LapAI-Forecast — project status")
     st.caption("Code for Earth · African Stream · dual close-out: AF t2m skill + laptop demo (→ 23 Sep 2026)")
 
+    if LOGO.is_file():
+        h1, h2 = st.columns([1, 4])
+        with h1:
+            st.image(str(LOGO), width=160)
+        with h2:
+            st.markdown(
+                "**Mvula** — AIFS-derived laptop-scale AI weather for African contexts.\n\n"
+                "Freeze **v5**: analysis-forced African **t2m** · ~8.8 MiB student · CPU inference."
+            )
+    else:
+        st.caption("Logo missing — expected at `docs/branding/mvula_logo.png`.")
+
     st.info(
         "Freeze **v5** as the Code for Earth student artefact: analysis-forced **t2m** skill vs K1, "
         "plus CPU size/speed evidence. **No** free-running 10-day claim from Cout=3."
@@ -1276,6 +1290,8 @@ def main() -> None:
             st.markdown(f'<div class="block {css}"><strong>{mark}</strong> — {text}</div>', unsafe_allow_html=True)
 
     with st.sidebar:
+        if LOGO.is_file():
+            st.image(str(LOGO), width=120)
         st.header("Reports")
         for name in (
             "FINAL_REPORT.md",

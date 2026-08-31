@@ -1,5 +1,9 @@
 # LapAI-Forecast / Mvula
 
+<p align="center">
+  <img src="docs/branding/mvula_logo.png" alt="Mvula logo" width="280"/>
+</p>
+
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
 
 The same project often lives under `tiny-media-analysis/lapai-forecast/` on local machines; `origin` should point at the URL above.

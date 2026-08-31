@@ -49,6 +49,7 @@ From: ubuntu:22.04
     reports /opt/lapai-forecast/reports
     students /opt/lapai-forecast/students
     containers /opt/lapai-forecast/containers
+    docs /opt/lapai-forecast/docs
 
 %environment
     export LAPAI_REPO=/opt/lapai-forecast
