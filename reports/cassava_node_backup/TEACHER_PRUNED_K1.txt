@@ -1,0 +1,13 @@
+# Track A accepted teacher — K1 (do not overwrite with tp-recovery)
+
+Canonical on Cassava:
+
+  models/teacher_pruned.ckpt
+    -> models/trackA_prune_k1_from_a1bplus_runs/checkpoint/f52c98d7-4530-49d4-a230-309fa005e92a/inference-last.ckpt
+
+This laptop clone may not hold the multi-GB weights. Sync from Cassava when needed for offline eval:
+
+  scp -r cassava-gpu:/local/Mthetho/lapai-forecast/models/teacher_pruned.ckpt models/
+  # or copy the target inference-last.ckpt and ln -s / mklink
+
+See reports/TRACKA_REPORT.md and reports/TRACKB_START.md.
