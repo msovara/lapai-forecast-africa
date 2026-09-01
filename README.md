@@ -5,13 +5,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/msovara/lapai-forecast-africa"><img src="https://img.shields.io/badge/GitHub-msovara%2Flapai--forecast--africa-blue?logo=github" alt="GitHub"></a>
   <a href="https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py"><img src="https://img.shields.io/badge/Live_app-Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Live app Streamlit"></a>
 </p>
 
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
 
-**Badges:** GitHub → this repo. **Live app** → [Streamlit Community Cloud deploy](https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py) (sign in with GitHub, then Deploy). After deploy, the app URL is typically `https://<name>.streamlit.app`. Local: `python run_mvula.py dashboard` or `streamlit run streamlit_status.py`.
+**Badges:** **Live app** → [Streamlit Community Cloud deploy](https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py) (sign in with GitHub, then Deploy). After deploy, the app URL is typically `https://<name>.streamlit.app`. Local: `python run_mvula.py dashboard` or `streamlit run streamlit_status.py`.
 
 Local checkouts may live under `tiny-media-analysis/lapai-forecast/`; `origin` should point at the URL above.
 
