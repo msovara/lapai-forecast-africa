@@ -106,6 +106,16 @@ run_mvula.py  scripts/  training/  utils/  pbs/  tests/
 
 GPU training envs: `environment-credit.yml` / `environment-credit-lengau.yml` (CHPC). End-user CPU env: `environment-mvula-enduser.yml`.
 
+## Team & contact
+
+| | |
+|--|--|
+| **Team (Mvula)** | Chimwemwe Chanda, Mthetho Sovara, Samuel Mathekga, Gabriel Elim, Fima Sichone |
+| **Mentors** | Shruti Nath, Rendani Mbuvha, Mario Santa Cruz López |
+| **Programme** | [ECMWF Code for Earth 2026 — African Stream](https://codeforearth.ecmwf.int/stream/africa-stream/) |
+| **Project page** | [codeforearth.ecmwf.int/project/mvula](https://codeforearth.ecmwf.int/project/mvula/) |
+| **Issues / questions** | [GitHub Issues](https://github.com/msovara/lapai-forecast-africa/issues) on this repository |
+
 ## License
 
 Source code in this repository is licensed under the [Apache License 2.0](LICENSE).
