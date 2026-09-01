@@ -78,7 +78,7 @@ tiny-media-analysis/
 ├── neoss-csir-chpc/                     (unrelated — left alone)
 ├── mpas-lengau/                         (unrelated — left alone)
 ├── wrf-lengau/                          (unrelated — left alone)
-├── configs/  recipes/  training/  ...   (existing IOD/JRA/T2M work — left alone)
+├── configs/  recipes/  training/  ...   (sibling research trees — left alone)
 │
 └── lapai-forecast/                      ← **all LapAI work lives here**
     ├── PLAN.md                          ← this document
@@ -168,7 +168,7 @@ tiny-media-analysis/
 **Hard isolation rules:**
 
 1. No file in `lapai-forecast/` imports from the repo's other top-level folders.
-2. The two conda envs (`environment-anemoi.yml`, `environment-credit.yml`) live inside `lapai-forecast/` and are independent of the existing `anemoi-training.yml` at the repo root, which continues to serve the JRA-3Q/T2M pipeline.
+2. The two conda envs (`environment-anemoi.yml`, `environment-credit.yml`) live inside `lapai-forecast/` and are independent of any sibling conda stacks outside this tree.
 3. PBS jobs `cd` into `lapai-forecast/` before launching anything.
 4. The `.gitignore` inside `lapai-forecast/` ignores `data/`, `models/`, `logs/`, and `*.onnx` regardless of the repo-root `.gitignore`.
 
@@ -499,7 +499,7 @@ PBS script outlines (to be written in Week 1):
 | R6 | ENACTS data licence blocks redistribution                                   | High       | Low    | Treat ENACTS as private fine-tune signal only; ship only the resulting adapter, not the data.      |
 | R7 | Anemoi / MILES-CREDIT API drift during 12 weeks                             | Medium     | Medium | Pin both at known-good commits in `lapai-forecast/requirements.txt` Week 1; re-eval at Week 6.     |
 | R8 | CHPC queue contention                                                        | Medium     | Medium | Use checkpoint-and-resume aggressively; prefer many short jobs over one long job for Track B.      |
-| R9 | Accidental coupling with the existing JRA-3Q / IOD / T2M scaffolding        | Low        | Medium | Hard isolation rules in §2; no imports across the boundary; separate conda envs and PBS scripts.   |
+| R9 | Accidental coupling with sibling research trees outside this package        | Low        | Medium | Hard isolation rules in §2; no imports across the boundary; separate conda envs and PBS scripts.   |
 
 ---
 
@@ -565,7 +565,7 @@ To keep scope realistic for 12 weeks and 1,650 GPU-h:
 - Tropical cyclone tracking, gust diagnostics, and other downstream products beyond direct model variables.
 - Re-training AIFS from scratch — we only fine-tune and prune existing public checkpoints.
 - Mobile / browser deployment — laptop CPU is the only deployment target.
-- **Any modification of the existing JRA-3Q / IOD / drought / T2M / MPAS / WRF / ICON code** in this repo. Those projects continue under their own folders, untouched.
+- **Any modification of sibling research trees** outside `lapai-forecast/` (those continue under their own folders, untouched).
 
 ---
 
