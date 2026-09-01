@@ -83,6 +83,16 @@ Weights are **bind-mounted**, not baked into the SIF. Docker: `containers/Docker
 
 Optional re-eval (ARCO + GPU recommended): `bash scripts/run_trackB_t2m_expanded_cassava.sh`
 
+## Hugging Face (packaging skeleton)
+
+End-user discovery path (model card + Gradio Space) lives under [`huggingface/`](huggingface/):
+
+- Model card: [`huggingface/model/README.md`](huggingface/model/README.md)
+- Space app: [`huggingface/space/`](huggingface/space/)
+- Upload steps: [`huggingface/UPLOAD.md`](huggingface/UPLOAD.md)
+
+Hub repos are **not** created automatically — run the upload commands after `huggingface-cli login`.
+
 ## Approach (brief)
 
 | Track | Role |

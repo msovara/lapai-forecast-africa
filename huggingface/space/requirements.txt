@@ -1,0 +1,8 @@
+gradio>=4.44,<5
+torch>=2.2
+numpy>=1.24
+matplotlib>=3.8
+huggingface_hub>=0.21
+# When the GitHub repo is public, prefer:
+# git+https://github.com/msovara/lapai-forecast-africa.git
+# Until then, install a local wheel or vendor lapai_inference into this Space.
