@@ -1,0 +1,11 @@
+Mvula / LapAI-Forecast
+Copyright 2026 Mvula / LapAI-Forecast contributors
+
+This product includes software developed for ECMWF Code for Earth 2026
+(African Stream — Challenge 40).
+
+Licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+Third-party components (e.g. ECMWF AIFS teacher checkpoints, Anemoi,
+CREDIT) remain under their respective licences and terms of use.

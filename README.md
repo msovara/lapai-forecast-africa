@@ -108,7 +108,11 @@ GPU training envs: `environment-credit.yml` / `environment-credit-lengau.yml` (C
 
 ## License
 
-Planned defaults: Apache-2.0 (code), CC-BY-4.0 (docs), permissive open weights for checkpoints compatible with NMHS redistribution (confirm before public redistribution).
+Source code in this repository is licensed under the [Apache License 2.0](LICENSE).
+
+- **Documentation** (reports, guides, figures under `reports/` and `docs/`): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Student checkpoint** (`models/student_global_stable_v5.ckpt`): provided for research and evaluation; redistribution for NMHS / research use is intended to be permissive. Third-party **teacher** weights (e.g. AIFS) remain under their original licences and terms.
+- See also [`NOTICE`](NOTICE) for attribution.
 
 ## Acknowledgements
 
