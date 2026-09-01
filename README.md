@@ -85,13 +85,15 @@ Optional re-eval (ARCO + GPU recommended): `bash scripts/run_trackB_t2m_expanded
 
 ## Hugging Face (packaging skeleton)
 
+Profile: [huggingface.co/msovara](https://huggingface.co/msovara)
+
 End-user discovery path (model card + Gradio Space) lives under [`huggingface/`](huggingface/):
 
 - Model card: [`huggingface/model/README.md`](huggingface/model/README.md)
 - Space app: [`huggingface/space/`](huggingface/space/)
 - Upload steps: [`huggingface/UPLOAD.md`](huggingface/UPLOAD.md)
 
-Hub repos are **not** created automatically — run the upload commands after `huggingface-cli login`.
+Target Hub ids: `msovara/mvula-v5-student` · `msovara/mvula-v5-demo` (create via CLI after login).
 
 ## Approach (brief)
 

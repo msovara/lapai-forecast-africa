@@ -63,7 +63,7 @@ def run_climate_demo(seed: int = 0):
     if not ckpt:
         if not repo_id:
             return None, (
-                "Set Space secret/env `HF_MODEL_ID` (e.g. youruser/mvula-v5-student) "
+                "Set Space secret/env `HF_MODEL_ID=msovara/mvula-v5-student` "
                 "after uploading the checkpoint, or `MVULA_CKPT` to a local path."
             )
         try:
