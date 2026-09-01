@@ -18,8 +18,10 @@ $hf = "$env:USERPROFILE\anaconda3\envs\lapai-anemoi\Scripts\hf.exe"
 & $hf upload C4E-Mvula/mvula-v5-demo huggingface\space-static . --repo-type space
 ```
 
-## LinkedIn URLs
+## LinkedIn / share URLs
 
-- https://github.com/msovara/lapai-forecast-africa  
-- https://huggingface.co/C4E-Mvula/mvula-v5-student  
-- https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo  
+- GitHub: https://github.com/msovara/lapai-forecast-africa  
+- Model: https://huggingface.co/C4E-Mvula/mvula-v5-student  
+- **Working demo page:** https://c4e-mvula-mvula-v5-demo.static.hf.space/  
+
+Note: the Hugging Face **App** tab may show “refused to connect” because it iframes `*.hf.space`, while static Spaces are served on `*.static.hf.space`. Prefer the `.static.hf.space` link for sharing.

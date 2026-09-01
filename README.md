@@ -87,7 +87,7 @@ Optional re-eval (ARCO + GPU recommended): `bash scripts/run_trackB_t2m_expanded
 
 - Org: [C4E-Mvula](https://huggingface.co/C4E-Mvula)
 - **Model:** [C4E-Mvula/mvula-v5-student](https://huggingface.co/C4E-Mvula/mvula-v5-student)
-- **Demo Space:** [C4E-Mvula/mvula-v5-demo](https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo) (static landing page)
+- **Demo Space:** [C4E-Mvula/mvula-v5-demo](https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo) · direct page: https://c4e-mvula-mvula-v5-demo.static.hf.space/
 - Packaging sources: [`huggingface/`](huggingface/) · upload notes: [`huggingface/UPLOAD.md`](huggingface/UPLOAD.md)
 
 ## Approach (brief)
