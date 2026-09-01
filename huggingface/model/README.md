@@ -55,7 +55,7 @@ from huggingface_hub import hf_hub_download
 
 # After you upload this checkpoint to your model repo:
 ckpt_path = hf_hub_download(
-    repo_id="msovara/mvula-v5-student",
+    repo_id="C4E-Mvula/mvula-v5-student",
     filename="student_global_stable_v5.ckpt",
 )
 blob = torch.load(ckpt_path, map_location="cpu", weights_only=False)

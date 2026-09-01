@@ -1,51 +1,25 @@
-# Upload Mvula to Hugging Face (`msovara`)
+# Upload Mvula to Hugging Face
 
-Profile: [huggingface.co/msovara](https://huggingface.co/msovara)
+Profile: [huggingface.co/msovara](https://huggingface.co/msovara) · Org: [C4E-Mvula](https://huggingface.co/C4E-Mvula)
 
-| Hub repo | Source in this git tree |
-|----------|-------------------------|
-| [`msovara/mvula-v5-student`](https://huggingface.co/msovara/mvula-v5-student) (model) | `huggingface/model/` + `models/student_global_stable_v5.ckpt` |
-| [`msovara/mvula-v5-demo`](https://huggingface.co/spaces/msovara/mvula-v5-demo) (Space) | `huggingface/space/` |
+| Hub repo | Status |
+|----------|--------|
+| [`C4E-Mvula/mvula-v5-student`](https://huggingface.co/C4E-Mvula/mvula-v5-student) | Model card + `student_global_stable_v5.ckpt` |
+| [`C4E-Mvula/mvula-v5-demo`](https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo) | **Static** end-user Space (free) |
 
-## 0. Login (once)
+Gradio Spaces need HF Pro (personal) or Team (org). Interactive app source remains in `huggingface/space/` for later.
 
-```bash
-pip install -U "huggingface_hub[cli]"
-huggingface-cli login
+## Refresh uploads
+
+```powershell
+$hf = "$env:USERPROFILE\anaconda3\envs\lapai-anemoi\Scripts\hf.exe"
+& $hf upload C4E-Mvula/mvula-v5-student huggingface\model\README.md README.md
+& $hf upload C4E-Mvula/mvula-v5-student models\student_global_stable_v5.ckpt student_global_stable_v5.ckpt
+& $hf upload C4E-Mvula/mvula-v5-demo huggingface\space-static . --repo-type space
 ```
 
-## 1. Model repo
-
-```bash
-cd /path/to/lapai-forecast
-
-huggingface-cli repo create mvula-v5-student --type model  # once
-
-huggingface-cli upload msovara/mvula-v5-student huggingface/model/README.md README.md
-
-huggingface-cli upload msovara/mvula-v5-student \
-  models/student_global_stable_v5.ckpt \
-  student_global_stable_v5.ckpt
-```
-
-## 2. Space
-
-```bash
-# Gallery images (already in assets/ on git)
-huggingface-cli repo create mvula-v5-demo --type space --space_sdk gradio  # once
-
-huggingface-cli upload msovara/mvula-v5-demo huggingface/space . --repo-type space
-```
-
-In the Space **Settings → Variables**, set:
-
-- `HF_MODEL_ID=msovara/mvula-v5-student`
-
-For the live forward tab, `lapai_inference` must import. When GitHub is public, uncomment the git line in `space/requirements.txt`. While the GitHub repo is private, vendor `lapai_inference` or keep the gallery-only tabs.
-
-## 3. LinkedIn URLs
+## LinkedIn URLs
 
 - https://github.com/msovara/lapai-forecast-africa  
-- https://huggingface.co/msovara/mvula-v5-student  
-- https://huggingface.co/spaces/msovara/mvula-v5-demo  
-- Profile: https://huggingface.co/msovara
+- https://huggingface.co/C4E-Mvula/mvula-v5-student  
+- https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo  

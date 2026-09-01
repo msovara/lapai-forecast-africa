@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mvula v5 — African laptop-scale temperature AI</title>
+  <style>
+    :root { --ink:#15202b; --muted:#445; --line:#dde3ea; --bg:#f7f9fc; --accent:#0b6e4f; }
+    body { margin:0; font-family: Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); line-height:1.5; }
+    header { background:linear-gradient(135deg,#0b3d5c,#0b6e4f); color:#fff; padding:2.2rem 1.2rem 1.8rem; }
+    header h1 { margin:0 0 .4rem; font-size:clamp(1.6rem,3vw,2.2rem); }
+    header p { margin:0; max-width:46rem; opacity:.95; }
+    main { max-width:920px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem; margin:1rem 0; }
+    h2 { font-size:1.25rem; margin:0 0 .6rem; }
+    table { width:100%; border-collapse:collapse; font-size:.95rem; }
+    th, td { border:1px solid var(--line); padding:.45rem .55rem; text-align:left; }
+    th { background:#eef5f1; }
+    img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); }
+    a { color:var(--accent); }
+    .muted { color:var(--muted); font-size:.95rem; }
+    ul { margin:.4rem 0 .2rem 1.1rem; }
+    .grid { display:grid; gap:1rem; }
+    @media (min-width:760px) { .grid.two { grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mvula — weather AI on a laptop</h1>
+    <p>ECMWF Code for Earth 2026 (African Stream). A ~9&nbsp;MB distilled model for short-range African temperature guidance — not a supercomputer product, not a 10-day ops forecast app.</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Try / dig deeper</h2>
+      <ul>
+        <li><a href="https://huggingface.co/C4E-Mvula/mvula-v5-student">Model on Hugging Face</a> (weights + model card)</li>
+        <li><a href="https://github.com/msovara/lapai-forecast-africa">GitHub repo</a> (code, dashboard, draft paper PDF)</li>
+        <li>Local dashboard after clone: <code>python run_mvula.py dashboard</code></li>
+      </ul>
+      <p class="muted">Built for NMHS colleagues, students, and AfriClimate AI explorers on everyday computers.</p>
+    </section>
+
+    <section class="card">
+      <h2>What it can / cannot do</h2>
+      <div class="grid two">
+        <div>
+          <strong>Can</strong>
+          <ul>
+            <li>Short-range African 2&nbsp;m temperature orientation</li>
+            <li>Run on CPU / laptop (~2.5&nbsp;s per +6&nbsp;h step)</li>
+            <li>Open weights and documentation</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Cannot (this freeze)</strong>
+          <ul>
+            <li>Replace official national forecasts</li>
+            <li>Free-running 10-day global weather</li>
+            <li>Full precip / all-weather product</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Packaged African t2m skill (2023, 61 inits)</h2>
+      <table>
+        <thead><tr><th>Lead</th><th>RMSE (°C)</th><th>ACC</th><th>Bias (°C)</th></tr></thead>
+        <tbody>
+          <tr><td>+6 h</td><td>1.38</td><td>0.97</td><td>−0.12</td></tr>
+          <tr><td>+12 h</td><td>7.80</td><td>0.45</td><td>−5.33 (cold bias)</td></tr>
+          <tr><td>+18 h</td><td>4.38</td><td>0.75</td><td>−1.12</td></tr>
+          <tr><td>+24 h</td><td>3.23</td><td>0.84</td><td>+1.30</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Analysis-forced evaluation — honest about the +12&nbsp;h failure.</p>
+    </section>
+
+    <section class="card">
+      <h2>Spatial skill (+6 / +24 h)</h2>
+      <img src="assets/mvula_fig10_t2m_spatial_6h_24h_quad.png" alt="Fig.10 spatial bias and RMSE at +6 and +24 hours" />
+    </section>
+
+    <section class="card">
+      <h2>Explainability</h2>
+      <img src="assets/mvula_fig11_t2m_xai_attribution.png" alt="Fig.11 channel attribution and +12h pathology" />
+    </section>
+
+    <section class="card">
+      <h2>Team &amp; credit</h2>
+      <p>Team Mvula · Mentors: Shruti Nath, Rendani Mbuvha, Mario Santa Cruz López · GPU support: Cassava AI Factory · HPC: CHPC Lengau · Programme: ECMWF Code for Earth.</p>
+      <p class="muted">Apache-2.0 code · research student weights · AIFS teacher terms remain separate.</p>
+    </section>
+  </main>
+</body>
+</html>
