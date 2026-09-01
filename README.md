@@ -136,6 +136,7 @@ Source code in this repository is licensed under the [Apache License 2.0](LICENS
 
 - **Cassava AI Factory** ([Cassava Technologies](https://www.cassava.ai/)) — GPU access for student training, AF evaluation, and related workloads.
 - **Centre for High Performance Computing (CHPC)**, South Africa (Lengau) — HPC compute and environment support.
+- **[AfriClimate AI](https://africlimate.ai/)** — community context for open, Africa-focused climate–AI collaboration.
 - **ECMWF** — AIFS checkpoints and Anemoi.
 - **NSF NCAR MILES** — CREDIT framework (Track B).
 - **ECMWF Code for Earth** — African Stream mentoring and programme support.
