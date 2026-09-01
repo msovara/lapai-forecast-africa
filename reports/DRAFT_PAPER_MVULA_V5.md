@@ -302,7 +302,3 @@ Single-panel RMSE/bias maps also available as `trackb_t2m_v5_{rmse,bias}_L{006,0
 | AF African t2m skill +6…+24 h | Full multi-var free-run Week-9 table |
 | Open code + packaged eval | Operational NMHS pilot / LoRA adapters |
 | Honest Case A (Cout=3) limit | That v5 “is” a closed dynamical NWP emulator |
-
----
-
-*End of draft. For mentor packaging, prefer this file plus [`FINAL_REPORT.md`](FINAL_REPORT.md) and the status matrix.*
