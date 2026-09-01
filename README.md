@@ -11,9 +11,9 @@
 
 Canonical Git repository: [github.com/msovara/lapai-forecast-africa](https://github.com/msovara/lapai-forecast-africa).
 
-**Badges:** GitHub → this repo. **Live app** → opens [Streamlit Community Cloud deploy](https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py) (sign in with GitHub, then Deploy). After the first deploy you get a URL like `https://<name>.streamlit.app` — tell me that URL and we can point the red badge at it permanently. Local: `python run_mvula.py dashboard` or `streamlit run streamlit_status.py`.
+**Badges:** GitHub → this repo. **Live app** → [Streamlit Community Cloud deploy](https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py) (sign in with GitHub, then Deploy). After deploy, the app URL is typically `https://<name>.streamlit.app`. Local: `python run_mvula.py dashboard` or `streamlit run streamlit_status.py`.
 
-The same project often lives under `tiny-media-analysis/lapai-forecast/` on local machines; `origin` should point at the URL above.
+Local checkouts may live under `tiny-media-analysis/lapai-forecast/`; `origin` should point at the URL above.
 
 **Mvula** (ECMWF Code for Earth 2026 — African Stream) shrinks advanced AI weather models toward laptop-scale use for African contexts.
 
@@ -301,11 +301,14 @@ lapai-forecast/
 
 ## License
 
-To be selected before the first code commit. Default plan: Apache-2.0 for code, CC-BY-4.0 for documentation, with model weights under a permissive open-weights licence compatible with NMHS redistribution.
+Planned defaults: Apache-2.0 for code, CC-BY-4.0 for documentation, and a permissive open-weights licence for model checkpoints compatible with NMHS redistribution (confirm before public redistribution).
 
 ## Acknowledgements
 
-- ECMWF for the AIFS public checkpoints and the Anemoi framework.
-- NSF NCAR MILES for the CREDIT framework.
-- The Centre for High-Performance Computing (CHPC), South Africa, for compute resources.
-- Code for Earth — African Stream.
+Training, evaluation, and packaging of Mvula v5 relied on the following organisations and platforms:
+
+- **Cassava AI Factory** ([Cassava Technologies](https://www.cassava.ai/)) — GPU access for student training, analysis-forced evaluation campaigns, and related GPU workloads that made this work possible.
+- **Centre for High Performance Computing (CHPC)**, South Africa (Lengau) — additional HPC compute and environment support.
+- **ECMWF** — AIFS public checkpoints and the Anemoi framework.
+- **NSF NCAR MILES** — the CREDIT framework used in Track B student training.
+- **ECMWF Code for Earth** — African Stream mentoring and programme support.
