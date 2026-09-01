@@ -74,6 +74,7 @@ Weights are **bind-mounted**, not baked into the SIF. Docker: `containers/Docker
 
 ### 4. Packaged results (no re-run needed)
 
+- [`reports/DRAFT_PAPER_MVULA_V5.md`](reports/DRAFT_PAPER_MVULA_V5.md) / [`reports/DRAFT_PAPER_MVULA_V5.pdf`](reports/DRAFT_PAPER_MVULA_V5.pdf) — draft paper (narrative + figures)
 - [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md) — close-out narrative
 - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — AF t2m scorecard
 - [`reports/MVULA_XAI_ATTRIBUTION.md`](reports/MVULA_XAI_ATTRIBUTION.md) — Fig.11 channel/spatial saliency

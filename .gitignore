@@ -24,6 +24,10 @@ reports/**/*.png
 reports/**/*.pdf
 reports/**/*.html
 !reports/.gitkeep
+# Close-out draft paper PDF (explicitly published)
+!reports/DRAFT_PAPER_MVULA_V5.pdf
+# Packaged publication figures (already tracked / needed for paper + README)
+!reports/figures/
 
 # --- Python ---
 __pycache__/

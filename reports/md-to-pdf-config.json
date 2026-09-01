@@ -1,0 +1,15 @@
+{
+  "pdf_options": {
+    "format": "A4",
+    "printBackground": true,
+    "margin": {
+      "top": "18mm",
+      "bottom": "18mm",
+      "left": "16mm",
+      "right": "16mm"
+    }
+  },
+  "stylesheet": [],
+  "body_class": ["markdown-body"],
+  "css": "body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; } h1,h2,h3 { page-break-after: avoid; } img { max-width: 100%; height: auto; page-break-inside: avoid; } table { font-size: 9.5pt; border-collapse: collapse; width: 100%; margin: 0.8em 0; } th, td { border: 1px solid #ccc; padding: 4px 6px; } blockquote { border-left: 3px solid #888; margin-left: 0; padding-left: 1em; color: #333; } code { font-size: 0.9em; } pre { white-space: pre-wrap; font-size: 0.85em; }"
+}

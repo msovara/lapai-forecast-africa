@@ -8,7 +8,7 @@
 **Evidence commits:** `3b7cde4` (AF t2m package) · `aa0b218` (consumer laptop bench)  
 **Release tag:** [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/releases/tag/trackb-v5-c4e) (checkout this tag or `main`)
 
-**Mentors — open first:** this file → [`MVULA_CODE4EARTH_STATUS_MATRIX.md`](MVULA_CODE4EARTH_STATUS_MATRIX.md) → [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) + [figures](figures/) → [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) → repo [README close-out quickstart](../README.md#close-out-quickstart).
+**Mentors — open first:** [`DRAFT_PAPER_MVULA_V5.md`](DRAFT_PAPER_MVULA_V5.md) (full narrative + figures) → this file → [`MVULA_CODE4EARTH_STATUS_MATRIX.md`](MVULA_CODE4EARTH_STATUS_MATRIX.md) → [`TRACKB_T2M_EXPANDED.md`](TRACKB_T2M_EXPANDED.md) + [figures](figures/) → [`MVULA_LAPTOP_BENCHMARK.md`](MVULA_LAPTOP_BENCHMARK.md) → repo [README](../README.md).
 
 ---
 
