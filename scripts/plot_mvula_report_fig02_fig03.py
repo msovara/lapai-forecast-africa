@@ -402,7 +402,7 @@ def fig2_primary_00z(student, k1) -> None:
         float(np.mean([float(r["variables"]["t2m"]["rmse"]) for r in k1_rows])) if k1_rows else float("nan")
     )
 
-    fig, axes = plt.subplots(1, 3, figsize=(10.2, 4.0), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 4.2), layout="constrained")
     panels = [
         (axes[0], "RMSE (°C)", float(rmse.mean()), float(rmse.std(ddof=1)), k1_rmse, "#1f4e79"),
         (axes[1], "ACC", float(acc.mean()), float(acc.std(ddof=1)), None, "#2e5a1c"),
@@ -471,11 +471,10 @@ def fig2_primary_00z(student, k1) -> None:
         )
     fig.legend(
         handles=legend_handles,
-        loc="lower center",
+        loc="outside lower center",
         ncol=2,
         frameon=False,
         fontsize=9,
-        bbox_to_anchor=(0.5, -0.02),
     )
 
     fig.suptitle(
