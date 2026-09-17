@@ -400,31 +400,68 @@ def fig2_primary_00z(student, k1) -> None:
         float(np.mean([float(r["variables"]["t2m"]["rmse"]) for r in k1_rows])) if k1_rows else float("nan")
     )
 
-    fig, axes = plt.subplots(1, 3, figsize=(10.2, 3.6), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 3.8), constrained_layout=True)
     panels = [
         (axes[0], "RMSE (°C)", float(rmse.mean()), float(rmse.std(ddof=1)), k1_rmse, "#1f4e79"),
         (axes[1], "ACC", float(acc.mean()), float(acc.std(ddof=1)), None, "#2e5a1c"),
         (axes[2], "Bias (°C)", float(bias.mean()), float(bias.std(ddof=1)), None, "#6b2d5c"),
     ]
     for ax, ylabel, mean, std, k1v, color in panels:
-        ax.bar([0], [mean], color=color, width=0.55, zorder=2)
+        ax.bar([0], [mean], color=color, width=0.45, zorder=2)
         ax.errorbar([0], [mean], yerr=[std], fmt="none", ecolor="#333333", capsize=4, zorder=3)
         ax.set_xticks([0])
         ax.set_xticklabels(["00Z IC\n→ one +6 h step"])
         ax.set_ylabel(ylabel)
         ax.grid(True, axis="y", alpha=0.3, zorder=0)
+        ax.set_xlim(-0.75, 0.75)
+        # Clear room above the error bar for the numeric label
+        top = mean + abs(std)
+        bottom = mean - abs(std)
+        if ylabel.startswith("Bias"):
+            pad = 0.35 * max(abs(top), abs(bottom), 0.2)
+            ax.set_ylim(min(0.0, bottom) - pad, max(0.0, top) + pad)
+            ax.axhline(0.0, color="#666666", lw=0.8, zorder=1)
+        elif ylabel == "ACC":
+            ax.set_ylim(0.0, 1.08)
+        else:
+            ax.set_ylim(0.0, top + 0.28)
         label = f"{mean:.3g}" if ylabel == "ACC" else f"{mean:.2f}"
-        ax.bar_label(ax.containers[0], labels=[label], padding=3, fontsize=10)
+        # Offset value to the right of the bar so it clears the error bar / fill
+        if ylabel.startswith("Bias"):
+            y_text = max(0.0, top) + 0.04
+        elif ylabel == "ACC":
+            y_text = mean + abs(std) + 0.025
+        else:
+            y_text = top + 0.06
+        ax.annotate(
+            label,
+            xy=(0, mean),
+            xytext=(0.28, y_text),
+            fontsize=10,
+            ha="left",
+            va="bottom",
+            annotation_clip=False,
+        )
         if k1v is not None and isinstance(k1v, (int, float)) and k1v == k1v:
-            ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, label=f"K1 RMSE={k1v:.2f} (n={len(k1_rows)})")
-            ax.legend(frameon=False, fontsize=7.5)
+            ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, zorder=1)
+            # Place K1 note outside the bar (upper-left), not over the fill
+            ax.text(
+                0.02,
+                0.98,
+                f"K1 RMSE={k1v:.2f} (n={len(k1_rows)})",
+                transform=ax.transAxes,
+                ha="left",
+                va="top",
+                fontsize=7.5,
+                color="#c45911",
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.9),
+            )
 
     fig.suptitle(
         "Fig. 2 (primary) — Headline result: analysis-forced one-step African t2m from 00Z IC\n"
         f"Student v5 · n={len(rows)} inits (2023) · not an autoregressive lead-time score. "
         "Error bars: ±1 std across inits.",
         fontsize=9,
-        y=1.08,
     )
     fig.savefig(OUT2_PRIMARY, dpi=160, bbox_inches="tight")
     plt.close(fig)
