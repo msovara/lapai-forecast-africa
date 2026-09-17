@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Generate Dueben-style Fig.2 (lead curves) and Fig.3 (init x lead heatmap)
+"""Generate Mvula report figures from TRACKB_T2M_EXPANDED.json.
 
-from reports/TRACKB_T2M_EXPANDED.json for the Mvula internal technical report.
+Mario Santa Cruz (ECMWF) framing (2026-09): scores are analysis-forced *one-step*
+predictions. With a 00Z campaign, labelled horizons map to analysis IC hours
+(00/06/12/18Z), not autoregressive lead times. Headline claim = 00Z IC one-step;
+multi-hour panels are IC-hour sensitivity only.
 """
 from __future__ import annotations
 
@@ -17,7 +20,8 @@ JSON_PATH = REPO / "reports" / "TRACKB_T2M_EXPANDED.json"
 FIG_DIR = REPO / "reports" / "figures"
 OUT1 = FIG_DIR / "mvula_fig01_pipeline.png"
 OUT1_PUB = FIG_DIR / "mvula_fig01_pipeline_publication.png"
-OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"
+OUT2 = FIG_DIR / "mvula_fig02_t2m_lead_curves.png"  # IC-hour sensitivity (backup)
+OUT2_PRIMARY = FIG_DIR / "mvula_fig02_primary_00z_onestep.png"  # presentation headline
 OUT3 = FIG_DIR / "mvula_fig03_t2m_init_lead_heatmap.png"
 OUT6 = FIG_DIR / "mvula_fig06_t2m_plus12h_pathology.png"
 OUT7 = FIG_DIR / "mvula_fig07_t2m_seasonal.png"
@@ -29,6 +33,15 @@ BENCH_JSON = REPO / "reports" / "MVULA_LAPTOP_BENCHMARK.json"
 BASELINES_JSON = REPO / "reports" / "TRACKB_T2M_BASELINES.json"
 
 SEASON_ORDER = {"DJF": 0, "MAM": 1, "JJA": 2, "SON": 3}
+
+
+def lead_to_ic_hour(lead_h: int, init_hour: int = 0) -> int:
+    """AF protocol: IC at init+(L−6)h for a campaign with fixed init_hour (00Z → 0)."""
+    return (int(init_hour) + int(lead_h) - 6) % 24
+
+
+def ic_tick(lead_h: int, init_hour: int = 0) -> str:
+    return f"{lead_to_ic_hour(lead_h, init_hour):02d}Z"
 
 
 def fig1_pipeline() -> None:
@@ -68,15 +81,15 @@ def fig1_pipeline() -> None:
         {
             "x": 6.95,
             "title": "Evaluation",
-            "body": "Analysis-forced\n+6 / +12 / +18 / +24 h\n(IC at init+L−6h)",
-            "foot": "no free-run",
+            "body": "AF one-step only\n(+6 h native step)\nnot autoregressive",
+            "foot": "Case A / no free-run",
             "fc": "#e2efda",
             "ec": "#548235",
         },
         {
             "x": 9.15,
             "title": "Verify",
-            "body": "African t2m\nvs ARCO ERA5\n+ persistence / K1",
+            "body": "Headline: 00Z IC\nAfrican t2m one-step\n(+ IC-hour checks)",
             "foot": "n=61 inits",
             "fc": "#f4cccc",
             "ec": "#990000",
@@ -155,7 +168,7 @@ def fig1_pipeline() -> None:
         5.6,
         0.35,
         "Free-run / 10-day rollout is architecturally excluded (Cout=3, no 3→65 decoder). "
-        "Primary science metric: AF African t2m.",
+        "Primary metric: AF one-step African t2m from 00Z analysis IC (not AR lead skill).",
         ha="center",
         va="center",
         fontsize=8,
@@ -232,10 +245,10 @@ def fig1_pipeline_publication() -> None:
             "VERIFY",
             "C. African t2m verification",
             [
-                "Protocol: IC at init+(L−6) h → one +6 h step; leads L ∈ {6, 12, 18, 24} h",
-                "Domain: Africa · truth/IC: public ARCO ERA5 · n = 61 × 00Z inits (2023)",
-                "Metrics: cosine-latitude RMSE / ACC / bias (°C); baselines: AF persistence, K1",
-                "Headline: +6 h beats persistence (+41.8%); +12/+18 h failure regime",
+                "Protocol: analysis-forced one-step (native +6 h); not autoregressive rollout",
+                "Domain: Africa · ARCO ERA5 · n = 61 × 00Z inits (2023)",
+                "Headline claim: one-step from 00Z analysis IC (RMSE≈1.38 °C; +41.8% vs persistence)",
+                "Other labelled horizons = IC-hour sensitivity (06/12/18Z), not AR lead times",
             ],
             "#2E5A1C",
             "#F1F6ED",
@@ -376,7 +389,50 @@ def load_rows():
     return blob, student, k1
 
 
+def fig2_primary_00z(student, k1) -> None:
+    """Presentation headline: one-step AF skill from 00Z analysis IC only."""
+    rows = [r for r in student if int(r["lead_hours"]) == 6]
+    rmse = np.array([float(r["variables"]["t2m"]["student_rmse_vs_era5"]) for r in rows])
+    acc = np.array([float(r["variables"]["t2m"]["student_acc"]) for r in rows])
+    bias = np.array([float(r["variables"]["t2m"]["student_bias"]) for r in rows])
+    k1_rows = [r for r in k1 if int(r["lead_hours"]) == 6]
+    k1_rmse = (
+        float(np.mean([float(r["variables"]["t2m"]["rmse"]) for r in k1_rows])) if k1_rows else float("nan")
+    )
+
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 3.6), constrained_layout=True)
+    panels = [
+        (axes[0], "RMSE (°C)", float(rmse.mean()), float(rmse.std(ddof=1)), k1_rmse, "#1f4e79"),
+        (axes[1], "ACC", float(acc.mean()), float(acc.std(ddof=1)), None, "#2e5a1c"),
+        (axes[2], "Bias (°C)", float(bias.mean()), float(bias.std(ddof=1)), None, "#6b2d5c"),
+    ]
+    for ax, ylabel, mean, std, k1v, color in panels:
+        ax.bar([0], [mean], color=color, width=0.55, zorder=2)
+        ax.errorbar([0], [mean], yerr=[std], fmt="none", ecolor="#333333", capsize=4, zorder=3)
+        ax.set_xticks([0])
+        ax.set_xticklabels(["00Z IC\n→ one +6 h step"])
+        ax.set_ylabel(ylabel)
+        ax.grid(True, axis="y", alpha=0.3, zorder=0)
+        label = f"{mean:.3g}" if ylabel == "ACC" else f"{mean:.2f}"
+        ax.bar_label(ax.containers[0], labels=[label], padding=3, fontsize=10)
+        if k1v is not None and isinstance(k1v, (int, float)) and k1v == k1v:
+            ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, label=f"K1 RMSE={k1v:.2f} (n={len(k1_rows)})")
+            ax.legend(frameon=False, fontsize=7.5)
+
+    fig.suptitle(
+        "Fig. 2 (primary) — Headline result: analysis-forced one-step African t2m from 00Z IC\n"
+        f"Student v5 · n={len(rows)} inits (2023) · not an autoregressive lead-time score. "
+        "Error bars: ±1 std across inits.",
+        fontsize=9,
+        y=1.08,
+    )
+    fig.savefig(OUT2_PRIMARY, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {OUT2_PRIMARY}")
+
+
 def fig2_lead_curves(student, k1) -> None:
+    """Backup: one-step AF skill by analysis IC hour (00Z campaign)."""
     by_lead = defaultdict(list)
     for r in student:
         t = r["variables"]["t2m"]
@@ -384,6 +440,7 @@ def fig2_lead_curves(student, k1) -> None:
             (float(t["student_rmse_vs_era5"]), float(t["student_acc"]), float(t["student_bias"]))
         )
     leads = sorted(by_lead)
+    ticks = [ic_tick(L) for L in leads]
     rmse = np.array([np.mean([x[0] for x in by_lead[L]]) for L in leads])
     rmse_std = np.array([np.std([x[0] for x in by_lead[L]], ddof=1) for L in leads])
     acc = np.array([np.mean([x[1] for x in by_lead[L]]) for L in leads])
@@ -412,10 +469,11 @@ def fig2_lead_curves(student, k1) -> None:
     )
     if k1_leads:
         ax.plot(k1_leads, k1_rmse, "s--", color="#c45911", label=f"K1 teacher (n={len(k1_by[k1_leads[0]])})")
-    ax.set_xlabel("Lead time (h)")
+    ax.set_xlabel("Analysis IC hour (00Z campaign; one-step AF)")
     ax.set_ylabel("RMSE (°C)")
-    ax.set_title("African t2m RMSE vs lead")
+    ax.set_title("African t2m RMSE by IC hour")
     ax.set_xticks(leads)
+    ax.set_xticklabels(ticks)
     ax.grid(True, alpha=0.3)
     ax.legend(frameon=False, fontsize=8)
 
@@ -432,18 +490,19 @@ def fig2_lead_curves(student, k1) -> None:
     )
     if k1_leads:
         ax.plot(k1_leads, k1_acc, "s--", color="#c45911", label="K1 teacher")
-    ax.set_xlabel("Lead time (h)")
+    ax.set_xlabel("Analysis IC hour (00Z campaign; one-step AF)")
     ax.set_ylabel("ACC")
-    ax.set_title("African t2m ACC vs lead")
+    ax.set_title("African t2m ACC by IC hour")
     ax.set_xticks(leads)
+    ax.set_xticklabels(ticks)
     ax.set_ylim(0, 1.05)
     ax.grid(True, alpha=0.3)
     ax.legend(frameon=False, fontsize=8)
 
     fig.suptitle(
-        "Fig. 2 — Analysis-forced African t2m skill (Mvula student v5)\n"
-        "Protocol: IC at init+(L−6)h → one +6 h step; cosine-latitude metrics vs ARCO ERA5. "
-        "Shaded/error bars: ±1 std across inits.",
+        "Fig. 2 (backup) — One-step AF skill by analysis IC hour (not autoregressive lead time)\n"
+        "Each point: ERA5 IC at that hour → one +6 h step. 00Z = headline; 06Z column = cold-bias sensitivity. "
+        "Error bars: ±1 std across inits.",
         fontsize=9,
         y=1.08,
     )
@@ -453,10 +512,9 @@ def fig2_lead_curves(student, k1) -> None:
 
 
 def fig3_heatmap(student) -> None:
-    # One row per init, columns leads
+    # One row per init, columns = analysis IC hour
     inits = sorted({r["init_date"] for r in student})
     leads = sorted({r["lead_hours"] for r in student})
-    # order inits by season then date
     season_of = {}
     for r in student:
         season_of[r["init_date"]] = r["season"]
@@ -470,33 +528,29 @@ def fig3_heatmap(student) -> None:
 
     fig_h = max(6.5, 0.14 * len(inits))
     fig, ax = plt.subplots(figsize=(7.2, fig_h), constrained_layout=True)
-    # Clip colour scale so +12h ridge is visible without washing +6h
     vmax = float(np.nanpercentile(mat, 95))
-    # Low RMSE = blue, high RMSE = red (diverging blues/reds; +12 h failure lights up red).
     im = ax.imshow(mat, aspect="auto", cmap="RdBu_r", vmin=0.0, vmax=vmax, interpolation="nearest")
     ax.set_xticks(range(len(leads)))
-    ax.set_xticklabels([f"+{L}h" for L in leads])
-    # Season separators + sparse y labels
+    ax.set_xticklabels([ic_tick(L) for L in leads])
     ylabels = []
     for init in inits:
         ylabels.append(f"{init[4:6]}-{init[6:]} {season_of[init]}")
     step = max(1, len(inits) // 20)
     ax.set_yticks(range(0, len(inits), step))
     ax.set_yticklabels([ylabels[i] for i in range(0, len(inits), step)], fontsize=7)
-    ax.set_xlabel("Lead time")
-    ax.set_ylabel("Initialisation (MM-DD, season)")
+    ax.set_xlabel("Analysis IC hour (one-step AF)")
+    ax.set_ylabel("Initialisation date (MM-DD, season)")
     cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
     cbar.set_label("RMSE (°C)")
 
-    # Mark season boundaries
     seasons = [season_of[i] for i in inits]
     for i in range(1, len(seasons)):
         if seasons[i] != seasons[i - 1]:
             ax.axhline(i - 0.5, color="black", lw=0.8, alpha=0.7)
 
     ax.set_title(
-        "Fig. 3 — Init × lead African t2m RMSE scorecard (student v5, n=61)\n"
-        "Bright column at +12 h = systematic cold-bias failure mode (RMSE≈7.8 °C).",
+        "Fig. 3 — Init × analysis-IC-hour African t2m RMSE (student v5, n=61; one-step AF)\n"
+        "Bright 06Z column = systematic cold-bias sensitivity (not AR +12 h lead skill).",
         fontsize=9,
     )
     fig.savefig(OUT3, dpi=160, bbox_inches="tight")
@@ -525,7 +579,7 @@ def fig6_plus12_pathology(student) -> None:
     ax.axvline(biases.mean(), color="#c45911", ls="--", lw=1.5, label=f"mean={biases.mean():.2f} °C")
     ax.set_xlabel("Bias (°C)  (student − ERA5)")
     ax.set_ylabel("Count of inits")
-    ax.set_title("+12 h bias distribution (n=61)")
+    ax.set_title("06Z-IC one-step bias (n=61)")
     ax.legend(frameon=False, fontsize=8)
     ax.grid(True, alpha=0.3, axis="y")
 
@@ -538,13 +592,13 @@ def fig6_plus12_pathology(student) -> None:
         patch.set_alpha(0.85)
     ax.axhline(0.0, color="black", lw=0.8, alpha=0.5)
     ax.set_ylabel("Bias (°C)")
-    ax.set_title("+12 h bias by season")
+    ax.set_title("06Z-IC bias by season")
     ax.grid(True, alpha=0.3, axis="y")
 
     fig.suptitle(
-        "Fig. 6 — +12 h African t2m cold-bias pathology (student v5)\n"
+        "Fig. 6 — 06Z analysis-IC one-step cold-bias pathology (student v5)\n"
         f"All {len(biases)} inits are cold (bias ∈ [{biases.min():.2f}, {biases.max():.2f}] K); "
-        f"mean RMSE={rmses.mean():.2f} °C. Likely diurnal / lead-conditioned AF failure, not random noise.",
+        f"mean RMSE={rmses.mean():.2f} °C. Time-of-day / IC-hour sensitivity under AF — not AR lead error.",
         fontsize=9,
         y=1.06,
     )
@@ -593,12 +647,12 @@ def fig7_seasonal(student) -> None:
     m6, s6 = zip(*[_mean_std(metrics[(s, 6)]["rmse"]) for s in seasons])
     m24, s24 = zip(*[_mean_std(metrics[(s, 24)]["rmse"]) for s in seasons])
     n6 = [len(metrics[(s, 6)]["rmse"]) for s in seasons]
-    bars1 = ax.bar(x - width / 2, m6, width, yerr=s6, capsize=3, color=c6, label="+6 h", ecolor="#8faadc")
-    bars2 = ax.bar(x + width / 2, m24, width, yerr=s24, capsize=3, color=c24, label="+24 h", ecolor="#f4b183")
+    bars1 = ax.bar(x - width / 2, m6, width, yerr=s6, capsize=3, color=c6, label="00Z IC", ecolor="#8faadc")
+    bars2 = ax.bar(x + width / 2, m24, width, yerr=s24, capsize=3, color=c24, label="18Z IC", ecolor="#f4b183")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{s}\n(n={n})" for s, n in zip(seasons, n6)])
     ax.set_ylabel("RMSE (°C)")
-    ax.set_title("African t2m RMSE by season")
+    ax.set_title("African t2m RMSE by season (one-step AF)")
     ax.legend(frameon=False, fontsize=8)
     ax.grid(True, axis="y", alpha=0.3)
     ax.bar_label(bars1, fmt="%.2f", padding=2, fontsize=7)
@@ -608,13 +662,13 @@ def fig7_seasonal(student) -> None:
     ax = axes[1]
     a6, as6 = zip(*[_mean_std(metrics[(s, 6)]["acc"]) for s in seasons])
     a24, as24 = zip(*[_mean_std(metrics[(s, 24)]["acc"]) for s in seasons])
-    ax.bar(x - width / 2, a6, width, yerr=as6, capsize=3, color=c6, label="+6 h", ecolor="#8faadc")
-    ax.bar(x + width / 2, a24, width, yerr=as24, capsize=3, color=c24, label="+24 h", ecolor="#f4b183")
+    ax.bar(x - width / 2, a6, width, yerr=as6, capsize=3, color=c6, label="00Z IC", ecolor="#8faadc")
+    ax.bar(x + width / 2, a24, width, yerr=as24, capsize=3, color=c24, label="18Z IC", ecolor="#f4b183")
     ax.set_xticks(x)
     ax.set_xticklabels(seasons)
     ax.set_ylabel("ACC")
     ax.set_ylim(0.6, 1.02)
-    ax.set_title("African t2m ACC by season")
+    ax.set_title("African t2m ACC by season (one-step AF)")
     ax.legend(frameon=False, fontsize=8)
     ax.grid(True, axis="y", alpha=0.3)
     for i, (v6, v24) in enumerate(zip(a6, a24)):
@@ -624,8 +678,9 @@ def fig7_seasonal(student) -> None:
     growth = [100.0 * (m24[i] / m6[i] - 1.0) for i in range(len(seasons))]
     growth_txt = ", ".join(f"{s} +{g:.0f}%" for s, g in zip(seasons, growth))
     fig.suptitle(
-        "Fig. 7 — Seasonal African t2m skill at +6 h vs +24 h (student v5)\n"
-        f"+6 h stays strong in all seasons; +24 h RMSE growth: {growth_txt}. Error bars: ±1 std across inits.",
+        "Fig. 7 — Seasonal one-step AF skill: 00Z IC vs 18Z IC (student v5)\n"
+        f"00Z IC stays strong in all seasons; 18Z IC RMSE growth vs 00Z: {growth_txt}. "
+        "Not AR +6/+24 h lead skill. Error bars: ±1 std across inits.",
         fontsize=9,
         y=1.08,
     )
@@ -697,19 +752,20 @@ def fig8_baselines() -> None:
             lw=1.4,
             label="Climatology (MM–DD HH)",
         )
-    ax.set_xlabel("Lead time (h)")
+    ax.set_xlabel("Analysis IC hour (one-step AF)")
     ax.set_ylabel("RMSE (°C)")
     ax.set_xticks(leads)
-    ax.set_title("RMSE: persistence → Mvula → K1")
+    ax.set_xticklabels([ic_tick(L) for L in leads])
+    ax.set_title("RMSE by IC hour: persistence → Mvula → K1")
     ax.grid(True, alpha=0.3)
     ax.legend(frameon=False, fontsize=8)
 
     ax = axes[1]
     skills = [100.0 * float(skill[str(L)]["student_skill_vs_persistence_af"]) for L in leads]
     colors = ["#1f4e79" if s > 0 else "#c00000" for s in skills]
-    bars = ax.bar([f"+{L}" for L in leads], skills, color=colors, width=0.55, zorder=2)
+    bars = ax.bar([ic_tick(L) for L in leads], skills, color=colors, width=0.55, zorder=2)
     ax.axhline(0.0, color="black", lw=0.8, zorder=1)
-    ax.set_xlabel("Lead time (h)")
+    ax.set_xlabel("Analysis IC hour (one-step AF)")
     ax.set_ylabel("Skill vs AF persistence (%)")
     ax.set_title("Relative skill  1 − RMSE$_\\mathrm{stu}$ / RMSE$_\\mathrm{pers}$")
     ax.grid(True, axis="y", alpha=0.3, zorder=0)
@@ -720,8 +776,8 @@ def fig8_baselines() -> None:
 
     ax.legend(
         handles=[
-            Patch(facecolor="#1f4e79", edgecolor="none", label="Beats persistence (useful / recovery)"),
-            Patch(facecolor="#c00000", edgecolor="none", label="Worse than persistence (failure regime)"),
+            Patch(facecolor="#1f4e79", edgecolor="none", label="Beats persistence (useful)"),
+            Patch(facecolor="#c00000", edgecolor="none", label="Worse than persistence (IC-hour failure)"),
         ],
         frameon=True,
         fancybox=False,
@@ -733,9 +789,9 @@ def fig8_baselines() -> None:
     ax.set_ylim(min(skills) - y_pad, max(skills) + y_pad)
 
     fig.suptitle(
-        "Fig. 8 — Student skill relative to analysis-forced persistence\n"
-        "AF persistence: T̂(valid)=T(IC), IC=init+(L−6)h (matched to student protocol). "
-        "Positive % ⇒ student extracts useful state information beyond copying the analysis.",
+        "Fig. 8 — One-step AF skill vs persistence by analysis IC hour (not AR lead time)\n"
+        "AF persistence: T̂(valid)=T(IC). Positive % ⇒ useful state information beyond copying the analysis. "
+        "Headline claim uses 00Z only.",
         fontsize=9,
         y=1.08,
     )
@@ -800,6 +856,7 @@ def main() -> None:
     fig1_pipeline()
     fig1_pipeline_publication()
     _blob, student, k1 = load_rows()
+    fig2_primary_00z(student, k1)
     fig2_lead_curves(student, k1)
     fig3_heatmap(student)
     fig6_plus12_pathology(student)

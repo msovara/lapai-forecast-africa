@@ -265,6 +265,10 @@ def write_lead_spatial_figures(
     figures_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, str] = {}
 
+    # 00Z campaign AF map: lead L ↔ analysis IC hour (L−6) % 24
+    ic_hour = (int(lead) - 6) % 24
+    ic_lab = f"{ic_hour:02d}Z"
+
     bias_vmax = float(np.nanpercentile(np.abs(mean_bias), 98))
     bias_vmax = max(0.5, float(np.ceil(bias_vmax * 2) / 2))  # neat 0.5 °C steps
     rmse_vmax = float(np.nanpercentile(mean_rmse, 98))
@@ -292,7 +296,7 @@ def write_lead_spatial_figures(
             cmap=cmap,
             vmin=vmin,
             vmax=vmax,
-            title=f"Student v5 t2m {kind} · Africa · +{lead} h (n={n_inits})",
+            title=f"Student v5 t2m {kind} · Africa · {ic_lab} IC one-step (n={n_inits})",
             cbar_label=label,
             add_colorbar=True,
         )
@@ -332,7 +336,7 @@ def write_lead_spatial_figures(
             cmap="RdBu_r",
             vmin=-bias_vmax,
             vmax=bias_vmax,
-            title=f"Mean bias · +{lead} h",
+            title=f"Mean bias · {ic_lab} IC (one-step)",
             panel_label="a",
             add_colorbar=False,
             left_labels=True,
@@ -346,7 +350,7 @@ def write_lead_spatial_figures(
             cmap="YlOrRd",
             vmin=0.0,
             vmax=rmse_vmax,
-            title=f"RMSE · +{lead} h",
+            title=f"RMSE · {ic_lab} IC (one-step)",
             panel_label="b",
             add_colorbar=False,
             left_labels=False,
@@ -385,7 +389,8 @@ def write_lead_spatial_figures(
             )
 
         fig.suptitle(
-            f"African t2m spatial verification · student v5 · +{lead} h (n={n_inits} inits, 2023)",
+            f"African t2m spatial verification · student v5 · {ic_lab} analysis IC (one-step AF) "
+            f"(n={n_inits} inits, 2023)",
             fontsize=11,
             fontweight="bold",
             y=0.98,
@@ -432,12 +437,12 @@ def write_quad_spatial_figure(
     rmse_vmax = float(np.nanpercentile(np.concatenate([rmse_6.ravel(), rmse_24.ravel()]), 98))
     rmse_vmax = max(0.5, float(np.ceil(rmse_vmax * 2) / 2))
 
-    # Rows = metric (bias, RMSE); columns = lead (+6 h, +24 h)
+    # Rows = metric (bias, RMSE); columns = analysis IC hour (00Z / 18Z for 00Z campaign)
     panels = (
-        (bias_6, "RdBu_r", -bias_vmax, bias_vmax, "a", "Mean bias · +6 h"),
-        (bias_24, "RdBu_r", -bias_vmax, bias_vmax, "b", "Mean bias · +24 h"),
-        (rmse_6, "YlOrRd", 0.0, rmse_vmax, "c", "RMSE · +6 h"),
-        (rmse_24, "YlOrRd", 0.0, rmse_vmax, "d", "RMSE · +24 h"),
+        (bias_6, "RdBu_r", -bias_vmax, bias_vmax, "a", "Mean bias · 00Z IC (one-step)"),
+        (bias_24, "RdBu_r", -bias_vmax, bias_vmax, "b", "Mean bias · 18Z IC (one-step)"),
+        (rmse_6, "YlOrRd", 0.0, rmse_vmax, "c", "RMSE · 00Z IC (one-step)"),
+        (rmse_24, "YlOrRd", 0.0, rmse_vmax, "d", "RMSE · 18Z IC (one-step)"),
     )
 
     fig_w, fig_h = 10.4, 8.6
@@ -500,7 +505,7 @@ def write_quad_spatial_figure(
     cbar_r.ax.tick_params(labelsize=8)
 
     fig.suptitle(
-        f"African t2m spatial verification · student v5 · +6 h / +24 h "
+        f"African t2m spatial verification · student v5 · 00Z vs 18Z analysis IC (one-step AF) "
         f"(n={n_inits} inits, 2023)",
         fontsize=12,
         fontweight="bold",

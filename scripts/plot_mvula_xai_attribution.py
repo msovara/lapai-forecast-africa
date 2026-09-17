@@ -259,21 +259,21 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     ax3.bar(x + w / 2, bias_vals, w, label="Bias (°C)", color="#2e75b6")
     ax3.axhline(0.0, color="gray", lw=0.8)
     ax3.set_xticks(x)
-    ax3.set_xticklabels([f"+{L} h" for L in leads])
+    ax3.set_xticklabels(["00Z", "06Z", "12Z", "18Z"])
     ax3.set_ylabel("°C")
-    ax3.set_title("(d) Why +12 h fails (packaged AF skill)")
+    ax3.set_title("(d) 06Z-IC pathology (one-step AF skill by IC hour)")
     ax3.legend(fontsize=8, loc="upper right")
     if biases12.size:
         note = (
-            f"At +12 h: mean bias {biases12.mean():.2f} °C; "
+            f"At 06Z IC: mean bias {biases12.mean():.2f} °C; "
             f"all {biases12.size}/{biases12.size} inits cold "
             f"[{biases12.min():.2f}, {biases12.max():.2f}].\n"
-            "AF IC is 06Z for 00Z inits → diurnal / lead-conditioned error,\n"
-            "not random noise. Network is most sensitive to mid-level T/q/z."
+            "One-step AF from 06Z analysis — time-of-day / IC-hour sensitivity,\n"
+            "not autoregressive +12 h lead skill. Network most sensitive to T/q/z."
         )
     else:
         note = (
-            "+12 h is a systematic cold-bias failure regime (see TRACKB_T2M_EXPANDED).\n"
+            "06Z-IC one-step cold-bias regime (see TRACKB_T2M_EXPANDED).\n"
             "Attribution uses climate+noise IC (ARCO diurnal ICs optional next step)."
         )
     ax3.text(
@@ -288,7 +288,7 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     )
 
     fig.suptitle(
-        "Fig. 11 — Mvula v5 explainability: what drives African 2t, and why +12 h fails",
+        "Fig. 11 — Mvula v5 explainability: what drives African 2t, and 06Z-IC one-step pathology",
         fontsize=12,
         fontweight="bold",
         y=0.98,
