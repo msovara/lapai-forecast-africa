@@ -426,7 +426,7 @@ def fig2_primary_00z(student, k1) -> None:
         else:
             ax.set_ylim(0.0, top + 0.28)
         label = f"{mean:.3g}" if ylabel == "ACC" else f"{mean:.2f}"
-        # Offset value to the right of the bar so it clears the error bar / fill
+        # Numeric value above/right of the bar, clear of the error bar
         if ylabel.startswith("Bias"):
             y_text = max(0.0, top) + 0.04
         elif ylabel == "ACC":
@@ -436,7 +436,7 @@ def fig2_primary_00z(student, k1) -> None:
         ax.annotate(
             label,
             xy=(0, mean),
-            xytext=(0.28, y_text),
+            xytext=(0.32, y_text),
             fontsize=10,
             ha="left",
             va="bottom",
@@ -444,17 +444,18 @@ def fig2_primary_00z(student, k1) -> None:
         )
         if k1v is not None and isinstance(k1v, (int, float)) and k1v == k1v:
             ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, zorder=1)
-            # Place K1 note clear of the bar and left spine
-            ax.text(
-                0.98,
-                0.98,
-                f"K1 RMSE={k1v:.2f} (n={len(k1_rows)})",
-                transform=ax.transAxes,
-                ha="right",
-                va="top",
+            # Anchor K1 label on the dashed line, left of the bar (not top-right)
+            ax.annotate(
+                f"K1={k1v:.2f} (n={len(k1_rows)})",
+                xy=(-0.22, k1v),
+                xytext=(-0.68, k1v + 0.06),
                 fontsize=7.5,
                 color="#c45911",
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.9),
+                ha="left",
+                va="bottom",
+                arrowprops=dict(arrowstyle="-", color="#c45911", lw=0.8),
+                bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor="none", alpha=0.95),
+                annotation_clip=False,
             )
 
     fig.suptitle(
