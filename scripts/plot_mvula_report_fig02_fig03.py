@@ -444,13 +444,13 @@ def fig2_primary_00z(student, k1) -> None:
         )
         if k1v is not None and isinstance(k1v, (int, float)) and k1v == k1v:
             ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, zorder=1)
-            # Place K1 note outside the bar (upper-left), not over the fill
+            # Place K1 note clear of the bar and left spine
             ax.text(
-                0.02,
+                0.98,
                 0.98,
                 f"K1 RMSE={k1v:.2f} (n={len(k1_rows)})",
                 transform=ax.transAxes,
-                ha="left",
+                ha="right",
                 va="top",
                 fontsize=7.5,
                 color="#c45911",
