@@ -28,6 +28,7 @@ reports/**/*.html
 !reports/DRAFT_PAPER_MVULA_V5.pdf
 # Packaged publication figures (already tracked / needed for paper + README)
 !reports/figures/
+!reports/figures/**
 
 # --- Python ---
 __pycache__/
