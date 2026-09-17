@@ -14,6 +14,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 REPO = Path(__file__).resolve().parents[1]
 JSON_PATH = REPO / "reports" / "TRACKB_T2M_EXPANDED.json"
@@ -400,12 +402,13 @@ def fig2_primary_00z(student, k1) -> None:
         float(np.mean([float(r["variables"]["t2m"]["rmse"]) for r in k1_rows])) if k1_rows else float("nan")
     )
 
-    fig, axes = plt.subplots(1, 3, figsize=(10.2, 3.8), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 4.0), constrained_layout=True)
     panels = [
         (axes[0], "RMSE (°C)", float(rmse.mean()), float(rmse.std(ddof=1)), k1_rmse, "#1f4e79"),
         (axes[1], "ACC", float(acc.mean()), float(acc.std(ddof=1)), None, "#2e5a1c"),
         (axes[2], "Bias (°C)", float(bias.mean()), float(bias.std(ddof=1)), None, "#6b2d5c"),
     ]
+    k1_handle = None
     for ax, ylabel, mean, std, k1v, color in panels:
         ax.bar([0], [mean], color=color, width=0.45, zorder=2)
         ax.errorbar([0], [mean], yerr=[std], fmt="none", ecolor="#333333", capsize=4, zorder=3)
@@ -443,20 +446,37 @@ def fig2_primary_00z(student, k1) -> None:
             annotation_clip=False,
         )
         if k1v is not None and isinstance(k1v, (int, float)) and k1v == k1v:
-            ax.axhline(k1v, color="#c45911", ls="--", lw=1.4, zorder=1)
-            # Anchor K1 label on the dashed line, left of the bar (not top-right)
-            ax.annotate(
-                f"K1={k1v:.2f} (n={len(k1_rows)})",
-                xy=(-0.22, k1v),
-                xytext=(-0.68, k1v + 0.06),
-                fontsize=7.5,
+            k1_handle = ax.axhline(
+                k1v,
                 color="#c45911",
-                ha="left",
-                va="bottom",
-                arrowprops=dict(arrowstyle="-", color="#c45911", lw=0.8),
-                bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor="none", alpha=0.95),
-                annotation_clip=False,
+                ls="--",
+                lw=1.4,
+                zorder=1,
+                label=f"K1 teacher (RMSE={k1v:.2f}, n={len(k1_rows)})",
             )
+
+    legend_handles = [
+        Patch(facecolor="#1f4e79", edgecolor="none", label="Student v5 (bars)"),
+    ]
+    if k1_handle is not None:
+        legend_handles.append(
+            Line2D(
+                [0],
+                [0],
+                color="#c45911",
+                ls="--",
+                lw=1.4,
+                label=k1_handle.get_label(),
+            )
+        )
+    fig.legend(
+        handles=legend_handles,
+        loc="lower center",
+        ncol=2,
+        frameon=False,
+        fontsize=9,
+        bbox_to_anchor=(0.5, -0.02),
+    )
 
     fig.suptitle(
         "Fig. 2 (primary) — Headline result: analysis-forced one-step African t2m from 00Z IC\n"
