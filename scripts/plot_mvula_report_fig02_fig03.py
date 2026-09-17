@@ -47,134 +47,205 @@ def ic_tick(lead_h: int, init_hour: int = 0) -> str:
 
 
 def fig1_pipeline() -> None:
-    """Scientific pathway schematic (not a CNN layer diagram)."""
-    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+    """Full train→verify schematic with AF one-step / IC-hour framing (Mario)."""
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
-    fig, ax = plt.subplots(figsize=(11.2, 3.8))
-    ax.set_xlim(0, 11.2)
-    ax.set_ylim(0, 3.8)
+    fig, ax = plt.subplots(figsize=(13.2, 9.0), dpi=160)
+    ax.set_xlim(0, 13.2)
+    ax.set_ylim(0, 9.0)
     ax.axis("off")
 
-    stages = [
-        {
-            "x": 0.35,
-            "title": "Teacher",
-            "body": "K1 GraphTransformer\n(pruned Anemoi GT)",
-            "foot": "~52.8 MiB",
-            "fc": "#fce4d6",
-            "ec": "#c45911",
-        },
-        {
-            "x": 2.55,
-            "title": "Distillation",
-            "body": "Knowledge distill\nteacher → student",
-            "foot": "Track B train",
-            "fc": "#fff2cc",
-            "ec": "#bf8f00",
-        },
-        {
-            "x": 4.75,
-            "title": "Student v5",
-            "body": "InceptionNeXt CNN\nCin=65 → Cout=3\n(tp, msl, 2t)",
-            "foot": "8.8 MiB · Case A",
-            "fc": "#ddebf7",
-            "ec": "#1f4e79",
-        },
-        {
-            "x": 6.95,
-            "title": "Evaluation",
-            "body": "AF one-step only\n(+6 h native step)\nnot autoregressive",
-            "foot": "Case A / no free-run",
-            "fc": "#e2efda",
-            "ec": "#548235",
-        },
-        {
-            "x": 9.15,
-            "title": "Verify",
-            "body": "Headline: 00Z IC\nAfrican t2m one-step\n(+ IC-hour checks)",
-            "foot": "n=61 inits",
-            "fc": "#f4cccc",
-            "ec": "#990000",
-        },
-    ]
+    def box(x, y, w, h, fc, ec, lw=1.4, rs=0.06, z=2):
+        p = FancyBboxPatch(
+            (x, y),
+            w,
+            h,
+            boxstyle=f"round,pad=0.01,rounding_size={rs}",
+            linewidth=lw,
+            edgecolor=ec,
+            facecolor=fc,
+            zorder=z,
+        )
+        ax.add_patch(p)
+        return p
 
-    box_w, box_h = 1.85, 2.15
-    y0 = 0.95
+    def txt(x, y, s, **kw):
+        ax.text(x, y, s, zorder=3, **kw)
 
-    for i, st in enumerate(stages):
-        box = FancyBboxPatch(
-            (st["x"], y0),
-            box_w,
-            box_h,
-            boxstyle="round,pad=0.03,rounding_size=0.08",
-            linewidth=1.6,
-            edgecolor=st["ec"],
-            facecolor=st["fc"],
-            mutation_aspect=0.8,
-        )
-        ax.add_patch(box)
-        ax.text(
-            st["x"] + box_w / 2,
-            y0 + box_h - 0.28,
-            st["title"],
-            ha="center",
-            va="top",
-            fontsize=10,
-            fontweight="bold",
-            color=st["ec"],
-        )
-        ax.text(
-            st["x"] + box_w / 2,
-            y0 + box_h / 2 - 0.05,
-            st["body"],
-            ha="center",
-            va="center",
-            fontsize=8,
-            color="#333333",
-            linespacing=1.25,
-        )
-        ax.text(
-            st["x"] + box_w / 2,
-            y0 + 0.18,
-            st["foot"],
-            ha="center",
-            va="bottom",
-            fontsize=7.5,
-            style="italic",
-            color="#555555",
-        )
-        if i < len(stages) - 1:
-            x1 = st["x"] + box_w + 0.05
-            x2 = stages[i + 1]["x"] - 0.05
-            arr = FancyArrowPatch(
-                (x1, y0 + box_h / 2),
-                (x2, y0 + box_h / 2),
+    def arrow(x1, y1, x2, y2, color="#555555"):
+        ax.add_patch(
+            FancyArrowPatch(
+                (x1, y1),
+                (x2, y2),
                 arrowstyle="-|>",
-                mutation_scale=14,
-                linewidth=1.4,
-                color="#666666",
+                mutation_scale=12,
+                linewidth=1.3,
+                color=color,
+                zorder=2,
             )
-            ax.add_patch(arr)
+        )
 
-    ax.text(
-        5.6,
-        3.45,
-        "Fig. 1 — Mvula scientific pipeline (learn → verify)",
+    # Title
+    txt(
+        6.4,
+        8.72,
+        "Fig. 1 — Mvula v5: train → freeze → analysis-forced one-step verification",
         ha="center",
         va="center",
-        fontsize=11,
+        fontsize=12,
         fontweight="bold",
         color="#1f4e79",
     )
-    ax.text(
-        5.6,
-        0.35,
-        "Free-run / 10-day rollout is architecturally excluded (Cout=3, no 3→65 decoder). "
-        "Primary metric: AF one-step African t2m from 00Z analysis IC (not AR lead skill).",
+
+    # ---- Training / distillation ----
+    txt(0.25, 8.35, "TRAINING / DISTILLATION  (not held-out)", ha="left", va="center",
+        fontsize=8.5, fontweight="bold", color="#555555")
+    box(0.25, 7.35, 3.5, 0.85, "#d6eaf8", "#2874a6")
+    txt(2.0, 7.95, "2020–2021 ERA5 + K1 teacher targets", ha="center", va="center",
+        fontsize=8, fontweight="bold", color="#1a5276")
+    txt(2.0, 7.62, "teacher_k1_cache_full2020_2021.zarr\nAfrica-weighted training",
+        ha="center", va="center", fontsize=7, color="#333333", linespacing=1.2)
+
+    arrow(3.85, 7.77, 4.25, 7.77)
+    box(4.35, 7.35, 3.7, 0.85, "#e8daef", "#7d3c98")
+    txt(6.2, 7.95, "CNN DISTILLATION  (InceptionNeXt student)", ha="center", va="center",
+        fontsize=8, fontweight="bold", color="#5b2c6f")
+    txt(6.2, 7.62, "Cin=65 → Cout=3  (tp, msl, 2t)\nKnowledge distill from K1",
+        ha="center", va="center", fontsize=7, color="#333333", linespacing=1.2)
+
+    arrow(8.15, 7.77, 8.55, 7.77)
+    box(8.65, 7.35, 2.55, 0.85, "#d5f5e3", "#1e8449")
+    txt(9.92, 7.95, "MVULA v5  [FROZEN]", ha="center", va="center",
+        fontsize=8.5, fontweight="bold", color="#145a32")
+    txt(9.92, 7.58, "student_global_stable_v5.ckpt\n2.17 M params · 8.8 MiB",
+        ha="center", va="center", fontsize=7, color="#333333", linespacing=1.2)
+
+    # Sidebar: on-cache gate
+    box(11.35, 7.35, 1.6, 0.85, "#fdebd0", "#b9770e", lw=1.1)
+    txt(12.15, 7.95, "ON-CACHE\nMVP GATE", ha="center", va="center",
+        fontsize=7, fontweight="bold", color="#7e5109", linespacing=1.15)
+    txt(12.15, 7.55, "Same 2020–21\ncache · not for\nfinal claims",
+        ha="center", va="center", fontsize=6, color="#333333", linespacing=1.15)
+
+    # ---- Held-out ----
+    txt(0.25, 7.05, "HELD-OUT / VERIFICATION DATA", ha="left", va="center",
+        fontsize=8.5, fontweight="bold", color="#555555")
+    box(0.25, 5.95, 10.95, 0.95, "#d4e6f1", "#1f618d")
+    txt(2.2, 6.70, "2023 ERA5 (ARCO)", ha="center", va="center",
+        fontsize=9, fontweight="bold", color="#1a5276")
+
+    box(0.45, 6.08, 5.3, 0.55, "#eaf2f8", "#5dade2", lw=1.0, rs=0.04)
+    txt(3.1, 6.42, "Expanded production campaign", ha="center", va="center",
+        fontsize=7.5, fontweight="bold", color="#1a5276")
+    txt(3.1, 6.18, "61 × 00Z inits · DJF/MAM/JJA/SON · 2023-01-01 → 2023-10-30",
+        ha="center", va="center", fontsize=6.5, color="#333333")
+
+    box(5.9, 6.08, 5.05, 0.55, "#eaf2f8", "#5dade2", lw=1.0, rs=0.04)
+    txt(8.42, 6.42, "Jan-2023 pilot (OOS gate)", ha="center", va="center",
+        fontsize=7.5, fontweight="bold", color="#1a5276")
+    txt(8.42, 6.18, "Weekly 00Z · dates 1/8/15/22/29 · used for early gates",
+        ha="center", va="center", fontsize=6.5, color="#333333")
+
+    box(11.35, 5.95, 1.6, 0.95, "#fdebd0", "#b9770e", lw=1.1)
+    txt(12.15, 6.65, "K1 TEACHER\nCOMPARE", ha="center", va="center",
+        fontsize=7, fontweight="bold", color="#7e5109", linespacing=1.15)
+    txt(12.15, 6.20, "Limited n=3\nJan 2023 dates\nwhere scored",
+        ha="center", va="center", fontsize=6, color="#333333", linespacing=1.15)
+
+    # ---- AF protocol ----
+    txt(0.25, 5.65, "ANALYSIS-FORCED VERIFICATION PROTOCOL  (all columns)",
+        ha="left", va="center", fontsize=8.5, fontweight="bold", color="#555555")
+    txt(
+        0.25,
+        5.38,
+        "Not a free-running rollout. Each column = one native +6 h step from a fresh ERA5 analysis IC "
+        "(IC-hour sensitivity for a 00Z campaign — not autoregressive lead time).",
+        ha="left",
+        va="center",
+        fontsize=7,
+        color="#922b21",
+        style="italic",
+    )
+
+    # Protocol outer frame
+    box(0.25, 2.55, 10.95, 2.70, "#f8f9f9", "#7f8c8d", lw=1.2, rs=0.05, z=1)
+
+    ic_cols = [
+        ("00Z IC", "#27ae60", "#e8f8f5", "IC = ERA5 at t (00Z)", "→ ERA5 at t+6 h"),
+        ("06Z IC", "#e67e22", "#fef5e7", "IC = ERA5 at t+6 h", "→ ERA5 at t+12 h"),
+        ("12Z IC", "#c0392b", "#fdedec", "IC = ERA5 at t+12 h", "→ ERA5 at t+18 h"),
+        ("18Z IC", "#8e44ad", "#f5eef8", "IC = ERA5 at t+18 h", "→ ERA5 at t+24 h"),
+    ]
+    col_w = 2.55
+    x0 = 0.45
+    y_head = 4.85
+    for i, (title, ec, fc, ic_line, ver_line) in enumerate(ic_cols):
+        x = x0 + i * (col_w + 0.12)
+        box(x, y_head, col_w, 0.32, fc, ec, lw=1.5, rs=0.03)
+        txt(x + col_w / 2, y_head + 0.16, title, ha="center", va="center",
+            fontsize=8, fontweight="bold", color=ec)
+
+        # three stacked cells
+        rows = [
+            (4.35, "1. Re-IC from ERA5", ic_line),
+            (3.70, "2. Student +6 h step", "Mvula v5 · one native step"),
+            (3.05, "3. Verify vs ERA5", ver_line),
+        ]
+        for y, head, body in rows:
+            box(x, y, col_w, 0.58, "#ffffff", ec, lw=1.0, rs=0.03)
+            txt(x + col_w / 2, y + 0.40, head, ha="center", va="center",
+                fontsize=6.8, fontweight="bold", color="#2c3e50")
+            txt(x + col_w / 2, y + 0.16, body, ha="center", va="center",
+                fontsize=6.3, color="#333333")
+
+    # Sidebar mental model
+    box(11.35, 2.55, 1.6, 2.70, "#eaecee", "#566573", lw=1.1)
+    txt(12.15, 5.00, "QUICK\nMENTAL MODEL", ha="center", va="center",
+        fontsize=7, fontweight="bold", color="#2c3e50", linespacing=1.15)
+    txt(
+        12.15,
+        3.85,
+        "Train: 2020–21\n\nHeld-out: 2023\n\nProtocol:\nAF re-IC\none-step\n(Cout=3)\n\nNot free-run\nNo AR error\naccumulation",
         ha="center",
         va="center",
-        fontsize=8,
-        color="#444444",
+        fontsize=6.2,
+        color="#333333",
+        linespacing=1.25,
+    )
+
+    # ---- Evaluation ----
+    txt(0.25, 2.25, "EVALUATION", ha="left", va="center",
+        fontsize=8.5, fontweight="bold", color="#555555")
+    box(0.25, 1.15, 10.95, 0.95, "#d6eaf8", "#2874a6")
+    txt(1.6, 1.85, "AFRICA T2M\nPRIMARY", ha="center", va="center",
+        fontsize=8, fontweight="bold", color="#1a5276", linespacing=1.15)
+    txt(
+        6.5,
+        1.62,
+        "RMSE (°C) · ACC · Bias (°C) · vs AF persistence · gap to K1\n"
+        "Headline claim = 00Z IC one-step · other columns = IC-hour sensitivity (06/12/18Z)",
+        ha="center",
+        va="center",
+        fontsize=7.5,
+        color="#1a5276",
+        linespacing=1.35,
+    )
+
+    # Takeaway
+    ax.add_patch(
+        Rectangle((0.25, 0.25), 12.7, 0.70, fill=False, ls="--", lw=1.3, edgecolor="#7f8c8d", zorder=2)
+    )
+    txt(
+        6.6,
+        0.60,
+        "Key takeaway: Mvula v5 is trained on 2020–2021, frozen, then scored out-of-sample on 2023 ERA5 "
+        "with analysis-forced one-step (+6 h) forecasts.\n"
+        "Columns differ by analysis IC hour — not by autoregressive lead. True AR needs predicted full state + forcings.",
+        ha="center",
+        va="center",
+        fontsize=7.2,
+        color="#2c3e50",
+        linespacing=1.35,
     )
 
     fig.savefig(OUT1, dpi=170, bbox_inches="tight", facecolor="white")
