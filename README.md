@@ -132,6 +132,10 @@ Source code in this repository is licensed under the [Apache License 2.0](LICENS
 - **Student checkpoint** (`models/student_global_stable_v5.ckpt`): provided for research and evaluation; redistribution for NMHS / research use is intended to be permissive. Third-party **teacher** weights (e.g. AIFS) remain under their original licences and terms.
 - See also [`NOTICE`](NOTICE) for attribution.
 
+## AI-assisted development
+
+Portions of the software development and documentation process were assisted by AI coding tools (including [Cursor](https://cursor.com/)). All generated or modified code remains subject to human review, testing and validation by the project team. AI assistance does not constitute scientific validation; reported results are based on the documented experimental protocol and evaluation.
+
 ## Acknowledgements
 
 - **Cassava AI Factory** ([Cassava Technologies](https://www.cassava.ai/)) — GPU access for student training, AF evaluation, and related workloads.

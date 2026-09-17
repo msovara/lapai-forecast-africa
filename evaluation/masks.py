@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
-import torch
+
+if TYPE_CHECKING:
+    import torch
 
 # Original Track A / Phase 0 Africa box (config/domains.yaml, lon east to 55E).
 AFRICA_LAT: Tuple[float, float] = (-40.0, 40.0)
@@ -58,18 +60,24 @@ def lat_lon_to_indices(
     return slice(int(lat_idx.min()), int(lat_idx.max()) + 1), slice(int(lon_idx.min()), int(lon_idx.max()) + 1)
 
 
-def africa_crop(tensor_nchw: torch.Tensor, lat_slice: slice, lon_slice: slice) -> torch.Tensor:
+def africa_crop(tensor_nchw: "torch.Tensor", lat_slice: slice, lon_slice: slice) -> "torch.Tensor":
     return tensor_nchw[..., lat_slice, lon_slice]
 
 
-def area_rmse(pred: torch.Tensor, target: torch.Tensor, lat_weights: torch.Tensor) -> torch.Tensor:
+def area_rmse(pred: "torch.Tensor", target: "torch.Tensor", lat_weights: "torch.Tensor") -> "torch.Tensor":
+    import torch
+
     w = lat_weights.view(1, 1, -1, 1).to(pred)
     num = (w * (pred - target) ** 2).sum()
     den = w.expand_as(pred).sum()
     return torch.sqrt(num / den)
 
 
-def anomaly_correlation_coefficient(pred_anom: torch.Tensor, ref_anom: torch.Tensor, lat_weights: torch.Tensor) -> torch.Tensor:
+def anomaly_correlation_coefficient(
+    pred_anom: "torch.Tensor", ref_anom: "torch.Tensor", lat_weights: "torch.Tensor"
+) -> "torch.Tensor":
+    import torch
+
     w = lat_weights.view(1, 1, -1, 1).to(pred_anom)
     num = (w * pred_anom * ref_anom).sum()
     den = torch.sqrt((w * pred_anom**2).sum() * (w * ref_anom**2).sum()).clamp(min=1e-12)
