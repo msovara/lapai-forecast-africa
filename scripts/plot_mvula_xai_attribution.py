@@ -363,7 +363,7 @@ def refresh_fig11_ic_framing() -> None:
     ax_b.imshow(crops["b"], aspect="auto")
     ax_b.axis("off")
     ax_c = fig.add_subplot(gs[1, :])
-    ax_c.imshow(crops["c"], aspect="equal")
+    ax_c.imshow(crops["c"], aspect="auto")
     ax_c.set_title("(c) Spatial |grad| (channel-mean)", fontsize=11, pad=8)
     ax_c.axis("off")
     ax3 = fig.add_subplot(gs[2, :])
