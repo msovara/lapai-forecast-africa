@@ -345,15 +345,15 @@ def refresh_fig11_ic_framing() -> None:
     if ys.size and xs.size:
         y0, y1 = int(ys.min()), int(ys.max()) + 1
         x0, x1 = int(xs.min()), int(xs.max()) + 1
-        y0 = y0 + int(0.10 * (y1 - y0))  # skip residual title text
+        y0 = y0 + int(0.18 * (y1 - y0))  # skip residual title text
         crops["c"] = c[y0:y1, x0:x1]
 
-    fig = plt.figure(figsize=(12.8, 12.2), dpi=200)
+    fig = plt.figure(figsize=(12.8, 13.0), dpi=200)
     gs = fig.add_gridspec(
         3,
         2,
-        height_ratios=[1.0, 1.55, 1.15],
-        hspace=0.26,
+        height_ratios=[0.95, 1.85, 1.10],
+        hspace=0.24,
         wspace=0.18,
     )
     ax_a = fig.add_subplot(gs[0, 0])
@@ -363,7 +363,7 @@ def refresh_fig11_ic_framing() -> None:
     ax_b.imshow(crops["b"], aspect="auto")
     ax_b.axis("off")
     ax_c = fig.add_subplot(gs[1, :])
-    ax_c.imshow(crops["c"], aspect="auto")
+    ax_c.imshow(crops["c"], aspect="equal")
     ax_c.set_title("(c) Spatial |grad| (channel-mean)", fontsize=11, pad=8)
     ax_c.axis("off")
     ax3 = fig.add_subplot(gs[2, :])
