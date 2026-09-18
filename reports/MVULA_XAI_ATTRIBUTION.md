@@ -7,7 +7,7 @@
 
 Gradient **saliency** on the frozen student (`student_global_stable_v5.ckpt`):
 how much the African-mean predicted **2t** changes with each of the **65** input channels,
-plus a spatial sensitivity map. Combined with the packaged AF skill table to explain the **+12 h** failure.
+plus a spatial sensitivity map. Combined with the packaged AF skill table to explain the **06Z-IC** one-step cold-bias pathology.
 
 ## Method (honest limits)
 
@@ -16,7 +16,7 @@ plus a spatial sensitivity map. Combined with the packaged AF skill table to exp
 | Target | African-mean `2t` (Cout index 2) |
 | Score | Mean `|∂2t/∂x|` over the Africa land box |
 | IC | Checkpoint climate (`input_mean`) + small noise, then training normalization |
-| Not yet | Lead-conditioned ARCO ICs (00Z vs 06Z) for true +6 vs +12 attribution contrast |
+| Not yet | ARCO ICs at 00Z vs 06Z for true IC-hour attribution contrast |
 
 This is **model explainability** (what the CNN listens to), not a full physical causal proof.
 
@@ -45,17 +45,18 @@ This is **model explainability** (what the CNN listens to), not a full physical 
 | 9 | `z250` | 0.0002998 |
 | 10 | `z600` | 0.0002985 |
 
-## Why +12 h fails (observed AF package)
+## 06Z-IC pathology (observed AF package)
 
-- +6 h RMSE ≈ **1.38 °C**; +12 h RMSE ≈ **7.80 °C**.
-- +12 h bias ≈ **-5.33 °C** (cold).
-- **61/61** inits cold at +12 h (range [-5.76, -4.91] °C).
-- Protocol: for 00Z inits, +12 h uses an **06Z** ERA5 IC (analysis-forced) — consistent with a **diurnal / lead-conditioned** failure, not random scatter.
-- Persistence also beats the student at +12/+18 h (see Fig. 8 / baselines).
+- **00Z IC** one-step RMSE ≈ **1.38 °C**; **06Z IC** RMSE ≈ **7.80 °C**.
+- **06Z IC** bias ≈ **-5.33 °C** (cold).
+- **61/61** inits cold at 06Z IC (range [-5.76, -4.91] °C).
+- Protocol: columns are **analysis IC hours** under AF one-step — not autoregressive lead times.
+- Persistence also beats the student at 06Z/12Z IC (see Fig. 8 / baselines).
+
 
 ## One-sentence takeaway
 
-**The student is most sensitive to thermodynamic/moisture multilevel fields when forming African 2t; the +12 h collapse is a systematic cold bias under AF 06Z ICs, not an unexplained black-box glitch.**
+**The student is most sensitive to thermodynamic/moisture multilevel fields when forming African 2t; the 06Z-IC collapse is a systematic cold bias under AF, not an unexplained black-box glitch.**
 
 ## Regenerate
 
