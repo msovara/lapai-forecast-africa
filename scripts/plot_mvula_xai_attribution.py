@@ -338,6 +338,15 @@ def refresh_fig11_ic_framing() -> None:
         "b": img[top:mid_y, mid_x:w],
         "c": img[mid_y:h, 0:mid_x],
     }
+    # Tight-crop panel (c): drop white margins and embedded old title band
+    c = crops["c"]
+    mask = c.mean(axis=2) < 250
+    ys, xs = np.where(mask)
+    if ys.size and xs.size:
+        y0, y1 = int(ys.min()), int(ys.max()) + 1
+        x0, x1 = int(xs.min()), int(xs.max()) + 1
+        y0 = y0 + int(0.10 * (y1 - y0))  # skip residual title text
+        crops["c"] = c[y0:y1, x0:x1]
 
     fig = plt.figure(figsize=(12.8, 12.2), dpi=200)
     gs = fig.add_gridspec(
