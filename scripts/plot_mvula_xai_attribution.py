@@ -194,9 +194,15 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     # Top-15 channels
     top_idx = np.argsort(chan)[::-1][:15]
 
-    fig = plt.figure(figsize=(12.5, 9.2), dpi=200)
-    # Grid: 2×2
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 1.0], hspace=0.32, wspace=0.28)
+    fig = plt.figure(figsize=(12.8, 12.2), dpi=200)
+    # Spatial map (c) gets a full-width middle row so it is not letterboxed
+    gs = fig.add_gridspec(
+        3,
+        2,
+        height_ratios=[1.0, 1.55, 1.15],
+        hspace=0.28,
+        wspace=0.22,
+    )
 
     # (a) Variable-group attribution
     ax0 = fig.add_subplot(gs[0, 0])
@@ -219,13 +225,13 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     ax1.set_xlabel("|∂2t / ∂x_c| (Africa mean)")
     ax1.set_title("(b) Top-15 input channels")
 
-    # (c) Spatial saliency
+    # (c) Spatial saliency — full-width row
     if HAS_CARTOPY:
         import cartopy.crs as ccrs
 
-        ax2 = fig.add_subplot(gs[1, 0], projection=ccrs.PlateCarree())
+        ax2 = fig.add_subplot(gs[1, :], projection=ccrs.PlateCarree())
     else:
-        ax2 = fig.add_subplot(gs[1, 0])
+        ax2 = fig.add_subplot(gs[1, :])
     sp, lat_af, lon_af = _to_africa_plot_grid(spatial, lat, lon)
     # Scale for a readable colorbar (raw |grad| ~ 1e-4); avoid 0.0000x tick clutter
     grad_scale = 1.0e4
@@ -239,21 +245,20 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
         cmap="magma",
         vmin=0.0,
         vmax=max(vmax, 1e-12),
-        title="Spatial |grad| (channel-mean)",
-        panel_label="c",
+        title="(c) Spatial |grad| (channel-mean)",
+        panel_label=None,
         cbar_label=r"|∂2t / ∂x| × 10$^{-4}$",
-        add_colorbar=True,
         draw_grid=False,
     )
 
-    ax3 = fig.add_subplot(gs[1, 1])
+    ax3 = fig.add_subplot(gs[2, :])
     _draw_panel_d(ax3, expanded)
 
     fig.suptitle(
         "Fig. 11 — Mvula v5 explainability: what drives African 2t, and 06Z-IC one-step pathology",
         fontsize=12,
         fontweight="bold",
-        y=0.98,
+        y=0.995,
     )
     fig.savefig(OUT_FIG, dpi=300, bbox_inches="tight", facecolor="white", pad_inches=0.08)
     plt.close(fig)
@@ -320,9 +325,11 @@ def refresh_fig11_ic_framing() -> None:
         raise FileNotFoundError(EXPANDED)
 
     expanded = json.loads(EXPANDED.read_text(encoding="utf-8"))
-    img = np.asarray(Image.open(OUT_FIG).convert("RGB"))
+    # Prefer a clean pre-composite source if present (sharper spatial map for enlarged panel c)
+    src = FIG_DIR / "_fig11_src_clean.png"
+    img = np.asarray(Image.open(src if src.is_file() else OUT_FIG).convert("RGB"))
     h, w = img.shape[:2]
-    # Approximate 2×2 panel crops (exclude outer title strip)
+    # Approximate equal 2×2 crops from the original layout (exclude outer title strip)
     top = int(0.07 * h)
     mid_y = int(0.52 * h)
     mid_x = int(0.50 * w)
@@ -332,19 +339,31 @@ def refresh_fig11_ic_framing() -> None:
         "c": img[mid_y:h, 0:mid_x],
     }
 
-    fig = plt.figure(figsize=(12.5, 9.2), dpi=200)
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 1.0], hspace=0.18, wspace=0.12)
-    for key, slot in (("a", gs[0, 0]), ("b", gs[0, 1]), ("c", gs[1, 0])):
-        ax = fig.add_subplot(slot)
-        ax.imshow(crops[key])
-        ax.axis("off")
-    ax3 = fig.add_subplot(gs[1, 1])
+    fig = plt.figure(figsize=(12.8, 12.2), dpi=200)
+    gs = fig.add_gridspec(
+        3,
+        2,
+        height_ratios=[1.0, 1.55, 1.15],
+        hspace=0.26,
+        wspace=0.18,
+    )
+    ax_a = fig.add_subplot(gs[0, 0])
+    ax_a.imshow(crops["a"], aspect="auto")
+    ax_a.axis("off")
+    ax_b = fig.add_subplot(gs[0, 1])
+    ax_b.imshow(crops["b"], aspect="auto")
+    ax_b.axis("off")
+    ax_c = fig.add_subplot(gs[1, :])
+    ax_c.imshow(crops["c"], aspect="auto")
+    ax_c.set_title("(c) Spatial |grad| (channel-mean)", fontsize=11, pad=8)
+    ax_c.axis("off")
+    ax3 = fig.add_subplot(gs[2, :])
     _draw_panel_d(ax3, expanded)
     fig.suptitle(
         "Fig. 11 — Mvula v5 explainability: what drives African 2t, and 06Z-IC one-step pathology",
         fontsize=12,
         fontweight="bold",
-        y=0.98,
+        y=0.995,
     )
     fig.savefig(OUT_FIG, dpi=300, bbox_inches="tight", facecolor="white", pad_inches=0.08)
     plt.close(fig)
