@@ -194,12 +194,13 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     # Top-15 channels
     top_idx = np.argsort(chan)[::-1][:15]
 
-    fig = plt.figure(figsize=(12.8, 12.2), dpi=200)
-    # Spatial map (c) gets a full-width middle row so it is not letterboxed
+    fig = plt.figure(figsize=(12.8, 10.4), dpi=200)
+    # Modest boost for spatial panel (c): wider + a bit taller than equal 2×2
     gs = fig.add_gridspec(
-        3,
         2,
-        height_ratios=[1.0, 1.55, 1.15],
+        2,
+        height_ratios=[1.0, 1.25],
+        width_ratios=[1.35, 1.0],
         hspace=0.28,
         wspace=0.22,
     )
@@ -225,13 +226,13 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
     ax1.set_xlabel("|∂2t / ∂x_c| (Africa mean)")
     ax1.set_title("(b) Top-15 input channels")
 
-    # (c) Spatial saliency — full-width row
+    # (c) Spatial saliency
     if HAS_CARTOPY:
         import cartopy.crs as ccrs
 
-        ax2 = fig.add_subplot(gs[1, :], projection=ccrs.PlateCarree())
+        ax2 = fig.add_subplot(gs[1, 0], projection=ccrs.PlateCarree())
     else:
-        ax2 = fig.add_subplot(gs[1, :])
+        ax2 = fig.add_subplot(gs[1, 0])
     sp, lat_af, lon_af = _to_africa_plot_grid(spatial, lat, lon)
     # Scale for a readable colorbar (raw |grad| ~ 1e-4); avoid 0.0000x tick clutter
     grad_scale = 1.0e4
@@ -251,7 +252,7 @@ def plot_fig11(chan: np.ndarray, spatial: np.ndarray, lat, lon, expanded: dict) 
         draw_grid=False,
     )
 
-    ax3 = fig.add_subplot(gs[2, :])
+    ax3 = fig.add_subplot(gs[1, 1])
     _draw_panel_d(ax3, expanded)
 
     fig.suptitle(
@@ -348,12 +349,13 @@ def refresh_fig11_ic_framing() -> None:
         y0 = y0 + int(0.18 * (y1 - y0))  # skip residual title text
         crops["c"] = c[y0:y1, x0:x1]
 
-    fig = plt.figure(figsize=(12.8, 13.0), dpi=200)
+    fig = plt.figure(figsize=(12.8, 10.4), dpi=200)
     gs = fig.add_gridspec(
-        3,
         2,
-        height_ratios=[0.95, 1.85, 1.10],
-        hspace=0.24,
+        2,
+        height_ratios=[1.0, 1.25],
+        width_ratios=[1.35, 1.0],
+        hspace=0.26,
         wspace=0.18,
     )
     ax_a = fig.add_subplot(gs[0, 0])
@@ -362,11 +364,11 @@ def refresh_fig11_ic_framing() -> None:
     ax_b = fig.add_subplot(gs[0, 1])
     ax_b.imshow(crops["b"], aspect="auto")
     ax_b.axis("off")
-    ax_c = fig.add_subplot(gs[1, :])
+    ax_c = fig.add_subplot(gs[1, 0])
     ax_c.imshow(crops["c"], aspect="auto")
-    ax_c.set_title("(c) Spatial |grad| (channel-mean)", fontsize=11, pad=8)
+    ax_c.set_title("(c) Spatial |grad| (channel-mean)", fontsize=10, pad=6)
     ax_c.axis("off")
-    ax3 = fig.add_subplot(gs[2, :])
+    ax3 = fig.add_subplot(gs[1, 1])
     _draw_panel_d(ax3, expanded)
     fig.suptitle(
         "Fig. 11 — Mvula v5 explainability: what drives African 2t, and 06Z-IC one-step pathology",
