@@ -134,7 +134,7 @@ Source code in this repository is licensed under the [Apache License 2.0](LICENS
 
 ## AI-assisted development
 
-Portions of the software development and documentation process were assisted by AI coding tools (including [Cursor](https://cursor.com/)). All generated or modified code remains subject to human review, testing and validation by the project team. AI assistance does not constitute scientific validation; reported results are based on the documented experimental protocol and evaluation.
+Portions of the software development and documentation process were assisted by AI coding tools (including [Cursor](https://cursor.com/)). All generated or modified code remains subject to human review, testing and validation by the project team. AI assistance does not constitute scientific validation. Reported results are based on the documented experimental protocol and evaluation.
 
 ## Acknowledgements
 
