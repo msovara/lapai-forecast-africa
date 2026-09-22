@@ -333,10 +333,37 @@ def _render_spatial_maps_tab() -> None:
     teacher_nc = REPO / "data/processed/phase0/forecasts" / f"{init}_00Z.nc"
     coarsened_nc = REPO / "data/processed/trackA/forecasts" / f"{init}_00Z.nc"
     if not teacher_nc.is_file() or not coarsened_nc.is_file():
-        st.warning(
-            f"Forecast NetCDF missing. Expected:\n- `{teacher_nc}`\n- `{coarsened_nc}`\n\n"
-            "Copy from Lengau or re-run `run_phase0_forecast.py` / Track A forecast PBS."
+        st.info(
+            "**Interactive NetCDF maps are not shipped in the public app.** "
+            "Phase 0 / Track A forecast files are large artefacts (Lengau / local `data/processed/…`) "
+            "and are gitignored — so this tab cannot load live fields on Streamlit Cloud."
         )
+        st.markdown(
+            "Use the **packaged Africa t2m maps** from the Mvula v5 campaign instead "
+            "(analysis-forced one-step; **00Z** vs **18Z** IC):"
+        )
+        fig_dir = REPORTS / "figures"
+        packaged = [
+            ("Fig. 10 — spatial quad (00Z / 18Z IC)", fig_dir / "mvula_fig10_t2m_spatial_6h_24h_quad.png"),
+            ("00Z IC — RMSE", fig_dir / "trackb_t2m_v5_rmse_L006h.png"),
+            ("00Z IC — bias", fig_dir / "trackb_t2m_v5_bias_L006h.png"),
+            ("18Z IC — RMSE", fig_dir / "trackb_t2m_v5_rmse_L024h.png"),
+            ("18Z IC — bias", fig_dir / "trackb_t2m_v5_bias_L024h.png"),
+        ]
+        shown = False
+        for caption, path in packaged:
+            if path.is_file():
+                st.image(str(path), caption=caption, use_container_width=True)
+                shown = True
+        if not shown:
+            st.caption("Figures missing under `reports/figures/` — see the GitHub repo artefact set.")
+        with st.expander("For developers with local NetCDF forecasts"):
+            st.code(
+                f"Expected files:\n- {teacher_nc}\n- {coarsened_nc}\n\n"
+                "Copy from Lengau or re-run run_phase0_forecast.py / Track A forecast PBS, "
+                "then re-open this tab locally.",
+                language="text",
+            )
         return
 
     try:
