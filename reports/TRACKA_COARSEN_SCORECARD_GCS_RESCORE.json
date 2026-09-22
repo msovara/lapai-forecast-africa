@@ -35,15 +35,15 @@
     "20230129"
   ],
   "forecasts": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_a1_windows/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230129_00Z.nc"
   ],
   "results": [
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230101_00Z.nc",
       "init_date": "20230101",
       "lead_hours": 24,
       "valid_time": "2023-01-02T00:00:00.000000000",
@@ -74,7 +74,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230101_00Z.nc",
       "init_date": "20230101",
       "lead_hours": 48,
       "valid_time": "2023-01-03T00:00:00.000000000",
@@ -105,7 +105,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230108_00Z.nc",
       "init_date": "20230108",
       "lead_hours": 24,
       "valid_time": "2023-01-09T00:00:00.000000000",
@@ -136,7 +136,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230108_00Z.nc",
       "init_date": "20230108",
       "lead_hours": 48,
       "valid_time": "2023-01-10T00:00:00.000000000",
@@ -167,7 +167,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230115_00Z.nc",
       "init_date": "20230115",
       "lead_hours": 24,
       "valid_time": "2023-01-16T00:00:00.000000000",
@@ -198,7 +198,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230115_00Z.nc",
       "init_date": "20230115",
       "lead_hours": 48,
       "valid_time": "2023-01-17T00:00:00.000000000",
@@ -229,7 +229,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230122_00Z.nc",
       "init_date": "20230122",
       "lead_hours": 24,
       "valid_time": "2023-01-23T00:00:00.000000000",
@@ -260,7 +260,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230122_00Z.nc",
       "init_date": "20230122",
       "lead_hours": 48,
       "valid_time": "2023-01-24T00:00:00.000000000",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230129_00Z.nc",
       "init_date": "20230129",
       "lead_hours": 24,
       "valid_time": "2023-01-30T00:00:00.000000000",
@@ -322,7 +322,7 @@
       }
     },
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc",
+      "forecast": "data/processed/trackA_a1_windows/forecasts/20230129_00Z.nc",
       "init_date": "20230129",
       "lead_hours": 48,
       "valid_time": "2023-01-31T00:00:00.000000000",

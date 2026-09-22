@@ -1321,6 +1321,12 @@ def main() -> None:
             st.warning("reports/TRACKA_A1_GATE.json not found.")
         else:
             st.subheader(f"A1 gate — {'PASSED' if gate_ok else 'FAILED'}")
+            st.caption(
+                "Track A coarsening gate: **Candidate** = O96→O48 coarsened teacher · "
+                "**Baseline** = Phase 0 N320 AIFS teacher · "
+                "Pass if RMSE ≤5% worse at +24 h / +48 h (real forecast leads). "
+                "Negative degradation % means the candidate is better than baseline."
+            )
             st.markdown(
                 f"Variables: {', '.join(gate.get('variables') or [])} · "
                 f"Leads: {gate.get('leads_hours')} h · "

@@ -2,18 +2,18 @@
   "step": "prune_full",
   "passed": false,
   "baseline_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_a1_windows\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_a1_windows/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_a1_windows/forecasts/20230129_00Z.nc"
   ],
   "candidate_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_full\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_full\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_full\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_full\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_full\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_prune_full/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_prune_full/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_prune_full/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_prune_full/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_prune_full/forecasts/20230129_00Z.nc"
   ],
   "variables": [
     "t2m",
@@ -442,6 +442,6 @@
     ]
   },
   "eval_grid": "321x301",
-  "baseline_scorecard_path": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\reports\\TRACKA_COARSEN_SCORECARD_GCS_RESCORE.json",
-  "candidate_scorecard_path": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\reports\\TRACKA_PRUNE_FULL_SCORECARD.json"
+  "baseline_scorecard_path": "reports/TRACKA_COARSEN_SCORECARD_GCS_RESCORE.json",
+  "candidate_scorecard_path": "reports/TRACKA_PRUNE_FULL_SCORECARD.json"
 }
