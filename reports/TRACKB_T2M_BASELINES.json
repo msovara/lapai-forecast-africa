@@ -1,7 +1,7 @@
 {
   "protocol": "trackB_t2m_baselines_vs_expanded",
   "timestamp_utc": "2026-08-30T06:21:26.978361+00:00",
-  "expanded_json": "/local/Mthetho/lapai-forecast/reports/TRACKB_T2M_EXPANDED.json",
+  "expanded_json": "reports/TRACKB_T2M_EXPANDED.json",
   "arco_path": "gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3",
   "definitions": {
     "persistence_af": "T_hat(valid)=T(IC); IC=init+(L-6)h \u2014 matched to AF student protocol",

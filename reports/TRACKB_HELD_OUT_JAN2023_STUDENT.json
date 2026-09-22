@@ -3,7 +3,7 @@
   "timestamp_utc": "2026-08-25T20:05:00.967390+00:00",
   "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
   "candidate_student": "models/student_global_stable_v3.ckpt",
-  "forecast_dir": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_k1_a1bplus/forecasts",
+  "forecast_dir": "data/processed/trackA_prune_k1_a1bplus/forecasts",
   "domain": "africa",
   "truth_source": "gcs://code4earth/era5",
   "leads_hours": [
@@ -41,7 +41,7 @@
       "state_meta": {
         "init_date": "20230101",
         "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "cache_dir": "~/.cache/aifs-africa/era5",
         "n320_points": 542080,
         "state_shape": [
           65,
@@ -70,7 +70,7 @@
       "state_meta": {
         "init_date": "20230108",
         "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "cache_dir": "~/.cache/aifs-africa/era5",
         "n320_points": 542080,
         "state_shape": [
           65,
@@ -99,7 +99,7 @@
       "state_meta": {
         "init_date": "20230115",
         "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "cache_dir": "~/.cache/aifs-africa/era5",
         "n320_points": 542080,
         "state_shape": [
           65,
@@ -128,7 +128,7 @@
       "state_meta": {
         "init_date": "20230122",
         "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "cache_dir": "~/.cache/aifs-africa/era5",
         "n320_points": 542080,
         "state_shape": [
           65,
@@ -157,7 +157,7 @@
       "state_meta": {
         "init_date": "20230129",
         "init_time": "0000",
-        "cache_dir": "/home/ubuntu/.cache/aifs-africa/era5",
+        "cache_dir": "~/.cache/aifs-africa/era5",
         "n320_points": 542080,
         "state_shape": [
           65,

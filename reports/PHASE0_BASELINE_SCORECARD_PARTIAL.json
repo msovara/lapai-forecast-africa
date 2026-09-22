@@ -19,11 +19,11 @@
     "20230101"
   ],
   "forecasts": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\aifs-africa\\output\\20230101_00Z.nc"
+    "../aifs-africa/output/20230101_00Z.nc"
   ],
   "results": [
     {
-      "forecast": "C:\\Users\\MthethoSovara\\tiny-media-analysis\\aifs-africa\\output\\20230101_00Z.nc",
+      "forecast": "../aifs-africa/output/20230101_00Z.nc",
       "init_date": "20230101",
       "lead_hours": 24,
       "valid_time": "2023-01-02T00:00:00.000000000",

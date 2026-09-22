@@ -2,18 +2,18 @@
   "step": "prune_k1_vs_a1b",
   "passed": false,
   "baseline_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_gt_coarsen\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_gt_coarsen\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_gt_coarsen\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_gt_coarsen\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_gt_coarsen\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_gt_coarsen/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_gt_coarsen/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_gt_coarsen/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_gt_coarsen/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_gt_coarsen/forecasts/20230129_00Z.nc"
   ],
   "candidate_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune_k1\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_prune_k1/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_prune_k1/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_prune_k1/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_prune_k1/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_prune_k1/forecasts/20230129_00Z.nc"
   ],
   "variables": [
     "t2m",

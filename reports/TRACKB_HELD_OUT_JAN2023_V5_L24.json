@@ -3,7 +3,7 @@
   "timestamp_utc": "2026-08-26T14:55:05.271155+00:00",
   "baseline": "K1 teacher (models/teacher_pruned.ckpt) Jan-2023 weekly free-running forecasts",
   "candidate_student": "models/student_global_stable_v5.ckpt",
-  "forecast_dir": "/local/Mthetho/lapai-forecast/data/processed/trackA_prune_k1_a1bplus/forecasts",
+  "forecast_dir": "data/processed/trackA_prune_k1_a1bplus/forecasts",
   "domain": "africa",
   "truth_source": "gcs://code4earth/era5",
   "leads_hours": [

@@ -2,18 +2,18 @@
   "step": "prune",
   "passed": false,
   "baseline_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA/forecasts/20230101_00Z.nc",
+    "data/processed/trackA/forecasts/20230108_00Z.nc",
+    "data/processed/trackA/forecasts/20230115_00Z.nc",
+    "data/processed/trackA/forecasts/20230122_00Z.nc",
+    "data/processed/trackA/forecasts/20230129_00Z.nc"
   ],
   "candidate_scorecard": [
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230101_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230108_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230115_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230122_00Z.nc",
-    "C:\\Users\\MthethoSovara\\tiny-media-analysis\\lapai-forecast\\data\\processed\\trackA_prune\\forecasts\\20230129_00Z.nc"
+    "data/processed/trackA_prune/forecasts/20230101_00Z.nc",
+    "data/processed/trackA_prune/forecasts/20230108_00Z.nc",
+    "data/processed/trackA_prune/forecasts/20230115_00Z.nc",
+    "data/processed/trackA_prune/forecasts/20230122_00Z.nc",
+    "data/processed/trackA_prune/forecasts/20230129_00Z.nc"
   ],
   "variables": [
     "t2m",
