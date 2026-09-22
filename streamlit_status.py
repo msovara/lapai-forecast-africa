@@ -31,6 +31,7 @@ st.markdown(
 .block { padding: 0.75rem 1rem; border-radius: 0.4rem; margin-bottom: 0.5rem; }
 .done { background: #e8f5e9; border-left: 4px solid #2e7d32; }
 .warn { background: #fff8e1; border-left: 4px solid #f9a825; }
+.scope { background: #e3f2fd; border-left: 4px solid #1565c0; }
 .info { background: #e3f2fd; border-left: 4px solid #1565c0; }
 .muted { color: #666; font-size: 0.9rem; }
 </style>
@@ -607,17 +608,18 @@ def _tracka_graph() -> str:
     )
 
 
+# kind: done | next | scope
 TODOS = [
-    ("Phase 0 closed — N320 teacher baseline + scorecard", True),
-    ("Track A A1 coarsening gate passed; K1 prune accepted as teacher", True),
-    ("Track B student v5 frozen (Cout=3: tp/msl/2t; Case A — no free-run)", True),
-    ("Laptop CPU bench on consumer i7 (measured; ~9 MiB, ~2.5 s/step)", True),
-    ("Mvula status matrix + state closure docs on GitHub", True),
-    ("AF t2m production campaign (multi-season × IC hours 00/06/12/18Z)", True),
-    ("Package TRACKB_T2M_EXPANDED + Dueben-style skill scorecard", True),
-    ("FINAL_REPORT + README freeze + tag trackb-v5-c4e", True),
-    ("Optional ONNX smoke (not required for v5 close-out)", False),
-    ("Do not reopen free-run / Cout=65 / tp recovery before close-out", True),
+    ("Phase 0 closed — N320 AIFS teacher baseline and scorecard", "done"),
+    ("Track A coarsening gate passed (A1); pruned model accepted as teacher", "done"),
+    ("Track B student v5 frozen — outputs tp, msl, 2t; one-step adaptation only", "done"),
+    ("Laptop CPU benchmark on a consumer i7 (~9 MiB, ~2.5 s per step)", "done"),
+    ("Status matrix and closure notes published on GitHub", "done"),
+    ("Africa t2m campaign scored across seasons and IC hours 00/06/12/18Z", "done"),
+    ("Expanded t2m scorecard packaged (TRACKB_T2M_EXPANDED)", "done"),
+    ("FINAL_REPORT, README, and release tag trackb-v5-c4e", "done"),
+    ("Optional ONNX export smoke (not required for this release)", "next"),
+    ("Free-run, 65-channel output, and precipitation recovery stay out of this release", "scope"),
 ]
 
 # Hard-coded matrix fallback if markdown parse fails (matches MVULA_CODE4EARTH_STATUS_MATRIX.md).
@@ -1353,9 +1355,14 @@ def main() -> None:
 
     with tab_todo:
         st.subheader("Done vs next")
-        for text, done in TODOS:
-            css = "done" if done else "warn"
-            mark = "Done" if done else "Next"
+        st.caption(
+            "Close-out for the public v5 release. "
+            "Green is finished, amber is optional follow-up, blue is a scope decision held for this release."
+        )
+        _marks = {"done": "Done", "next": "Next", "scope": "Scope"}
+        for text, kind in TODOS:
+            css = kind if kind in _marks else "warn"
+            mark = _marks.get(kind, "Note")
             st.markdown(f'<div class="block {css}"><strong>{mark}</strong> — {text}</div>', unsafe_allow_html=True)
 
     with st.sidebar:
