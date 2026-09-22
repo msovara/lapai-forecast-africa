@@ -19,18 +19,20 @@ Canonical repo: [github.com/msovara/lapai-forecast-africa](https://github.com/ms
 | | |
 |--|--|
 | **Model** | ~8.8 MiB student CNN (`models/student_global_stable_v5.ckpt`, tracked in git) |
-| **Laptop** | ~2.5 s per +6 h step on Intel i7-11800H CPU |
-| **Skill** | Analysis-forced African **t2m** (61 inits × leads 6/12/18/24 h) |
-| **Not claimed** | Free-run / 10-day forecast; Cout=65 full-state student; **tp** skill |
+| **Laptop** | ~2.5 s per +6 h step on Intel i7-11800H CPU (~1.2 GiB RSS; GPU not required) |
+| **Skill** | Analysis-forced **one-step** African **t2m** (61 × 00Z inits, 2023). Headline = **00Z IC** → native +6 h step |
+| **Not claimed** | Free-run / autoregressive / 10-day forecast; Cout=65 full-state student; **tp** skill; smartphone-ready |
 
-Full claim boundary and proposal-vs-delivered: FINAL_REPORT §2–4.
+Full claim boundary and proposal-vs-delivered: FINAL_REPORT §2–4. Presentation framing: [`reports/MVULA_PRESENTATION_SLIDES.md`](reports/MVULA_PRESENTATION_SLIDES.md).
 
 | Achieves | Limitations |
 |----------|-------------|
 | ~6× smaller than K1; laptop CPU inference | IC fetch/build not in that timing |
-| Strong AF **+6 h t2m** on Africa (ACC≈0.97) | **+12/+24 h** degrade; cold bias at +12 h |
-| Open eval package + Streamlit dashboard | **No** autonomous multi-day rollout |
+| Strong AF **00Z IC** one-step t2m (RMSE≈1.38 °C; ACC≈0.97; ~+42% vs persistence) | **06Z IC** one-step cold-bias pathology (all 61 inits); 12Z/18Z partial recovery |
+| Open eval package + Streamlit + Hugging Face model/demo | **No** autonomous multi-day / AR rollout (Case A Cout=3) |
 | Honest Case A docs | **tp** failed / out of scope |
+
+**Protocol note:** Packaged “6/12/18/24 h” columns are **analysis IC hours** (00/06/12/18Z) under AF one-step — not autoregressive lead times. True AR needs predicted full state + forcings.
 
 ## Run locally (no HPC/GPU required)
 
@@ -79,7 +81,8 @@ Weights are **bind-mounted**, not baked into the SIF. Docker: `containers/Docker
 - [`reports/TRACKB_T2M_EXPANDED.md`](reports/TRACKB_T2M_EXPANDED.md) — AF t2m scorecard
 - [`reports/MVULA_XAI_ATTRIBUTION.md`](reports/MVULA_XAI_ATTRIBUTION.md) — Fig.11 channel/spatial saliency
 - [`reports/MVULA_LAPTOP_BENCHMARK.md`](reports/MVULA_LAPTOP_BENCHMARK.md) — size / CPU timing
-- Figures: [+6 h RMSE](reports/figures/trackb_t2m_v5_rmse_L006h.png) · [+6 h bias](reports/figures/trackb_t2m_v5_bias_L006h.png) · [+24 h RMSE](reports/figures/trackb_t2m_v5_rmse_L024h.png) · [+24 h bias](reports/figures/trackb_t2m_v5_bias_L024h.png) · [Fig.10 spatial](reports/figures/mvula_fig10_t2m_spatial_6h_24h_quad.png) · [Fig.11 XAI](reports/figures/mvula_fig11_t2m_xai_attribution.png)
+- Headline figures: [Fig.2 primary 00Z](reports/figures/mvula_fig02_primary_00z_onestep.png) · [Fig.2 IC-hour backup](reports/figures/mvula_fig02_t2m_lead_curves.png) · [Fig.1 pipeline](reports/figures/mvula_fig01_pipeline.png) · [Fig.10 spatial](reports/figures/mvula_fig10_t2m_spatial_6h_24h_quad.png) · [Fig.11 XAI](reports/figures/mvula_fig11_t2m_xai_attribution.png)
+- Spatial maps: [00Z RMSE](reports/figures/trackb_t2m_v5_rmse_L006h.png) · [00Z bias](reports/figures/trackb_t2m_v5_bias_L006h.png) · [18Z RMSE](reports/figures/trackb_t2m_v5_rmse_L024h.png) · [18Z bias](reports/figures/trackb_t2m_v5_bias_L024h.png)
 
 Optional re-eval (ARCO + GPU recommended): `bash scripts/run_trackB_t2m_expanded_cassava.sh`
 
@@ -123,6 +126,7 @@ GPU training envs: `environment-credit.yml` / `environment-credit-lengau.yml` (C
 | **Programme** | [ECMWF Code for Earth 2026 — African Stream](https://codeforearth.ecmwf.int/stream/africa-stream/) |
 | **Project page** | [codeforearth.ecmwf.int/project/mvula](https://codeforearth.ecmwf.int/project/mvula/) |
 | **Issues / questions** | [GitHub Issues](https://github.com/msovara/lapai-forecast-africa/issues) on this repository |
+| **Contributing** | [`CONTRIBUTING.md`](CONTRIBUTING.md) — research demo norms and claim boundary |
 
 ## License
 

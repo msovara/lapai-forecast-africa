@@ -63,27 +63,28 @@
     </section>
 
     <section class="card">
-      <h2>Packaged African t2m skill (2023, 61 inits)</h2>
+      <h2>Packaged African t2m skill (2023, 61 × 00Z inits)</h2>
+      <p class="muted" style="margin-top:0">Analysis-forced <strong>one-step</strong> only (native +6&nbsp;h). Columns are <strong>analysis IC hours</strong> for a 00Z campaign — not autoregressive lead times.</p>
       <table>
-        <thead><tr><th>Lead</th><th>RMSE (°C)</th><th>ACC</th><th>Bias (°C)</th></tr></thead>
+        <thead><tr><th>Analysis IC</th><th>RMSE (°C)</th><th>ACC</th><th>Bias (°C)</th></tr></thead>
         <tbody>
-          <tr><td>+6 h</td><td>1.38</td><td>0.97</td><td>−0.12</td></tr>
-          <tr><td>+12 h</td><td>7.80</td><td>0.45</td><td>−5.33 (cold bias)</td></tr>
-          <tr><td>+18 h</td><td>4.38</td><td>0.75</td><td>−1.12</td></tr>
-          <tr><td>+24 h</td><td>3.23</td><td>0.84</td><td>+1.30</td></tr>
+          <tr><td><strong>00Z</strong> (headline)</td><td>1.38</td><td>0.97</td><td>−0.12</td></tr>
+          <tr><td>06Z</td><td>7.80</td><td>0.45</td><td>−5.33 (cold bias)</td></tr>
+          <tr><td>12Z</td><td>4.38</td><td>0.75</td><td>−1.12</td></tr>
+          <tr><td>18Z</td><td>3.23</td><td>0.84</td><td>+1.30</td></tr>
         </tbody>
       </table>
-      <p class="muted">Analysis-forced evaluation — honest about the +12&nbsp;h failure.</p>
+      <p class="muted">Headline claim = <strong>00Z</strong> one-step. Documented pathology = <strong>06Z</strong> IC cold bias (all 61 inits). Free-run / AR not supported (Cout=3).</p>
     </section>
 
     <section class="card">
-      <h2>Spatial skill (+6 / +24 h)</h2>
-      <img src="assets/mvula_fig10_t2m_spatial_6h_24h_quad.png" alt="Fig.10 spatial bias and RMSE at +6 and +24 hours" />
+      <h2>Spatial skill (00Z vs 18Z IC)</h2>
+      <img src="assets/mvula_fig10_t2m_spatial_6h_24h_quad.png" alt="Fig.10 spatial bias and RMSE for 00Z vs 18Z analysis IC" />
     </section>
 
     <section class="card">
       <h2>Explainability</h2>
-      <img src="assets/mvula_fig11_t2m_xai_attribution.png" alt="Fig.11 channel attribution and +12h pathology" />
+      <img src="assets/mvula_fig11_t2m_xai_attribution.png" alt="Fig.11 channel attribution and 06Z-IC pathology" />
     </section>
 
     <section class="card">

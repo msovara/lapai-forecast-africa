@@ -106,6 +106,13 @@ wheelhouse*/
 *.key
 *_token
 .cdsapirc
+credentials.json
+**/secrets/
+
+# --- Local scratch / probes (not for public tree) ---
+_hf_space_check/
+reports/figures/_fig11_*
+reports/figures/_diag_*
 
 # --- Upstream clones (use git submodule instead of vendoring) ---
 vendor/

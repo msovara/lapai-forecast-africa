@@ -35,13 +35,13 @@
 
 ## Figure-by-figure annotations
 
-### Fig. 1 — Pipeline (`mvula_fig01_pipeline_publication.png`)
+### Fig. 1 — Pipeline (`mvula_fig01_pipeline.png` / `_publication.png`)
 
 | | |
 |--|--|
-| **Shows** | AIFS → Track A compress/prune → K1 teacher → Track B student → laptop eval |
-| **Say** | “Architecture story: we distill a small student from a compressed AIFS-lineage teacher.” |
-| **Don’t** | Imply GraphCast is in this pipeline. |
+| **Shows** | Train 2020–21 → freeze Mvula v5 → AF one-step verify on 2023; columns = **00/06/12/18Z IC** |
+| **Say** | “Architecture story: we distill a small student from a compressed AIFS-lineage teacher; every score is one +6 h step from a fresh analysis.” |
+| **Don’t** | Call the four columns AR lead times, or imply GraphCast is in this pipeline. |
 
 ### Fig. 2 — Lead curves (`mvula_fig02_t2m_lead_curves.png`)
 
