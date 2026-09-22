@@ -944,7 +944,7 @@ def _render_trackb_tab() -> None:
         ]
         if "lead_h" in overall.columns and metric_cols:
             summary = overall.groupby("lead_h", as_index=False)[metric_cols].mean(numeric_only=True)
-            st.markdown("**Lead-time table (mean)**")
+            st.markdown("**IC-hour skill table (mean)**")
             st.dataframe(summary.round(3), use_container_width=True, hide_index=True)
 
         if "variable" in df.columns:
