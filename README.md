@@ -130,6 +130,12 @@ GPU training envs: `environment-credit.yml` / `environment-credit-lengau.yml` (C
 | **Issues / questions** | [GitHub Issues](https://github.com/msovara/lapai-forecast-africa/issues) on this repository |
 | **Contributing** | [`CONTRIBUTING.md`](CONTRIBUTING.md) — research demo norms and claim boundary |
 
+## Citation
+
+Cite the public snapshot with [`CITATION.cff`](CITATION.cff). The citable GitHub Release is [`mvula-v5.0.0`](https://github.com/msovara/lapai-forecast-africa/releases/tag/mvula-v5.0.0). The earlier tag [`trackb-v5-c4e`](https://github.com/msovara/lapai-forecast-africa/tree/trackb-v5-c4e) remains the pre-publication freeze; it is not the archive of record.
+
+Chanda, C., Sovara, M., Mathekga, S., Elim, G., & Sichone, F. (2026). *Mvula v5.0.0: compressing ECMWF AIFS for laptop-scale African weather experimentation* [Software]. https://github.com/msovara/lapai-forecast-africa/releases/tag/mvula-v5.0.0
+
 ## License
 
 Source code in this repository is licensed under the [Apache License 2.0](LICENSE).
