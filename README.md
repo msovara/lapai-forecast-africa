@@ -6,6 +6,8 @@
 
 <p align="center">
   <a href="https://share.streamlit.io/deploy?repository=msovara/lapai-forecast-africa&branch=main&mainModule=streamlit_status.py"><img src="https://img.shields.io/badge/Live_app-Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Live app Streamlit"></a>
+  &nbsp;
+  <a href="https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo"><img src="https://img.shields.io/badge/Demo-Hugging%20Face-FFD21E?logo=huggingface&logoColor=black" alt="Hugging Face Space"></a>
 </p>
 
 **Mvula** (ECMWF Code for Earth 2026 — African Stream) compresses ECMWF AIFS toward laptop-scale African weather experimentation.
