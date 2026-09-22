@@ -29,9 +29,13 @@ st.markdown(
     """
 <style>
 .block { padding: 0.75rem 1rem; border-radius: 0.4rem; margin-bottom: 0.5rem; }
-.done { background: #e8f5e9; border-left: 4px solid #2e7d32; }
-.warn { background: #fff8e1; border-left: 4px solid #f9a825; }
-.scope { background: #e3f2fd; border-left: 4px solid #1565c0; }
+div[data-testid="stMarkdownContainer"] .block,
+div[data-testid="stMarkdownContainer"] .block * {
+  color: #102016 !important;
+}
+.done { background: #c8e6c9; border-left: 4px solid #1b5e20; }
+.next, .warn { background: #ffe082; border-left: 4px solid #e65100; }
+.scope { background: #bbdefb; border-left: 4px solid #0d47a1; }
 .info { background: #e3f2fd; border-left: 4px solid #1565c0; }
 .muted { color: #666; font-size: 0.9rem; }
 </style>
@@ -1363,7 +1367,11 @@ def main() -> None:
         for text, kind in TODOS:
             css = kind if kind in _marks else "warn"
             mark = _marks.get(kind, "Note")
-            st.markdown(f'<div class="block {css}"><strong>{mark}</strong> — {text}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="block {css}" style="color:#102016;">'
+                f'<strong style="color:#102016;">{mark}</strong> — {text}</div>',
+                unsafe_allow_html=True,
+            )
 
     with st.sidebar:
         if LOGO.is_file():
