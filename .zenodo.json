@@ -1,0 +1,43 @@
+{
+  "title": "Mvula: compressing ECMWF AIFS for laptop-scale African weather experimentation",
+  "version": "5.0.0",
+  "upload_type": "software",
+  "license": "apache2.0",
+  "language": "eng",
+  "access_right": "open",
+  "keywords": [
+    "weather forecasting",
+    "AIFS",
+    "Africa",
+    "model compression",
+    "Code for Earth"
+  ],
+  "creators": [
+    {"name": "Chanda, Chimwemwe"},
+    {"name": "Sovara, Mthetho"},
+    {"name": "Mathekga, Samuel"},
+    {"name": "Elim, Gabriel"},
+    {"name": "Sichone, Fima"}
+  ],
+  "description": "<p>Public citable snapshot of Mvula v5 (ECMWF Code for Earth 2026, African Stream). The Track B student is about 8.8 MiB and is evaluated as one-step, analysis-forced African 2 m temperature on a laptop CPU.</p><p>This release does not claim a free-run, autoregressive, or 10-day forecast, full 65-channel output, precipitation skill, or smartphone deployment. Third-party AIFS teacher weights are not included and remain under their original terms.</p><p>Source code is Apache-2.0. Documentation in the repository is CC BY 4.0. Mentors: Shruti Nath, Rendani Mbuvha, Mario Santa Cruz L\u00f3pez.</p>",
+  "related_identifiers": [
+    {
+      "identifier": "https://codeforearth.ecmwf.int/project/mvula/",
+      "relation": "isDocumentedBy",
+      "scheme": "url",
+      "resource_type": "other"
+    },
+    {
+      "identifier": "https://huggingface.co/C4E-Mvula/mvula-v5-student",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "other"
+    },
+    {
+      "identifier": "https://huggingface.co/spaces/C4E-Mvula/mvula-v5-demo",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "other"
+    }
+  ]
+}

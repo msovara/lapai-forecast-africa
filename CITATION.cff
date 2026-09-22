@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use Mvula, please cite this software release."
+title: "Mvula: compressing ECMWF AIFS for laptop-scale African weather experimentation"
+version: 5.0.0
+date-released: "2026-09-22"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/msovara/lapai-forecast-africa"
+url: "https://codeforearth.ecmwf.int/project/mvula/"
+abstract: >-
+  Public citable snapshot of Mvula v5 (ECMWF Code for Earth 2026, African
+  Stream). The Track B student is about 8.8 MiB and is evaluated as one-step,
+  analysis-forced African 2 m temperature on a laptop CPU. This release does
+  not claim a free-run, autoregressive, or 10-day forecast, full 65-channel
+  output, precipitation skill, or smartphone deployment. Third-party AIFS
+  teacher weights are not included and remain under their original terms.
+  Source code is Apache-2.0; documentation in the repository is CC BY 4.0.
+authors:
+  - family-names: Chanda
+    given-names: Chimwemwe
+  - family-names: Sovara
+    given-names: Mthetho
+  - family-names: Mathekga
+    given-names: Samuel
+  - family-names: Elim
+    given-names: Gabriel
+  - family-names: Sichone
+    given-names: Fima
+keywords:
+  - weather forecasting
+  - AIFS
+  - Africa
+  - model compression
+  - Code for Earth
