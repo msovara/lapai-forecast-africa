@@ -130,6 +130,15 @@ def _layout(fig: go.Figure, *, title: str, height: int = 380) -> go.Figure:
     return fig
 
 
+def _lead_h_to_ic_label(lead_h) -> str:
+    """AF 00Z-campaign packaging: lead_hours columns map to analysis IC hours."""
+    try:
+        L = int(lead_h)
+    except (TypeError, ValueError):
+        return str(lead_h)
+    return {6: "00Z", 12: "06Z", 18: "12Z", 24: "18Z"}.get(L, f"+{L}h")
+
+
 def _rmse_vs_lead_figure(base: pd.DataFrame, cand: pd.DataFrame, variable: str) -> go.Figure:
     fig = go.Figure()
     colors = {"Teacher (N320)": "#64b5f6", "Coarsened O96": "#ffb74d"}
@@ -577,7 +586,7 @@ TODOS = [
     ("Track B student v5 frozen (Cout=3: tp/msl/2t; Case A — no free-run)", True),
     ("Laptop CPU bench on consumer i7 (measured; ~9 MiB, ~2.5 s/step)", True),
     ("Mvula status matrix + state closure docs on GitHub", True),
-    ("AF t2m production campaign (multi-season × 6/12/18/24h)", True),
+    ("AF t2m production campaign (multi-season × IC hours 00/06/12/18Z)", True),
     ("Package TRACKB_T2M_EXPANDED + Dueben-style skill scorecard", True),
     ("FINAL_REPORT + README freeze + tag trackb-v5-c4e", True),
     ("Optional ONNX smoke (not required for v5 close-out)", False),
@@ -592,7 +601,7 @@ MVULA_MATRIX_ROWS = [
     ("LoRA", "NOT SHOWN"),
     ("Quantization", "NOT SHOWN"),
     ("t2m retention", "DONE (expanded AF)"),
-    ("Multi-lead evaluation", "DONE (AF 6–24h)"),
+    ("Multi-lead evaluation", "DONE (AF IC-hour)"),
     ("African evaluation", "PARTIAL"),
     ("Laptop inference", "DONE"),
     ("Model size reduction", "DONE"),
@@ -727,7 +736,7 @@ def _skill_matrix_heatmap(df: pd.DataFrame, *, value_col: str, title: str) -> go
     fig = go.Figure(
         data=go.Heatmap(
             z=pivot.values,
-            x=[f"+{int(c)}h" for c in pivot.columns],
+            x=[_lead_h_to_ic_label(c) for c in pivot.columns],
             y=[str(i) for i in pivot.index],
             colorscale="RdYlGn_r" if "deg" in value_col or "rmse" in value_col.lower() else "RdYlGn",
             text=[[f"{v:.2f}" if pd.notna(v) else "" for v in row] for row in pivot.values],
@@ -735,7 +744,7 @@ def _skill_matrix_heatmap(df: pd.DataFrame, *, value_col: str, title: str) -> go
             colorbar=dict(title=value_col),
         )
     )
-    fig.update_xaxes(title="Lead")
+    fig.update_xaxes(title="Analysis IC hour (one-step AF)")
     fig.update_yaxes(title=idx_col)
     return _layout(fig, title=title, height=380)
 
@@ -758,7 +767,7 @@ def _lead_skill_lines(df: pd.DataFrame, *, metric: str) -> go.Figure:
         agg = sub.groupby("lead_h", as_index=False)[col].mean()
         fig.add_trace(
             go.Scatter(
-                x=agg["lead_h"],
+                x=[_lead_h_to_ic_label(v) for v in agg["lead_h"]],
                 y=agg[col],
                 mode="lines+markers",
                 name=label,
@@ -766,9 +775,9 @@ def _lead_skill_lines(df: pd.DataFrame, *, metric: str) -> go.Figure:
                 marker=dict(size=8),
             )
         )
-    fig.update_xaxes(title="Lead time (h)")
+    fig.update_xaxes(title="Analysis IC hour (one-step AF; not AR lead)")
     fig.update_yaxes(title="RMSE (K)" if metric == "rmse" else "ACC")
-    return _layout(fig, title=f"t2m {metric.upper()} vs lead (Africa · analysis-forced)")
+    return _layout(fig, title=f"t2m {metric.upper()} by analysis IC hour (Africa · one-step AF)")
 
 
 def _render_mvula_tab() -> None:
@@ -863,6 +872,11 @@ def _render_trackb_tab() -> None:
 
     st.divider()
     st.markdown("#### Held-out / production AF t2m skill")
+    st.caption(
+        "Analysis-forced **one-step** only. Packaged columns are **analysis IC hours** "
+        "(00Z / 06Z / 12Z / 18Z for a 00Z campaign) — not autoregressive lead times. "
+        "Headline = **00Z**; pathology = **06Z** cold bias."
+    )
     if expanded:
         st.success(
             f"Production expanded results loaded — "
@@ -875,7 +889,7 @@ def _render_trackb_tab() -> None:
         df = _expanded_t2m_long(expanded)
     elif held:
         st.info(
-            "Showing Jan-2023 held-out v5 (AF +6h/+24h). "
+            "Showing Jan-2023 held-out v5 (AF 00Z / 18Z IC one-step). "
             "Multi-season `TRACKB_T2M_EXPANDED.json` not written yet."
         )
         df = _held_out_student_long(held)
@@ -945,10 +959,10 @@ def _render_trackb_tab() -> None:
     # Spatial error maps from campaign figures
     fig_dir = REPORTS / "figures"
     map_files = [
-        ("+6h RMSE", fig_dir / "trackb_t2m_v5_rmse_L006h.png"),
-        ("+6h bias", fig_dir / "trackb_t2m_v5_bias_L006h.png"),
-        ("+24h RMSE", fig_dir / "trackb_t2m_v5_rmse_L024h.png"),
-        ("+24h bias", fig_dir / "trackb_t2m_v5_bias_L024h.png"),
+        ("00Z RMSE", fig_dir / "trackb_t2m_v5_rmse_L006h.png"),
+        ("00Z bias", fig_dir / "trackb_t2m_v5_bias_L006h.png"),
+        ("18Z RMSE", fig_dir / "trackb_t2m_v5_rmse_L024h.png"),
+        ("18Z bias", fig_dir / "trackb_t2m_v5_bias_L024h.png"),
     ]
     present = [(title, p) for title, p in map_files if p.is_file()]
     if present:
@@ -1017,12 +1031,12 @@ def _render_laptop_tab() -> None:
     st.divider()
     st.subheader("Explainability (Fig. 11)")
     st.caption(
-        "Gradient saliency: what input channels drive African 2t, plus why +12 h fails. "
+        "Gradient saliency: what input channels drive African 2t, plus 06Z-IC one-step pathology. "
         "See reports/MVULA_XAI_ATTRIBUTION.md"
     )
     xai = REPORTS / "figures" / "mvula_fig11_t2m_xai_attribution.png"
     if xai.is_file():
-        st.image(str(xai), caption="Fig. 11 — channel attribution + +12 h failure panel", use_container_width=True)
+        st.image(str(xai), caption="Fig. 11 — channel attribution + 06Z-IC pathology", use_container_width=True)
     else:
         st.info("Generate with: `python scripts/plot_mvula_xai_attribution.py`")
     xai_md = _load_text("MVULA_XAI_ATTRIBUTION.md")
@@ -1041,7 +1055,7 @@ def main() -> None:
     expanded_ready = (REPORTS / "TRACKB_T2M_EXPANDED.json").is_file()
 
     st.title("Mvula / LapAI-Forecast — project status")
-    st.caption("Code for Earth · African Stream · dual close-out: AF t2m skill + laptop demo (→ 23 Sep 2026)")
+    st.caption("Code for Earth · African Stream · dual close-out: AF one-step t2m (00Z headline) + laptop demo")
 
     if LOGO.is_file():
         h1, h2 = st.columns([2, 3])
@@ -1051,14 +1065,16 @@ def main() -> None:
             st.markdown(
                 "**Mvula** — Compressing ECMWF’s AIFS for Edge Deployment.\n\n"
                 "Code for Earth 2026 · African Stream · freeze **v5**: "
-                "analysis-forced African **t2m** · ~8.8 MiB student · CPU inference."
+                "analysis-forced **one-step** African **t2m** (headline **00Z** IC) · "
+                "~8.8 MiB student · CPU inference · no free-run / AR."
             )
     else:
         st.caption("Banner missing — expected at `docs/branding/mvula_banner.jpg`.")
 
     st.info(
-        "Freeze **v5** as the Code for Earth student artefact: analysis-forced **t2m** skill vs K1, "
-        "plus CPU size/speed evidence. **No** free-running 10-day claim from Cout=3."
+        "Freeze **v5** as the Code for Earth student artefact: analysis-forced **one-step** "
+        "**t2m** (headline **00Z** IC; **06Z** cold-bias pathology documented) vs K1, "
+        "plus CPU size/speed evidence. **No** free-running / AR 10-day claim from Cout=3."
     )
 
     c1, c2, c3, c4, c5 = st.columns(5)
@@ -1328,7 +1344,7 @@ def main() -> None:
         st.markdown("**Run locally**")
         st.code("streamlit run streamlit_status.py", language="bash")
         st.caption(f"Repo: `{REPO}`")
-        st.caption("Close-out: freeze v5 · AF t2m · laptop demo · no free-run claim")
+        st.caption("Close-out: freeze v5 · AF one-step t2m (00Z headline) · laptop demo · no free-run / AR claim")
 
 
 if __name__ == "__main__":

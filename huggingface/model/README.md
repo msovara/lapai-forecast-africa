@@ -29,21 +29,23 @@ It is **not** a free-running 10-day global NWP emulator and **not** an operation
 
 | Supported | Not supported / not claimed |
 |-----------|-----------------------------|
-| Cin=65 → Cout=3 (`tp`, `msl`, `2t`) | Autonomous free-run / 10-day rollout |
-| Analysis-forced African **t2m** skill (+6…+24 h packaged) | Full multi-variable Week-9 free-run table |
+| Cin=65 → Cout=3 (`tp`, `msl`, `2t`) | Autonomous free-run / autoregressive / 10-day rollout |
+| Analysis-forced **one-step** African **t2m** (headline = **00Z** IC) | Full multi-variable Week-9 free-run table |
 | CPU inference (~2.5 s / +6 h step on i7-11800H) | Finished ONNX / INT8 product (optional later) |
-| Open eval artefacts in the GitHub repo | LoRA / ENACTS country adapters |
+| Open eval artefacts in the GitHub repo | LoRA / ENACTS country adapters · smartphone-ready |
 
 **Precipitation (`tp`)** for this head failed (dry-collapse) and is **out of scope**.
 
-## Packaged skill (Africa, 61 inits × 2023)
+## Packaged skill (Africa, 61 × 00Z inits, 2023)
 
-| Lead | RMSE (°C) | ACC | Bias (°C) |
-|-----:|----------:|----:|----------:|
-| +6 h | 1.38 | 0.97 | −0.12 |
-| +12 h | 7.80 | 0.45 | −5.33 (systematic cold) |
-| +18 h | 4.38 | 0.75 | −1.12 |
-| +24 h | 3.23 | 0.84 | +1.30 |
+Analysis-forced **one-step** only. Table columns are **analysis IC hours** (00Z campaign), not AR lead times.
+
+| Analysis IC | RMSE (°C) | ACC | Bias (°C) |
+|-------------|----------:|----:|----------:|
+| **00Z** (headline) | 1.38 | 0.97 | −0.12 |
+| 06Z | 7.80 | 0.45 | −5.33 (systematic cold) |
+| 12Z | 4.38 | 0.75 | −1.12 |
+| 18Z | 3.23 | 0.84 | +1.30 |
 
 Full tables, maps, and draft paper: see the GitHub `reports/` folder (including `DRAFT_PAPER_MVULA_V5.pdf`).
 
