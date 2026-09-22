@@ -923,7 +923,7 @@ def _render_trackb_tab() -> None:
                 _skill_matrix_heatmap(
                     heat_src,
                     value_col="student_rmse",
-                    title="t2m RMSE skill matrix (season × lead)",
+                    title="t2m RMSE skill matrix (season × analysis IC hour)",
                 ),
                 use_container_width=True,
             )
@@ -944,7 +944,10 @@ def _render_trackb_tab() -> None:
         ]
         if "lead_h" in overall.columns and metric_cols:
             summary = overall.groupby("lead_h", as_index=False)[metric_cols].mean(numeric_only=True)
+            summary.insert(0, "Analysis IC", summary["lead_h"].map(_lead_h_to_ic_label))
+            summary = summary.drop(columns=["lead_h"])
             st.markdown("**IC-hour skill table (mean)**")
+            st.caption("Analysis IC hour (one-step AF) — not autoregressive lead time")
             st.dataframe(summary.round(3), use_container_width=True, hide_index=True)
 
         if "variable" in df.columns:
