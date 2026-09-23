@@ -25,8 +25,6 @@ Canonical repo: [github.com/msovara/lapai-forecast-africa](https://github.com/ms
 | **Skill** | Analysis-forced **one-step** African **t2m** (61 × 00Z inits, 2023). Headline = **00Z IC** → native +6 h step |
 | **Not claimed** | Free-run / autoregressive / 10-day forecast; Cout=65 full-state student; **tp** skill; smartphone-ready |
 
-Full claim boundary and proposal-vs-delivered: FINAL_REPORT §2–4. Presentation framing: [`reports/MVULA_PRESENTATION_SLIDES.md`](reports/MVULA_PRESENTATION_SLIDES.md).
-
 | Achieves | Limitations |
 |----------|-------------|
 | ~6× smaller than K1; laptop CPU inference | IC fetch/build not in that timing |
