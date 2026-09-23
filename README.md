@@ -32,8 +32,6 @@ Canonical repo: [github.com/msovara/lapai-forecast-africa](https://github.com/ms
 | Open eval package + Streamlit + Hugging Face model/demo | **No** autonomous multi-day / AR rollout (Case A Cout=3) |
 | Honest Case A docs | **tp** failed / out of scope |
 
-**Protocol note:** Packaged “6/12/18/24 h” columns are **analysis IC hours** (00/06/12/18Z) under AF one-step — not autoregressive lead times. True AR needs predicted full state + forcings.
-
 ## Run locally (no HPC/GPU required)
 
 | User | Path |
